@@ -1,0 +1,110 @@
+{
+  "date": "2026-10-23",
+  "project": "ReMem-SkillOpt",
+  "repository": "https://github.com/Asterlyra/ReMem-SkillOpt",
+  "visibility_at_creation": "private",
+  "upstream": {
+    "url": "https://github.com/microsoft/SkillOpt",
+    "commit": "1a44050fc53aa4938a7a3927b6cca550491bfe51",
+    "commit_date": "2026-10-18T17:03:51+00:00",
+    "readme_sha256": "5b0c7c6ec582121a9f46c9dbb98247eeea1f4816b45125aeb643fcd96a8077e6",
+    "readme_hash_normalization": "UTF-8 with universal-newline LF",
+    "license": "MIT; Microsoft copyright preserved"
+  },
+  "cam_reference": {
+    "url": "https://github.com/Lutra11/CAM-SkillOpt",
+    "local_readonly_path": "E:\\Programs\\CAM\\CAM-SkillOpt",
+    "local_head": "016e7efbcec168b25b0e3032c125e6e3a3f8a284",
+    "dirty_worktree": true,
+    "warning": "Local hashes identify inspected files; public repo/local HEAD alone do not reproduce them. No CAM algorithm files copied during bootstrap.",
+    "files": [
+      {
+        "path": "skillopt/cam/bootstrap_gate.py",
+        "exists_at_handoff": true,
+        "sha256_raw_bytes": "7b532902b290a9bd0c713f539277ff08ce0b28d41121724eee3f55dcd20125ed"
+      },
+      {
+        "path": "skillopt/cam/selection_guard.py",
+        "exists_at_handoff": true,
+        "sha256_raw_bytes": "d130d4805a9b49f85a40fe9cb924102b57d79e382901bb4a7d12f635f5f4cf2e"
+      },
+      {
+        "path": "skillopt/cam/adaptive_budget.py",
+        "exists_at_handoff": true,
+        "sha256_raw_bytes": "ca667cbfc5ef604c31abc41350fb8c0e34e7b65a25aa466b1197edec8cd70cc8"
+      },
+      {
+        "path": "skillopt/cam/rejected_memory.py",
+        "exists_at_handoff": true,
+        "sha256_raw_bytes": "fa46beecf73d9056ad6347441bb7412137a4d6511addc6fd90c4e51eae4167eb"
+      },
+      {
+        "path": "skillopt/cam/memory_context.py",
+        "exists_at_handoff": true,
+        "sha256_raw_bytes": "7a45fb09d0f7a36136fd53c6b4a30e53daeb669e8438271df7272f28fe7c0c01"
+      },
+      {
+        "path": "skillopt/model/azure_openai.py",
+        "exists_at_handoff": true,
+        "sha256_raw_bytes": "518c3ec098d48aa636d6e8c1067693a355888dd45d8a2f989283f2ccd17b1bcf"
+      },
+      {
+        "path": "skillopt/engine/trainer.py",
+        "exists_at_handoff": true,
+        "sha256_raw_bytes": "e7b794c4a02fb8870c19da42c0869aa657f6832585b4d1bade115b9c588ca5c8"
+      },
+      {
+        "path": "skillopt/gradient/reflect.py",
+        "exists_at_handoff": true,
+        "sha256_raw_bytes": "4e9e14573c60a6b55d48e79f0338bd38624c3bd1f2f862c353a123a472ed44c1"
+      },
+      {
+        "path": "docs/experiments/CAM_V3_IMPROVEMENTS.md",
+        "exists_at_handoff": true,
+        "sha256_raw_bytes": "ecc1b7ff8e20b9bec0ddedda329f58b3cf55e977151b658b87e6863ca4815c36"
+      },
+      {
+        "path": "docs/experiments/ZGCI_MODEL_HUB_API.md",
+        "exists_at_handoff": true,
+        "sha256_raw_bytes": "dd4d2a5f7e23f5d0e695e5aef36f2c73b3472cc1d6067f2da0a9d6c8e526615c"
+      },
+      {
+        "path": "docs/experiments/CAM_SKILLOPT_ZGCI_EXPERIMENT_PLAN.md",
+        "exists_at_handoff": true,
+        "sha256_raw_bytes": "4c1838cc7ff7f86791ac54e0737093e6d4a31c5738fcea49cc8771d8e975bdb5"
+      },
+      {
+        "path": "configs/experiments/zgci_cam_matrix.yaml",
+        "exists_at_handoff": true,
+        "sha256_raw_bytes": "8af6b3ce91b93c32230f7f663b026ed40e4df1c39f600b007c5a510dd8c64c1d"
+      },
+      {
+        "path": "reports/continuous_adaptation_v3/FINAL_SUMMARY.md",
+        "exists_at_handoff": true,
+        "sha256_raw_bytes": "0533632389d5c2e8fbadeed051f356fc7f69c00946d302b15d5519ef095e50fd"
+      },
+      {
+        "path": "reports/continuous_adaptation_v3/report.md",
+        "exists_at_handoff": true,
+        "sha256_raw_bytes": "8a52779623885bab58b256f3e2840dc94ecd5bda12630ac0e169b1e243c20de0"
+      },
+      {
+        "path": "reports/cam_v3r1_runtime_diagnostics/DIAGNOSIS.md",
+        "exists_at_handoff": true,
+        "sha256_raw_bytes": "46f575e6902b99a5bbb8318ab6fada6fe0ee3cc204791ce0438c5794c093a8f0"
+      },
+      {
+        "path": "reports/cam_v3r1_runtime_diagnostics/REPAIR_REPORT.md",
+        "exists_at_handoff": true,
+        "sha256_raw_bytes": "43acac86e94b5c4c401db3d2c182368f37e9af406755ddc37687df79f5605100"
+      }
+    ]
+  },
+  "handoff_scope": {
+    "fresh_upstream_clone": true,
+    "algorithm_implementation": false,
+    "model_api_calls": 0,
+    "formal_experiment_runs": 0,
+    "credentials_copied": false
+  }
+}
