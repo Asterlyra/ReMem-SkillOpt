@@ -1,0 +1,4 @@
+# Preparation and offline development; exact tested versions are recorded separately.
+-e .[dev]
+pandas>=2.2
+json-repair>=0.61.0
