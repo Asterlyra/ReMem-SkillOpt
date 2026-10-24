@@ -37,10 +37,10 @@
 
 ## 当前能做什么
 
-可以运行离线测试、重新验证数据、准备并验证开发版核心 12 格配置。使用 `scripts/remem/python.ps1` 固定项目解释器与 UTF-8。具体命令见框架文档；正式 18/21 格、外部对照、模型探活与最终测试发布尚未完成，不能直接套用旧 CAM 命令。
+可以运行离线测试、重新验证数据、准备并验证开发版核心 12 格及原生 SkillOpt 对照 3 格配置。使用 `scripts/remem/python.ps1` 固定项目解释器与 UTF-8。DeepSeek 小样本探活与旧结果暴露审计见 [预实验报告](research/remem/PREFLIGHT_REPORT.md)；CAM/AtomSearch 对照、正式 18/21 格与最终测试发布尚未完成，不能直接套用旧 CAM 命令。
 
 在仓库根目录执行 `python scripts/remem/validate_handoff.py` 可检查交接文件、研究矩阵和凭据模板；该检查不调用模型。
 
-环境密钥模板位于 [research/remem/model.env.example](research/remem/model.env.example)，没有任何真实密钥。历史模型档案不代表当前网关已再次探活。
+环境密钥模板位于 [research/remem/model.env.example](research/remem/model.env.example)，没有任何真实密钥。旧网关档案不代表当前可用；DeepSeek 开发路径已独立探活。
 
 初始交接记录：[BOOTSTRAP_REPORT.md](research/remem/BOOTSTRAP_REPORT.md)。当前实现记录：[FOUNDATION_REPORT.md](research/remem/FOUNDATION_REPORT.md)。

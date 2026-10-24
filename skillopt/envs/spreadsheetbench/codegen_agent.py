@@ -394,14 +394,17 @@ def _chat_call(
                 system = m["content"]
             else:
                 api_input.append({"role": m["role"], "content": m["content"]})
-        resp = _llm_call_with_retry(lambda timeout: client.responses.create(
-            model=deployment,
-                instructions=system,
-                input=api_input,
-                max_output_tokens=max_output_tokens,
-                **({"reasoning": {"effort": reasoning_effort}} if reasoning_effort else {}),
-                timeout=timeout,
-            ), timeout=llm_timeout)
+        from skillopt.remem.transport_audit import audited_call, record_usage
+        with audited_call("rollout"):
+            resp = _llm_call_with_retry(lambda timeout: client.responses.create(
+                model=deployment,
+                    instructions=system,
+                    input=api_input,
+                    max_output_tokens=max_output_tokens,
+                    **({"reasoning": {"effort": reasoning_effort}} if reasoning_effort else {}),
+                    timeout=timeout,
+                ), timeout=llm_timeout)
+            record_usage("target", "rollout", resp)
         if hasattr(resp, "usage") and resp.usage:
             tracker.record(
                 "rollout",
@@ -425,10 +428,13 @@ def _chat_call(
         }
         if reasoning_effort is not None:
             kwargs["reasoning_effort"] = reasoning_effort
-        resp = _llm_call_with_retry(lambda timeout: client.chat.completions.create(
-            **kwargs,
-            timeout=timeout,
-        ), timeout=llm_timeout)
+        from skillopt.remem.transport_audit import audited_call, record_usage
+        with audited_call("rollout"):
+            resp = _llm_call_with_retry(lambda timeout: client.chat.completions.create(
+                **kwargs,
+                timeout=timeout,
+            ), timeout=llm_timeout)
+            record_usage("target", "rollout", resp)
         if resp.usage:
             tracker.record(
                 "rollout",

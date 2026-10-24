@@ -1,0 +1,12 @@
+{
+  "scope": "exact_cross_split_duplicate_screen",
+  "runtime": "data\\spreadsheetbench_remem_400",
+  "tasks_missing_initial_books": 0,
+  "distinct_initial_book_hashes": 400,
+  "cross_split_identical_books": 0,
+  "cross_split_identical_instructions": 0,
+  "test_to_train_val_max_token_jaccard": 0.3448,
+  "test_items_with_token_jaccard_ge_0_8": 0,
+  "source_template_group_status": "unknown",
+  "limit": "Exact equality cannot rule out related source workbooks or templates with changed cells or wording."
+}

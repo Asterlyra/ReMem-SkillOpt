@@ -1,20 +1,23 @@
 {
   "schema_version": 1,
   "status": "draft_not_executable_not_frozen",
-  "date": "2026-10-23",
+  "date": "2026-10-24",
   "project": "ReMem-SkillOpt",
   "modules": {
     "R": {"name": "evidence_guided_controlled_repair", "includes": ["A_evidence_guided_repair", "D_evidence_constrained_edit_budget"]},
     "M": {"name": "persistent_failure_and_repair_memory", "includes": ["B_independent_failure_ledger", "C_repair_history"]}
   },
-  "models": {"target_alias": "qwen", "optimizer_alias": "glm", "registry_status": "historical_requires_preflight", "backend_candidate": "openai_chat", "auth_mode": "openai_compatible"},
+  "models": {"target_alias": "qwen", "optimizer_alias": "glm", "registry_status": "historical_gateway_unavailable", "backend_candidate": "openai_chat", "auth_mode": "openai_compatible", "development_fallback": {"request_alias": "deepseek-flash", "documented_version": "DeepSeek-V4.1-Flash-1017", "roles": ["target", "optimizer"], "preflight": "small_sample_passed_not_formal"}},
   "data": {
     "benchmark": "SpreadsheetBench",
     "train_unique": 80,
     "selection_unique": 40,
     "test_unique": 120,
     "historical_test_pool": 280,
-    "historical_exposure_audit_required": true,
+    "historical_test_pool_status": "all_280_ids_seen_in_old_CAM_results",
+    "fresh_test_candidate": "120_ids_from_unverified_original_912_not_seen_in_old_results",
+    "fresh_test_quality_status": "workbooks_readable_exact_duplicates_clear_source_templates_unverified",
+    "historical_exposure_audit_required": false,
     "freeze_task_ids_before_run": true,
     "source_group_leakage_audit_required": true
   },
@@ -71,5 +74,5 @@
   "primary_comparison": ["remem_full", "core_00"],
   "secondary_comparisons": [["remem_full", "repair_only"], ["remem_full", "memory_only"]],
   "metrics": ["final_test_success_rate", "fixed_revisit_repair_rate", "fixed_revisit_regression_rate", "failure_capture_coverage", "repeated_ineffective_repair_rate", "task_executions", "http_attempts", "tokens_and_coverage", "wall_time", "skill_length"],
-  "implementation_status": {"R": "implemented_offline_core", "M": "implemented_offline_task_match", "study_runner": "development_core_only", "external_controls": "planned", "transport_accounting": "planned", "model_preflight": "not_run", "formal_experiments": "not_run"}
+  "implementation_status": {"R": "implemented_offline_core", "M": "implemented_offline_task_match", "study_runner": "development_core_plus_skillopt_control", "external_controls": {"skillopt_controlled": "implemented_offline", "cam_reference": "planned", "atomsearch_budgeted": "planned_no_official_code_found"}, "transport_accounting": "implemented_for_openai_compatible_development_runs", "model_preflight": "deepseek_small_sample_passed", "formal_experiments": "not_run"}
 }

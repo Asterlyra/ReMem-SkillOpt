@@ -8,6 +8,7 @@ from __future__ import annotations
 import copy
 import importlib.metadata
 import json
+import os
 import platform
 import random
 import re
@@ -78,37 +79,53 @@ def source_files(root: Path) -> list[Path]:
     return sorted(files)
 
 
-def prepare(study_id: str, *, root: Path = ROOT) -> Path:
+def prepare(study_id: str, *, root: Path = ROOT, config_path: Path | None = None,
+            data_manifest_path: Path | None = None, include_skillopt_controlled: bool = False) -> Path:
     if not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}", study_id):
         raise ValueError("Invalid study ID")
     directory = root / "outputs/remem" / study_id
     if directory.exists():
         raise FileExistsError("Study already exists; choose a new version")
-    data_path = root / "data/remem_data_manifest.json"
+    config_source = (config_path or root / "configs/remem/core.yaml").resolve()
+    data_path = (data_manifest_path or root / "data/remem_data_manifest.json").resolve()
+    if not config_source.is_relative_to(root.resolve()) or not data_path.is_relative_to(root.resolve()):
+        raise ValueError("Study inputs must be inside the repository")
+    base = flatten_config(load_config(str(config_source)))
     data = json.loads(data_path.read_text(encoding="utf-8"))
-    train = json.loads((root / "data/spreadsheetbench_split/train/items.json").read_text(encoding="utf-8"))
-    selection = json.loads((root / "data/spreadsheetbench_split/val/items.json").read_text(encoding="utf-8"))
+    split_root = (root / base["split_dir"]).resolve()
+    train = json.loads((split_root / "train/items.json").read_text(encoding="utf-8"))
+    selection = json.loads((split_root / "val/items.json").read_text(encoding="utf-8"))
+    test = json.loads((split_root / "test/items.json").read_text(encoding="utf-8"))
     if len(train) != 80 or len(selection) != 40:
         raise ValueError("Unexpected development split sizes")
-    if {str(r["id"]) for r in train} & {str(r["id"]) for r in selection}:
-        raise ValueError("Overlapping train and selection IDs")
-    base = flatten_config(load_config(str(root / "configs/remem/core.yaml")))
+    identities = [{str(r["id"]) for r in rows} for rows in (train, selection, test)]
+    if any(len(identity) != len(rows) for identity, rows in zip(identities, (train, selection, test))) or any(
+            identities[i] & identities[j] for i, j in ((0, 1), (0, 2), (1, 2))):
+        raise ValueError("Duplicate or overlapping train, selection, and test IDs")
+    if base["data_root"] != data["runtime_data_root"] or "runtime_files" not in data:
+        raise ValueError("Study config and data manifest differ")
     directory.mkdir(parents=True)
     config_hashes = {}
     order = []
     for seed in (42, 43, 44):
         schedule = task_plan(train, seed)
         arms = list(CORE_ARMS)
+        if include_skillopt_controlled:
+            arms.append("skillopt_controlled")
         random.Random(seed + 10000).shuffle(arms)
         for arm in arms:
-            repair, memory = CORE_ARMS[arm]
             name = f"{arm}_{seed}"
             cfg = copy.deepcopy(base)
             cfg.update(seed=seed, out_root=str(directory / "runs" / name))
             for key in ("skill_init", "data_root", "split_dir"):
                 cfg[key] = str((root / cfg[key]).resolve())
-            cfg["remem"].update(repair=repair, memory=memory, run_id=f"{study_id}:{name}", task_schedule=schedule)
-            ReMemConfig.parse(cfg)
+            if arm == "skillopt_controlled":
+                cfg.pop("remem")
+                cfg.update(train_size=120, control_task_schedule=schedule, control_kind="skillopt_controlled")
+            else:
+                repair, memory = CORE_ARMS[arm]
+                cfg["remem"].update(repair=repair, memory=memory, run_id=f"{study_id}:{name}", task_schedule=schedule)
+                ReMemConfig.parse(cfg)
             config_path = directory / "configs" / f"{name}.json"
             write_json(config_path, cfg)
             config_hashes[config_path.relative_to(directory).as_posix()] = file_hash(config_path)
@@ -121,17 +138,23 @@ def prepare(study_id: str, *, root: Path = ROOT) -> Path:
         dest.write_bytes(path.read_bytes())
         snapshot[relative.as_posix()] = file_hash(dest)
     manifest = {
-        "schema_version": 1, "study_id": study_id, "scope": "development_core_only", "formal_ready": False,
+        "schema_version": 1, "study_id": study_id,
+        "scope": "development_core_plus_native_control" if include_skillopt_controlled else "development_core_only",
+        "formal_ready": False,
         "git_head": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
         "git_dirty": bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=root, text=True).strip()),
         "source": snapshot, "configs": config_hashes, "environment": environment(),
+        "config_template": config_source.relative_to(root).as_posix(),
+        "data_manifest_path": data_path.relative_to(root).as_posix(),
         "data_manifest_hash": file_hash(data_path), "data_root": data["runtime_data_root"],
         "data_files": data["runtime_files"], "run_order": order,
-        "split_hashes": {s: file_hash(root / "data/spreadsheetbench_split" / s / "items.json") for s in ("train", "val", "test")},
+        "split_dir": split_root.relative_to(root).as_posix(),
+        "split_hashes": {s: file_hash(split_root / s / "items.json") for s in ("train", "val", "test")},
         "formal_blockers": ["model_identity_cost_throughput_preflight", "historical_test_exposure_audit",
                             "source_template_group_audit", "transport_attempt_usage_accounting",
                             "external_control_implementations", "final_test_release_protocol"],
-        "external_arms": {k: "planned" for k in ("skillopt_controlled", "cam_reference", "atomsearch_budgeted")},
+        "external_arms": {"skillopt_controlled": "implemented_development" if include_skillopt_controlled else "planned",
+                          "cam_reference": "planned", "atomsearch_budgeted": "planned"},
     }
     write_json(directory / "freeze.json", manifest)
     (directory / "freeze.sha256").write_text(file_hash(directory / "freeze.json") + "\n", encoding="ascii")
@@ -150,10 +173,15 @@ def verify(directory: Path, *, root: Path = ROOT) -> dict:
     for path, expected in freeze["configs"].items():
         if file_hash(directory / path) != expected:
             raise ValueError("Frozen config changed")
-        ReMemConfig.parse(json.loads((directory / path).read_text(encoding="utf-8")))
+        config = json.loads((directory / path).read_text(encoding="utf-8"))
+        if config.get("control_kind") == "skillopt_controlled":
+            if len(config.get("control_task_schedule", [])) != 6 or config.get("eval_test"):
+                raise ValueError("Invalid SkillOpt control config")
+        else:
+            ReMemConfig.parse(config)
     if environment() != freeze["environment"]:
         raise ValueError("Python environment differs from frozen versions")
-    if file_hash(root / "data/remem_data_manifest.json") != freeze["data_manifest_hash"]:
+    if file_hash(root / freeze.get("data_manifest_path", "data/remem_data_manifest.json")) != freeze["data_manifest_hash"]:
         raise ValueError("Data manifest changed")
     runtime_root = root / freeze["data_root"]
     if {p.relative_to(runtime_root).as_posix() for p in runtime_root.rglob("*") if p.is_file()} != set(freeze["data_files"]):
@@ -162,13 +190,15 @@ def verify(directory: Path, *, root: Path = ROOT) -> dict:
         if file_hash(root / freeze["data_root"] / path) != expected:
             raise ValueError("Data payload changed")
     for split, expected in freeze["split_hashes"].items():
-        if file_hash(root / "data/spreadsheetbench_split" / split / "items.json") != expected:
+        if file_hash(root / freeze.get("split_dir", "data/spreadsheetbench_split") / split / "items.json") != expected:
             raise ValueError("Task split changed")
     return {"status": "passed", "scope": freeze["scope"], "formal_ready": False,
-            "core_runs": len(freeze["run_order"]), "formal_blockers": freeze["formal_blockers"]}
+            "core_runs": sum(not name.startswith("skillopt_controlled_") for name in freeze["run_order"]),
+            "external_runs": sum(name.startswith("skillopt_controlled_") for name in freeze["run_order"]),
+            "formal_blockers": freeze["formal_blockers"]}
 
 
-def run(directory: Path, name: str, *, execute: bool = False) -> dict:
+def run(directory: Path, name: str, *, execute: bool = False, key_file: Path | None = None) -> dict:
     verification = verify(directory)
     freeze = json.loads((directory / "freeze.json").read_text(encoding="utf-8"))
     if name not in freeze["run_order"]:
@@ -181,8 +211,38 @@ def run(directory: Path, name: str, *, execute: bool = False) -> dict:
     # Explicit --execute starts real development calls; never a formal claim.
     from scripts.train import get_adapter
     from skillopt.engine.trainer import ReflACTTrainer
-
-    return ReflACTTrainer(cfg, get_adapter(cfg)).train()
+    env_keys = ("OPTIMIZER_AZURE_OPENAI_API_KEY", "TARGET_AZURE_OPENAI_API_KEY", "REMEM_TRANSPORT_AUDIT_PATH")
+    previous = {key: os.environ.get(key) for key in env_keys}
+    try:
+        if key_file is not None:
+            key_file = key_file.resolve()
+            if not key_file.is_relative_to(ROOT) or subprocess.run(
+                    ["git", "check-ignore", "-q", "--", str(key_file)], cwd=ROOT, check=False).returncode != 0:
+                raise ValueError("DeepSeek key file must be Git-ignored inside this repository")
+            if (cfg.get("optimizer_model") != "deepseek-flash" or cfg.get("target_model") != "deepseek-flash"
+                    or cfg.get("optimizer_azure_openai_endpoint") != "https://api.deepseek.com"
+                    or cfg.get("target_azure_openai_endpoint") != "https://api.deepseek.com"):
+                raise ValueError("Local DeepSeek key file requires the pinned DeepSeek profile")
+            entries = dict(line.split("=", 1) for line in key_file.read_text(encoding="utf-8").splitlines()
+                           if line and not line.startswith("#") and "=" in line)
+            key = entries.get("DEEPSEEK_API_KEY", "")
+            if not key:
+                raise ValueError("Local DeepSeek API key missing")
+            os.environ["OPTIMIZER_AZURE_OPENAI_API_KEY"] = key
+            os.environ["TARGET_AZURE_OPENAI_API_KEY"] = key
+        os.environ["REMEM_TRANSPORT_AUDIT_PATH"] = str((directory / "runs" / name / "remem/transport.jsonl").resolve())
+        adapter = get_adapter(cfg)
+        if cfg.get("control_kind") == "skillopt_controlled":
+            from .controls import BudgetedControlAdapter, bind_native_control
+            bind_native_control(adapter, cfg["control_task_schedule"], cfg["seed"])
+            adapter = BudgetedControlAdapter(adapter, Path(cfg["out_root"]))
+        return ReflACTTrainer(cfg, adapter).train()
+    finally:
+        for key, value in previous.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
 
 
 def report(directory: Path) -> dict:
@@ -192,17 +252,35 @@ def report(directory: Path) -> dict:
     for name in freeze["run_order"]:
         folder = directory / "runs" / name
         summary_path, ledger = folder / "summary.json", folder / "remem/ledger.sqlite3"
-        row = {"run": name, "status": "not_started", "task_executions": None, "http_attempts": None, "tokens": None}
+        row = {"run": name, "status": "not_started", "task_executions": None,
+               "http_attempts": None, "retry_attempts": None, "cache_hits": None, "tokens": None}
+        audit_file = folder / "remem/transport.jsonl"
+        if audit_file.exists():
+            from .transport_audit import summarize
+            audit = summarize(audit_file)
+            row["http_attempts"] = audit["http_attempts"]
+            row["retry_attempts"] = audit["retry_attempts"]
+            row["http_elapsed_s_sum"] = audit["http_elapsed_s_sum"]
+            row["tokens"] = ({"prompt": audit["prompt_tokens"], "completion": audit["completion_tokens"],
+                              "cached_prompt": audit["cached_prompt_tokens"]} if audit["usage_complete"] else None)
+            row["usage_complete"] = audit["usage_complete"]
         if ledger.exists():
             uri = ledger.resolve().as_uri() + "?mode=ro"
             with sqlite3.connect(uri, uri=True) as db:
                 records = [(kind, json.loads(body)) for kind, body in db.execute("SELECT kind,payload FROM records")]
             row["status"] = "incomplete"
             row["task_executions"] = sum(p["tasks"] for k, p in records if k == "rollout_started")
+            row["cache_hits"] = sum(k == "cache_hit" for k, _ in records)
             row["task_failures"] = sum(k == "observation" and p["outcome"] == "failure" for k, p in records)
             row["infra_failures"] = sum(k in {"infra_failure", "optimizer_error"} for k, p in records)
             row["no_change"] = sum(k == "attempt" and p["gate_action"] == "no_change" for k, p in records)
             row["proposal_invalid"] = sum(k == "proposal_invalid" or (k == "proposal_result" and p["status"] == "proposal_invalid") for k, p in records)
+        control_journal = folder / "remem/control_rollouts.jsonl"
+        if control_journal.exists():
+            entries = [json.loads(line) for line in control_journal.read_text(encoding="utf-8").splitlines() if line]
+            row["status"] = "incomplete"
+            row["task_executions"] = sum(entry["tasks"] for entry in entries if entry["kind"] == "start")
+            row["cache_hits"] = sum(entry["kind"] == "cache" for entry in entries)
         if summary_path.exists():
             summary = json.loads(summary_path.read_text(encoding="utf-8"))
             row.update(status="development_completed", selection_score=summary["best_selection_hard"],

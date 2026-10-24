@@ -1,0 +1,17 @@
+# Development-only DeepSeek profile. The API key stays in .env.deepseek.local.
+_base_: core.yaml
+model:
+  optimizer: deepseek-flash
+  target: deepseek-flash
+  optimizer_backend: openai_chat
+  target_backend: openai_chat
+  optimizer_azure_openai_endpoint: https://api.deepseek.com
+  target_azure_openai_endpoint: https://api.deepseek.com
+  optimizer_azure_openai_auth_mode: openai_compatible
+  target_azure_openai_auth_mode: openai_compatible
+gradient:
+  analyst_workers: 2
+env:
+  data_root: data/spreadsheetbench_fresh_240_runtime
+  split_dir: data/spreadsheetbench_fresh_split
+  workers: 2

@@ -10,6 +10,7 @@ import os
 import subprocess
 import threading
 import time
+import uuid
 from types import SimpleNamespace
 from typing import Any
 from openai import AzureOpenAI, OpenAI
@@ -293,10 +294,13 @@ def _make_client(role: str) -> AzureOpenAI | OpenAI:
         )
     auth_mode = cfg["auth_mode"]
     if auth_mode in {"openai_compatible", "compat", "openai"}:
+        from skillopt.remem.transport_audit import client_options
+
         return OpenAI(
             base_url=cfg["endpoint"].rstrip("/"),
             api_key=cfg["api_key"] or "dummy",
             default_headers={"User-Agent": "SkillOpt"},
+            **client_options(role),
         )
     if auth_mode in {"api_key", "key"}:
         if not cfg["api_key"]:
@@ -363,11 +367,14 @@ def _chat_impl(
     stage: str,
     reasoning_effort: str | None = None,
     timeout: int | None = None,
+    *,
+    role: str = "optimizer",
 ) -> tuple[str, dict]:
     """Call LLM, track tokens, return (text, usage_dict)."""
     last_err = None
     usage_info = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 
+    audit_identity = uuid.uuid4().hex
     for attempt in range(retries):
         try:
             if _needs_responses_api(deployment):
@@ -382,7 +389,10 @@ def _chat_impl(
                     kwargs["reasoning"] = {"effort": actual_effort}
                 if timeout is not None:
                     kwargs["timeout"] = timeout
-                resp = client.responses.create(**kwargs)
+                from skillopt.remem.transport_audit import audited_call, record_usage
+                with audited_call(stage, audit_identity):
+                    resp = client.responses.create(**kwargs)
+                    record_usage(role, stage, resp)
                 text = getattr(resp, "output_text", None) or ""
                 if not text:
                     for item in getattr(resp, "output", None) or []:
@@ -412,7 +422,10 @@ def _chat_impl(
                     kwargs["reasoning_effort"] = actual_effort
                 if timeout is not None:
                     kwargs["timeout"] = timeout
-                resp = client.chat.completions.create(**kwargs)
+                from skillopt.remem.transport_audit import audited_call, record_usage
+                with audited_call(stage, audit_identity):
+                    resp = client.chat.completions.create(**kwargs)
+                    record_usage(role, stage, resp)
                 text = resp.choices[0].message.content or ""
                 if resp.usage:
                     usage_info = {
@@ -449,11 +462,13 @@ def _chat_messages_impl(
     tool_choice: str | dict[str, Any] | None = None,
     return_message: bool = False,
     timeout: int | None = None,
+    role: str = "optimizer",
 ) -> tuple[Any, dict]:
     """Call the model with a pre-built message list."""
     last_err = None
     usage_info = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 
+    audit_identity = uuid.uuid4().hex
     for attempt in range(retries):
         try:
             if _needs_responses_api(deployment):
@@ -474,7 +489,10 @@ def _chat_messages_impl(
                         kwargs["tool_choice"] = tool_choice
                 if timeout is not None:
                     kwargs["timeout"] = timeout
-                resp = client.responses.create(**kwargs)
+                from skillopt.remem.transport_audit import audited_call, record_usage
+                with audited_call(stage, audit_identity):
+                    resp = client.responses.create(**kwargs)
+                    record_usage(role, stage, resp)
                 message, text = _responses_to_chat_message(resp)
                 if hasattr(resp, "usage") and resp.usage:
                     usage_info = {
@@ -501,7 +519,10 @@ def _chat_messages_impl(
                     kwargs["reasoning_effort"] = actual_effort
                 if timeout is not None:
                     kwargs["timeout"] = timeout
-                resp = client.chat.completions.create(**kwargs)
+                from skillopt.remem.transport_audit import audited_call, record_usage
+                with audited_call(stage, audit_identity):
+                    resp = client.chat.completions.create(**kwargs)
+                    record_usage(role, stage, resp)
                 message = resp.choices[0].message
                 text = message.content or ""
                 if resp.usage:
@@ -782,6 +803,7 @@ def chat_target(
     return _chat_impl(
         get_target_client(), TARGET_DEPLOYMENT,
         system, user, max_completion_tokens, retries, stage, reasoning_effort, timeout,
+        role="target",
     )
 
 
@@ -867,6 +889,7 @@ def chat_target_messages(
         tool_choice=tool_choice,
         return_message=return_message,
         timeout=timeout,
+        role="target",
     )
 
 

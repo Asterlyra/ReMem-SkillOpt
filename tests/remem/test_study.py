@@ -6,6 +6,7 @@ import shutil
 import pytest
 
 from skillopt.remem import study
+from skillopt.remem.controls import BudgetedControlAdapter, FixedScheduleLoader
 
 
 def test_task_plan_is_fixed_stratified_and_repeats_only_training():
@@ -28,6 +29,9 @@ def prepared(tmp_path, monkeypatch):
         dest = root / name
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(study.ROOT / name, dest)
+    core = root / "configs/remem/core.yaml"
+    core.write_text(core.read_text(encoding="utf-8").replace(
+        "data/spreadsheetbench_remem_400", "data/runtime"), encoding="utf-8")
     rows = [{"id": str(i), "instruction_type": "cell"} for i in range(80)]
     for split, values in (("train", rows), ("val", [{"id": str(i)} for i in range(80, 120)]), ("test", [{"id": "private-test"}])):
         study.write_json(root / "data/spreadsheetbench_split" / split / "items.json", values)
@@ -56,6 +60,75 @@ def test_prepare_only_freezes_core_development_and_report_is_readonly(prepared):
         schedules = [c["remem"]["task_schedule"] for c in configs if c["seed"] == seed]
         assert all(s == schedules[0] for s in schedules)
     assert all(c["eval_test"] is False for c in configs)
+
+
+def test_prepare_alternate_data_profile(prepared):
+    root, _ = prepared
+    profile = root / "configs/remem/alternate.yaml"
+    profile.write_text("_base_: core.yaml\nenv:\n  data_root: data/other-runtime\n"
+                       "  split_dir: data/other-split\n", encoding="utf-8")
+    shutil.copytree(root / "data/spreadsheetbench_split", root / "data/other-split")
+    other = root / "data/other-runtime"
+    other.mkdir(parents=True)
+    (other / "example.xlsx").write_bytes(b"other synthetic payload")
+    manifest = root / "data/other-manifest.json"
+    study.write_json(manifest, {"runtime_data_root": "data/other-runtime",
+                                "runtime_files": {"example.xlsx": study.file_hash(other / "example.xlsx")}})
+    directory = study.prepare("test-alt", root=root, config_path=profile, data_manifest_path=manifest)
+    assert study.verify(directory, root=root)["status"] == "passed"
+    frozen = json.loads((directory / "freeze.json").read_text(encoding="utf-8"))
+    assert frozen["data_manifest_path"] == "data/other-manifest.json"
+    assert frozen["split_dir"] == "data/other-split"
+
+
+def test_skillopt_control_uses_same_frozen_task_schedule(prepared):
+    root, _ = prepared
+    directory = study.prepare("test-control", root=root, include_skillopt_controlled=True)
+    assert study.verify(directory, root=root)["external_runs"] == 3
+    core = json.loads((directory / "configs/core_00_42.json").read_text(encoding="utf-8"))
+    control = json.loads((directory / "configs/skillopt_controlled_42.json").read_text(encoding="utf-8"))
+    assert control["control_task_schedule"] == core["remem"]["task_schedule"]
+    assert control["train_size"] == 120 and "remem" not in control
+
+    class Base:
+        train_items = [{"id": str(i)} for i in range(80)]
+
+    batches = FixedScheduleLoader(Base(), control["control_task_schedule"], 42).plan_train_epoch(
+        epoch=1, steps_per_epoch=6, accumulation=1, batch_size=20, seed=42)
+    assert [[str(row["id"]) for row in batch.payload] for batch in batches] == control["control_task_schedule"]
+
+
+def test_control_rollout_budget_cache_and_interruption(tmp_path):
+    class Adapter:
+        calls = 0
+
+        def rollout(self, env, skill, out_dir, **kwargs):
+            self.calls += 1
+            folder = tmp_path / "train"
+            folder.mkdir()
+            results = [{"id": row["id"], "hard": 0} for row in env]
+            (folder / "results.jsonl").write_text("".join(json.dumps(row) + "\n" for row in results))
+            return results
+
+    base = Adapter()
+    adapter = BudgetedControlAdapter(base, tmp_path, task_limit=2)
+    env = [{"id": "a"}, {"id": "b"}]
+    assert len(adapter.rollout(env, "skill", str(tmp_path / "train"))) == 2
+    assert len(adapter.rollout(env, "skill", str(tmp_path / "train"))) == 2
+    assert base.calls == 1
+    events = adapter._records()
+    assert [row["kind"] for row in events] == ["start", "done", "cache"]
+    with pytest.raises(RuntimeError, match="budget exhausted"):
+        adapter.rollout(env, "changed skill", str(tmp_path / "other"))
+    class Broken:
+        def rollout(self, env, skill, out_dir, **kwargs):
+            raise OSError("simulated interruption")
+
+    interrupted = BudgetedControlAdapter(Broken(), tmp_path / "interrupted", task_limit=2)
+    with pytest.raises(OSError):
+        interrupted.rollout(env, "skill", str(tmp_path / "interrupted" / "train"))
+    with pytest.raises(RuntimeError, match="requires reconciliation"):
+        interrupted.rollout(env, "skill", str(tmp_path / "interrupted" / "train"))
 
 
 @pytest.mark.parametrize("target", ["source", "config", "payload", "split", "freeze"])

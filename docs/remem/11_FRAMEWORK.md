@@ -1,7 +1,7 @@
 # ReMem 核心框架实现与边界
 
 更新：2026-10-24。用户选择方案 2：有限范围的策略接口重构，继续共用上游 trainer。
-本阶段完成环境和离线开发基础，不声明模型效果或正式实验就绪。
+本阶段完成环境、离线开发基础和 DeepSeek 小样本探活，不声明方法效果或正式实验就绪。
 
 ## 结构与调用链
 
@@ -46,9 +46,10 @@ M1 当前只检索同任务历史，按重现次数和最近观测排序；不�
 已开始但未完成的执行必须先核对实际调用，不自动重跑并当成免费调用。
 ReMem 的事务检查点保存当前/best skill、分数与历史，恢复不依赖可能半写的 JSON 文件。
 
-逻辑优化器调用、计划执行次数、缓存与耗时已记录；HTTP 实际尝试次数及完整 target
-usage 尚未接入，缺失记 null。不能用现有上游 token 汇总替代正式成本审计。
-模型重试与后端响应身份核查属于下一阶段。当前 runner 不提供正式运行模式。
+逻辑优化器调用、计划执行次数、缓存与耗时已记录。OpenAI-compatible 路径现在
+逐请求记录 HTTP 尝试、状态、调用关联、响应模型标识和 usage；失败请求或缺失用量
+使总 token 保持 null，同时保留已知部分。其他后端尚未获得同等覆盖，不能用上游
+token 汇总替代正式成本审计。当前 runner 不提供正式运行模式。
 
 ## 使用命令
 
@@ -63,8 +64,9 @@ usage 尚未接入，缺失记 null。不能用现有上游 token 汇总替代�
 .\scripts\remem\python.ps1 scripts/remem/study.py report outputs/remem/foundation-v1
 ```
 
-以上命令不调用模型。`run` 默认只验证和显示 not_started；将来显式增加 `--execute`
-才调用模型，且仍只是 development run。当前没有配置真实凭据，也没有执行此选项。
+以上命令不调用模型。`run` 默认只验证和显示 not_started；显式指定 `--execute`
+才调用模型，且仍只是 development run。密钥仅存在受 Git 忽略的本地文件，
+三个小样本探活已经运行，完整优化矩阵未执行。
 
 prepare 生成四个核心方法×三个种子的配置。每 seed 的前四步覆盖 80 题，后两步固定
 重现 40 题；方法间共享完全相同的任务顺序。冻结包包含全部研究源码、prompt、解析后
@@ -74,12 +76,21 @@ prepare 生成四个核心方法×三个种子的配置。每 seed 的前四步�
 report 只读已有工件，不重新评估、不调用模型，也不把缺失指标填成零。
 源码快照和数据只存忽略目录，Git 提交代码、配置模板、依赖快照与说明。
 
+2026-10-24 增加 `deepseek-development.yaml`、候选新测试池及原生 SkillOpt 对照。
+DeepSeek 的 12 核心组加 3 对照配置可通过 `prepare --config
+configs/remem/deepseek-development.yaml --data-manifest data/remem_fresh_test_manifest.json
+--include-skillopt-controlled` 创建。只有 `run --execute --key-file
+.env.deepseek.local` 会真正调用模型；prepare/verify/默认 run/report 仍不调用。
+OpenAI-compatible HTTP 路径的请求、重试、响应、token 与缓存信息按运行单独留档；
+缺失或失败请求的总用量仍标缺失。原生对照继承固定六步训练序列与 400 次
+任务执行预算，但 CAM 与 AtomSearch 对照尚未完成，不能把该矩阵当正式对照集。
+
 ## 正式实验前仍需完成
 
-1. 训练数据准备样例上的模型探活：身份、接口契约、空响应、超时、费用、吞吐与输出上限。
-2. 实际 HTTP 尝试/重试/缓存与 target token 的统一审计，确定完整恢复与限流政策。
-3. 旧测试暴露 ID 并集及来源/模板跨集合审计；不能把上游 280 题池直接称为干净最终测试集。
-4. SkillOpt controlled、CAM、AtomSearch 对照实现及预算适配；目前显式标为 planned。
+1. 在 DeepSeek 小样本探活基础上，校准并发、超时、输出上限、费用及完整工作负载的响应身份。
+2. OpenAI-compatible 路径已有 HTTP/用量审计；其余后端的同等覆盖、失败请求可能产生的账单及中断对账仍须验证。
+3. 旧 280 题全暴露；新候选 120 题的来源模板分组及未人工验证质量仍须审查。
+4. SkillOpt controlled 已实现离线接入；CAM 和 AtomSearch 仍须实现或诚实缩减正式矩阵。
 5. 依校准冻结正式 18/21 格协议；全部最终 skill 固定后的统一测试发布和正式统计报告。
 
 没有迁移 CAM 源代码；现阶段配对门控等代码为本项目新实现。CAM 参考目录保持只读。

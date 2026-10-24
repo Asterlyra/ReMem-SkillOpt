@@ -1,0 +1,214 @@
+{
+  "schema_version": 2,
+  "reference_label": "read-only local CAM-SkillOpt outputs",
+  "scanned_results_files": 483,
+  "results_index_sha256": "6eeddb8df6e9b8ef0e6b91e926ab5bfe7b76f2441a37e3ede352fc7f0a3d2b47",
+  "split_sizes": {
+    "train": 80,
+    "val": 40,
+    "test": 280
+  },
+  "historically_exposed_test_pool_count": 280,
+  "test_named_exposed_count": 280,
+  "unseen_test_pool_count": 0,
+  "clean_final_120_available": false,
+  "additional_912_task_ids": 512,
+  "additional_seen_in_old_results": 0,
+  "additional_unseen_in_old_results": 512,
+  "evidence": [
+    {
+      "relative_path": "outputs/_archive/static_seed42_TIMEOUT120_MIXED/results.jsonl",
+      "sha256": "bbbbd34807ece9c9b73e8c8594b3c30c7beff81ee8759b2b06bd7d9a7371c0a9",
+      "test_pool_ids": 245
+    },
+    {
+      "relative_path": "outputs/_archive_v1_cam/spreadsheetbench__glm__cam_full_seed42/test_eval/results.jsonl",
+      "sha256": "3886f6280f477727d084d2654c847660a6b68c2536274477d1a534ae42050150",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/_archive_v1_cam/spreadsheetbench__glm__cam_full_seed42/test_eval_baseline/results.jsonl",
+      "sha256": "0549f79774a266aaef34afd35ef8567d36265996fe9d5b5e75353f8277469bb8",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/_archive_v1_cam/spreadsheetbench__qwen__cam_full_seed42/test_eval/results.jsonl",
+      "sha256": "b68e21673d80fe5b2096cc9d240a06905524c94e09e8cfba1ce63363ffe66f95",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/_archive_v1_cam/spreadsheetbench__qwen__cam_full_seed42/test_eval_baseline/results.jsonl",
+      "sha256": "44f29e923d482dc435326741614d01a477c0d27b42da5374bd072313b7626dab",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/_archive_v1_cam/spreadsheetbench__qwen__cam_no_bootstrap_seed42/test_eval_baseline/results.jsonl",
+      "sha256": "d6833188d0cec02ae73c73c82fb3cb46027bf2e85e42697711286cbde783e9b4",
+      "test_pool_ids": 99
+    },
+    {
+      "relative_path": "outputs/_archive_v1_cam/spreadsheetbench__qwen_nothink__cam_full_seed42/test_eval/results.jsonl",
+      "sha256": "35394245d893a5f248a494113f325579509469ded337f83c7ad71e063790a51d",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/_archive_v1_cam/spreadsheetbench__qwen_nothink__cam_full_seed42/test_eval_baseline/results.jsonl",
+      "sha256": "6088a3dac44598e9b11943a628e7a1fcdf0ab55c637cde18f9fa9734eb676b2c",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/continuous_adaptation_v3/spreadsheetbench/qwen/baseline_seed42/test_eval/results.jsonl",
+      "sha256": "ed98171ccfa03ced49bac65ed5bd0faf0e0a58f0bffefe42d4d13b54d7a70bb0",
+      "test_pool_ids": 120
+    },
+    {
+      "relative_path": "outputs/continuous_adaptation_v3/spreadsheetbench/qwen/baseline_seed43/test_eval/results.jsonl",
+      "sha256": "69ada3f7c7e20091bf4db97df2f238eca38eb863fc0b2f01654ec83606182172",
+      "test_pool_ids": 120
+    },
+    {
+      "relative_path": "outputs/continuous_adaptation_v3/spreadsheetbench/qwen/cam_v3_seed42/test_eval/results.jsonl",
+      "sha256": "646d276929601cd978bd50f7b160bb197c1f0ae85ffb76abed3fd590eebe5c76",
+      "test_pool_ids": 120
+    },
+    {
+      "relative_path": "outputs/continuous_adaptation_v3/spreadsheetbench/qwen/cam_v3_seed43/test_eval/results.jsonl",
+      "sha256": "50ff7b4e3f95dfbc9e72c888c8fced6f18c0bc9ca3898f2ab80c141ce97860d8",
+      "test_pool_ids": 120
+    },
+    {
+      "relative_path": "outputs/matrix/_smoke_v2b/test_eval/results.jsonl",
+      "sha256": "b3ca3cb1f15624c4d2b6c58ad9a7a3457676f6d0a99d78da4fe96647a2e21cef",
+      "test_pool_ids": 4
+    },
+    {
+      "relative_path": "outputs/matrix/_smoke_v2b/test_eval_baseline/results.jsonl",
+      "sha256": "9e096d82393155b533ec960158e30d33e3087811bab9ccc12ea8436a0e9a268d",
+      "test_pool_ids": 4
+    },
+    {
+      "relative_path": "outputs/matrix/_smoke_v2b/test_eval_final/results.jsonl",
+      "sha256": "ca2f04f8f4651cbc56cf76552d57af89e936eabe0c67ad194b8ad131e34cf8d6",
+      "test_pool_ids": 4
+    },
+    {
+      "relative_path": "outputs/matrix/spreadsheetbench/glm/baseline_seed42/test_eval/results.jsonl",
+      "sha256": "d3e2190d824bf178b66918532254d997506a8d6d78f94969bb3fa8be5bd7ff23",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/matrix/spreadsheetbench/glm/baseline_seed42/test_eval_baseline/results.jsonl",
+      "sha256": "0e8f4ad42c25d90831e3222c5e882ff5c39857e52912062b8d3af25156f88d52",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/matrix/spreadsheetbench/glm/baseline_seed42/test_eval_final/results.jsonl",
+      "sha256": "de82457f25598806b5959356a2c08abb44a3ad773fe0f2106e2b63db31a9e033",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/matrix/spreadsheetbench/glm/static_seed42/results.jsonl",
+      "sha256": "596dc698bea547087abc54deac5e965f633061797dd1719ab3a96ea1448ceca1",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/matrix/spreadsheetbench/qwen/baseline_seed42/test_eval/results.jsonl",
+      "sha256": "06a99dcf6adce19ea54f9ddad5187f77f7586d63c131737d654a58896e7b39d6",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/matrix/spreadsheetbench/qwen/baseline_seed42/test_eval_baseline/results.jsonl",
+      "sha256": "a05d7521b12cd8aebb05deb3ac6161778642122aee02fbfa6056dcf77497e790",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/matrix/spreadsheetbench/qwen/static_seed42/results.jsonl",
+      "sha256": "443bc60ceec9963d6b6c13bd8c52b25bc37a3fb705273237ebc6e5e06ad5a537",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/matrix/spreadsheetbench/qwen_nothink/baseline_seed42/test_eval/results.jsonl",
+      "sha256": "b0da09788853344fd56b1a55cd79bf6ea678c2f90b8a529ec89f40361c3947fd",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/matrix/spreadsheetbench/qwen_nothink/baseline_seed42/test_eval_baseline/results.jsonl",
+      "sha256": "f89df767f92f849070a5ce91ad2c4ea3299b0f0f614eb5c978c6541bc9a232d4",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/matrix/spreadsheetbench/qwen_nothink/baseline_seed42/test_eval_final/results.jsonl",
+      "sha256": "655f9bd7ea73d8abd4e4da9cd70ef08378893803038bd689f4771ec3c87297b6",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/matrix_v2r1/spreadsheetbench/qwen/baseline_seed42/test_eval/results.jsonl",
+      "sha256": "7b9091e3b3db444cc2b0b1ec07f5940e884994a1ceda0cc26ff4c70123f16c05",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/matrix_v2r1/spreadsheetbench/qwen/baseline_seed42/test_eval_baseline/results.jsonl",
+      "sha256": "afd4a9413b2e4935abc3665b5d47865923d7337588ee604f6da59d8726194bbb",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/matrix_v2r1/spreadsheetbench/qwen/baseline_seed42/test_eval_final/results.jsonl",
+      "sha256": "2d40e742daec92fdedc8979f84d05fdcd6e2a2e7583cce4fb0b09bee1fc8b641",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/matrix_v2r1/spreadsheetbench/qwen/cam_full_seed42/test_eval/results.jsonl",
+      "sha256": "a50e736f7e10e97c2bf5b42153e4fea8266ab284a460fb680f557d81b54d2a61",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/matrix_v2r1/spreadsheetbench/qwen/cam_full_seed42/test_eval_baseline/results.jsonl",
+      "sha256": "4e7e20753715da99d069d9308c7bcdc84f9335da20484148e964ea30a08e9369",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/matrix_v2r1/spreadsheetbench/qwen/cam_full_seed42/test_eval_final/results.jsonl",
+      "sha256": "f6e86dbeac3c01381f61da7f90d7e966fdc4aeb2408ec84a0af38dea1fba2698",
+      "test_pool_ids": 280
+    },
+    {
+      "relative_path": "outputs/preflight/baseline_glm_20/results.jsonl",
+      "sha256": "393b57f342443ad85373782383ed61bbac088dd1d1d87638ee1c745406af9f1b",
+      "test_pool_ids": 20
+    },
+    {
+      "relative_path": "outputs/preflight/baseline_qwen_20/results.jsonl",
+      "sha256": "a7aa6cd5310dafb2309ae52a1389d2b396851ba9148b430502b7b0e2eb819481",
+      "test_pool_ids": 20
+    },
+    {
+      "relative_path": "outputs/preflight/smoke_gemma4/results.jsonl",
+      "sha256": "fd34fb4bbe18dc159e5543019a421c9e7299951168c9d2d725deb70dae4cab09",
+      "test_pool_ids": 4
+    },
+    {
+      "relative_path": "outputs/preflight/smoke_qwen_nothink/results.jsonl",
+      "sha256": "5e67d30a2603ca358b5651403fa25cc600451c4d4fcb68cb9dca997642368282",
+      "test_pool_ids": 4
+    },
+    {
+      "relative_path": "outputs/smoke/v2r1_review/test_eval/results.jsonl",
+      "sha256": "a950bab95ed315398f84f0263bc29dd120eee7a01be3fc032733401ae05b5ab9",
+      "test_pool_ids": 4
+    },
+    {
+      "relative_path": "outputs/smoke/v2r1_review/test_eval_baseline/results.jsonl",
+      "sha256": "4af3d48253420854969c73801afdb15e46c1ed1517f437507f9c63106fc3bf2e",
+      "test_pool_ids": 4
+    },
+    {
+      "relative_path": "outputs/smoke/v2r1_review/test_eval_final/results.jsonl",
+      "sha256": "8cadcaacc4a35e985453c63532445ac03d07709d816b0b18d2650c23d79fdb29",
+      "test_pool_ids": 4
+    }
+  ],
+  "limits": [
+    "This audits old results.jsonl task IDs and paths, not every historical prompt or private run.",
+    "All 280 current test-pool IDs appear in old results; this alone rules out a never-used final 120 from that pool."
+  ]
+}

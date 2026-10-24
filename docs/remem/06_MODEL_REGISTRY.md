@@ -1,6 +1,27 @@
 # 可用模型与接入档案
 
-**历史证据日期 2026-10-16 至 2026-10-19；本项目整理日期 2026-10-23。未在新项目重新探测。** 可用性、费用、路由和限制都可能改变，以下用于准备，不是当前在线保证。
+**旧网关证据日期 2026-10-16 至 2026-10-19；本项目整理日期 2026-10-23。旧网关未在新项目重新探测。** 可用性、费用、路由和限制都可能改变，以下旧网关记录不是当前在线保证。
+
+## 2026-10-24 DeepSeek 临时开发接入
+
+旧网关本轮不可用，使用 DeepSeek 官方 `https://api.deepseek.com` 做准备阶段的独立探针。
+官方[调用文档](https://api-docs.deepseek.com/)把请求别名
+`deepseek-flash` 对应到 DeepSeek-V4.1-Flash-1017；实际 `/models` 返回该别名，
+Chat Completions 响应也只返回该别名，不能仅凭响应字段证明内部权重版本。
+
+一次最小聊天、一次真实 SpreadsheetBench **训练**任务、一次使用 R 提案提示词的
+优化器空证据调用都成功。训练任务通过评分，优化器返回有效 `no_change`；
+这只是接口/执行链探活，不是方法效果。真实训练任务 1 次 HTTP 请求、
+1,056 输入 token、8,079 输出 token；优化器 1 次请求、1,810 输入 token、
+100 输出 token。请求、用量和失败状态已保存为受忽略的元数据，不保存原始网关响应。
+官方[价格页](https://api-docs.deepseek.com/quick_start/pricing/)会变化，正式运行
+前应按当时账单再核对费用。两角色共用同一模型的结果不能与历史 glm/qwen 实验混称。
+
+本地密钥位于 Git 忽略的 `.env.deepseek.local`，配置模板
+`configs/remem/deepseek-development.yaml` 不含密钥。开发运行使用
+`openai_chat` 的 `openai_compatible` 认证路径；当前模型别名和价格页均已联网核对。
+
+以下章节仅描述旧网关档案。
 
 来源：旧项目 `docs/experiments/ZGCI_MODEL_HUB_API.md`、`CAM_SKILLOPT_ZGCI_EXPERIMENT_PLAN.md`、`configs/experiments/zgci_cam_matrix.yaml`、v3 实际运行记录。旧文档的“仅某模型能 JSON”“全部免费”等断言改为有日期的观察，不推广成模型本身永久能力限制。
 
