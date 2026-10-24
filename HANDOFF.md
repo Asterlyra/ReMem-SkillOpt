@@ -1,6 +1,6 @@
 # ReMem-SkillOpt 工作交接
 
-更新日期：2026-10-24。阶段：**environment/framework，R/M 已有离线实现，模型及正式实验未运行**。
+更新日期：2026-10-24。阶段：**environment/framework，R/M 已有离线实现，已做小样本探活，正式实验未运行**。
 
 当前实现、命令与局限以 [框架文档](docs/remem/11_FRAMEWORK.md) 和
 [实施报告](research/remem/FOUNDATION_REPORT.md) 为准。以下初始路线仍用于检查尚未完成的正式实验要求。
@@ -16,7 +16,7 @@
 
 ## 当前工作边界
 
-初始 bootstrap 的“不实施、不安装”边界已由本轮用户请求更新。本轮完成环境与框架，未复制旧凭据或发起模型调用。后续先做模型与数据审计、补齐正式实验要求，再按用户要求推进实验；不自动恢复旧 CAM 队列。
+初始 bootstrap 的“不实施、不安装”边界已由本轮用户请求更新。本轮完成环境与框架，未复制旧凭据；后续已按授权完成 DeepSeek 小样本探活。后续先做模型与数据审计、补齐正式实验要求，再按用户要求推进实验；不自动恢复旧 CAM 队列。
 
 两个模块的分组是沿用最近讨论的推荐结构。具体超参数与 21-run 矩阵是本交接的可审查默认草案，尚未冻结，不是既有结果。
 
@@ -27,7 +27,7 @@
 3. 已接入 R 和 M 独立开关，并验证无补丁、评估拒绝与中断分支的失败保全。M 跨任务检索及冷却调度仍未实现。
 4. 只迁移 CAM 中有明确用途、来源可核验的函数，并为行为变化建立有意义的离线检查。
 5. 数据/模型联调属于准备阶段。确认真实后端标识、响应契约、JSON、超时、费用与吞吐，不依赖历史探针的结论。
-6. 已实现开发版 runner 的 prepare/verify/run/report 分离与冻结；DeepSeek 小样本、旧结果暴露审计、OpenAI-compatible 逐请求用量审计和原生 SkillOpt 离线对照已完成。CAM/AtomSearch 对照、其他后端用量覆盖与最终测试发布流程仍待完成，详见 `research/remem/PREFLIGHT_REPORT.md`。
+6. 已实现开发版 runner 的 prepare/verify/run/report 分离与冻结；DeepSeek 小样本、旧结果暴露审计、OpenAI-compatible 逐请求用量审计和原生 SkillOpt 离线对照已完成。CAM/AtomSearch 已有开发实现，真实联调、其他后端用量覆盖与最终测试发布仍待完成，详见 `research/remem/PREFLIGHT_REPORT.md`。
 7. 环境和方法验收后，用当时用户授权与实际耗时确定冻结的 18 或 21 次运行协议，再执行完整种子组。
 
 ## 完成标准
@@ -48,3 +48,7 @@
 ## 推荐交给新 Codex 的首条消息
 
 > 请先阅读 START_HERE.md、HANDOFF.md 和 docs/remem/ 下的研究文档，在当前重新克隆的 SkillOpt 上实施 ReMem-SkillOpt。方法固定为 R（证据驱动受控修复）和 M（持续失败与修复记忆）。先完成数据契约、离线验证、集成及实验冻结工具，再准备正式实验；保留模型与测试暴露核查，不复用旧实验结果，不自行扩展搜索规模。实现前给出阶段计划，避免重新讨论已经确定的两个模块。
+
+## 2026-10-24 对照决策
+
+用户明确保留 AtomSearch，并选择按论文独立复现。不得再把来源选择列为待确认。实现与限制见 `docs/remem/12_ATOMSEARCH.md`；CAM 来源见 `research/remem/cam_port_provenance.json`。统一调用限额和小规模预实验入口已接入，正式实验仍未授权立即启动或宣称完成。

@@ -18,6 +18,7 @@ from skillopt.optimizer.update_modes import (
 )
 from skillopt.prompts import load_prompt
 from skillopt.utils import extract_json
+from skillopt.remem.call_policy import fail_research_stage
 
 
 # ── Public API ────────────────────────────────────────────────────────────────
@@ -102,6 +103,7 @@ def rank_and_select(
         pass
 
     # Fallback: simple truncation
+    fail_research_stage("ranking")
     return {
         "reasoning": patch.get("reasoning", "")
         + f" [fallback truncated {len(edits)}->{max_edits} {payload_label(update_mode)}]",

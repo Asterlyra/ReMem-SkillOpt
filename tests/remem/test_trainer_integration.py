@@ -133,6 +133,32 @@ def _store(cfg):
     return EventStore(Path(cfg["out_root"]) / "remem", json.loads(_identity(root)))
 
 
+@pytest.mark.parametrize("kind", ["skillopt_controlled", "cam_reference"])
+def test_native_controls_preserve_history_and_resume(make_run, monkeypatch, kind):
+    from skillopt.remem import native_control
+    cfg, adapter, _ = make_run()
+    schedule = cfg.pop("remem")["task_schedule"]
+    cfg.update(control_kind=kind, control_task_schedule=schedule)
+    contexts = []
+    def reflect(results, skill, directory, **kwargs):
+        contexts.append(kwargs.get("step_buffer_context", ""))
+        assert _store(cfg).records("observation")
+        content = "CHECK" if "CHECK" not in skill else "PRESERVE"
+        return [{"source_type": "failure", "patch": {"edits": [{"op": "append", "content": content,
+                     "support_task_ids": ["t1"], "support_count": 1}]}}]
+    adapter.reflect = reflect
+    monkeypatch.setattr(native_control, "merge_patches", lambda skill, failure, success, **kw:
+                        {"edits": [e for patch in failure + success for e in patch["edits"]]})
+    monkeypatch.setattr(native_control, "rank_and_select", lambda skill, patch, **kw: patch)
+    result = engine.ReflACTTrainer(cfg, adapter).train()
+    assert result["total_steps"] == 2 and result["control"]["gates"] >= 1
+    assert contexts[1].strip()  # Original native history is not suppressed as in core_00.
+    before = len(adapter.calls), len(contexts)
+    resumed = engine.ReflACTTrainer(cfg, adapter).train()
+    assert resumed["total_steps"] == 2
+    assert (len(adapter.calls), len(contexts)) == before
+
+
 @pytest.mark.parametrize("repair,memory", [(False, False), (True, False), (False, True), (True, True)])
 def test_actual_trainer_four_arms_and_no_history_leak(make_run, repair, memory):
     cfg, adapter, prompts = make_run(repair, memory, replies="no_change")

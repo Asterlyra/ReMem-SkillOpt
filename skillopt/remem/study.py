@@ -80,7 +80,9 @@ def source_files(root: Path) -> list[Path]:
 
 
 def prepare(study_id: str, *, root: Path = ROOT, config_path: Path | None = None,
-            data_manifest_path: Path | None = None, include_skillopt_controlled: bool = False) -> Path:
+            data_manifest_path: Path | None = None, include_skillopt_controlled: bool = False,
+            include_cam_reference: bool = False, include_atomsearch: bool = False,
+            calibration: bool = False) -> Path:
     if not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}", study_id):
         raise ValueError("Invalid study ID")
     directory = root / "outputs/remem" / study_id
@@ -105,13 +107,32 @@ def prepare(study_id: str, *, root: Path = ROOT, config_path: Path | None = None
     if base["data_root"] != data["runtime_data_root"] or "runtime_files" not in data:
         raise ValueError("Study config and data manifest differ")
     directory.mkdir(parents=True)
+    if calibration:
+        def subset(rows, count, seed):
+            groups = {}
+            for row in sorted(rows, key=lambda r: str(r["id"])):
+                groups.setdefault(row.get("instruction_type", "unknown"), []).append(row)
+            rng = random.Random(seed)
+            for group in groups.values():
+                rng.shuffle(group)
+            return [row for _, _, row in sorted((i/len(g), k, r) for k, g in groups.items() for i, r in enumerate(g))][:count]
+        train, selection = subset(train, 6, 20261024), subset(selection, 4, 20261025)
+        split_root = directory / "calibration_split"
+        for split, rows in (("train", train), ("val", selection), ("test", [])):
+            write_json(split_root / split / "items.json", rows)
+        base.update(train_size=6, batch_size=6, sel_env_num=4, test_env_num=0, split_dir=str(split_root))
+        base["remem"].update(task_executions=32, optimizer_calls=20)
     config_hashes = {}
     order = []
-    for seed in (42, 43, 44):
-        schedule = task_plan(train, seed)
-        arms = list(CORE_ARMS)
+    for seed in ((42,) if calibration else (42, 43, 44)):
+        schedule = ([[str(r["id"]) for r in train]] * 2 if calibration else task_plan(train, seed))
+        arms = ["remem_full"] if calibration else list(CORE_ARMS)
         if include_skillopt_controlled:
             arms.append("skillopt_controlled")
+        if include_cam_reference:
+            arms.append("cam_reference")
+        if include_atomsearch:
+            arms.append("atomsearch_budgeted")
         random.Random(seed + 10000).shuffle(arms)
         for arm in arms:
             name = f"{arm}_{seed}"
@@ -119,9 +140,19 @@ def prepare(study_id: str, *, root: Path = ROOT, config_path: Path | None = None
             cfg.update(seed=seed, out_root=str(directory / "runs" / name))
             for key in ("skill_init", "data_root", "split_dir"):
                 cfg[key] = str((root / cfg[key]).resolve())
-            if arm == "skillopt_controlled":
+            cfg["research_limits"] = dict(task_executions=400, optimizer_calls=80, output_tokens=16384,
+                                          max_attempts=3, timeout_s=120, target_calls=400)
+            if calibration:
+                cfg["research_limits"].update(task_executions=32, target_calls=32, optimizer_calls=20)
+            if arm not in CORE_ARMS:
                 cfg.pop("remem")
-                cfg.update(train_size=120, control_task_schedule=schedule, control_kind="skillopt_controlled")
+                cfg.update(train_size=len(train), control_task_schedule=schedule, control_kind=arm)
+                if arm == "atomsearch_budgeted":
+                    from .atomsearch import DEFAULTS
+                    cfg["atomsearch"] = {**DEFAULTS, **({"attempts": 2} if calibration else {})}
+                if arm == "cam_reference":
+                    from .native_control import CAM_V3
+                    cfg["cam_control"] = dict(CAM_V3)
             else:
                 repair, memory = CORE_ARMS[arm]
                 cfg["remem"].update(repair=repair, memory=memory, run_id=f"{study_id}:{name}", task_schedule=schedule)
@@ -139,7 +170,7 @@ def prepare(study_id: str, *, root: Path = ROOT, config_path: Path | None = None
         snapshot[relative.as_posix()] = file_hash(dest)
     manifest = {
         "schema_version": 1, "study_id": study_id,
-        "scope": "development_core_plus_native_control" if include_skillopt_controlled else "development_core_only",
+        "scope": "calibration_only" if calibration else "development_with_external_controls" if any((include_skillopt_controlled, include_cam_reference, include_atomsearch)) else "development_core_only",
         "formal_ready": False,
         "git_head": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
         "git_dirty": bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=root, text=True).strip()),
@@ -153,9 +184,10 @@ def prepare(study_id: str, *, root: Path = ROOT, config_path: Path | None = None
         "formal_blockers": ["model_identity_cost_throughput_calibration",
                             "fresh_test_source_template_and_quality_audit",
                             "failed_request_usage_reconciliation",
-                            "cam_atomsearch_control_implementations", "final_test_release_protocol"],
+                            "external_control_live_validation", "final_test_release_protocol"],
         "external_arms": {"skillopt_controlled": "implemented_development" if include_skillopt_controlled else "planned",
-                          "cam_reference": "planned", "atomsearch_budgeted": "planned"},
+                          "cam_reference": "implemented_development" if include_cam_reference else "not_included",
+                          "atomsearch_budgeted": "independent_reproduction_development" if include_atomsearch else "not_included"},
     }
     write_json(directory / "freeze.json", manifest)
     (directory / "freeze.sha256").write_text(file_hash(directory / "freeze.json") + "\n", encoding="ascii")
@@ -175,8 +207,8 @@ def verify(directory: Path, *, root: Path = ROOT) -> dict:
         if file_hash(directory / path) != expected:
             raise ValueError("Frozen config changed")
         config = json.loads((directory / path).read_text(encoding="utf-8"))
-        if config.get("control_kind") == "skillopt_controlled":
-            if len(config.get("control_task_schedule", [])) != 6 or config.get("eval_test"):
+        if config.get("control_kind") in {"skillopt_controlled", "cam_reference", "atomsearch_budgeted"}:
+            if len(config.get("control_task_schedule", [])) != (2 if freeze["scope"] == "calibration_only" else 6) or config.get("eval_test"):
                 raise ValueError("Invalid SkillOpt control config")
         else:
             ReMemConfig.parse(config)
@@ -194,8 +226,8 @@ def verify(directory: Path, *, root: Path = ROOT) -> dict:
         if file_hash(root / freeze.get("split_dir", "data/spreadsheetbench_split") / split / "items.json") != expected:
             raise ValueError("Task split changed")
     return {"status": "passed", "scope": freeze["scope"], "formal_ready": False,
-            "core_runs": sum(not name.startswith("skillopt_controlled_") for name in freeze["run_order"]),
-            "external_runs": sum(name.startswith("skillopt_controlled_") for name in freeze["run_order"]),
+            "core_runs": sum(any(name.startswith(arm + "_") for arm in CORE_ARMS) for name in freeze["run_order"]),
+            "external_runs": sum(not any(name.startswith(arm + "_") for arm in CORE_ARMS) for name in freeze["run_order"]),
             "formal_blockers": freeze["formal_blockers"]}
 
 
@@ -207,6 +239,11 @@ def run(directory: Path, name: str, *, execute: bool = False, key_file: Path | N
     cfg = json.loads((directory / "configs" / f"{name}.json").read_text(encoding="utf-8"))
     if not execute:
         return {"status": "not_started", "run": name, "verification": verification, "model_calls": 0}
+    return execute_config(cfg, key_file=key_file)
+
+
+def execute_config(cfg: dict, *, key_file: Path | None = None) -> dict:
+    """Execute a caller-verified development config under shared call limits."""
     if not sys.flags.utf8_mode:
         raise ValueError("Use scripts/remem/python.ps1 or Python -X utf8 for development execution")
     # Explicit --execute starts real development calls; never a formal claim.
@@ -231,13 +268,13 @@ def run(directory: Path, name: str, *, execute: bool = False, key_file: Path | N
                 raise ValueError("Local DeepSeek API key missing")
             os.environ["OPTIMIZER_AZURE_OPENAI_API_KEY"] = key
             os.environ["TARGET_AZURE_OPENAI_API_KEY"] = key
-        os.environ["REMEM_TRANSPORT_AUDIT_PATH"] = str((directory / "runs" / name / "remem/transport.jsonl").resolve())
+        os.environ["REMEM_TRANSPORT_AUDIT_PATH"] = str((Path(cfg["out_root"]) / "remem/transport.jsonl").resolve())
         adapter = get_adapter(cfg)
-        if cfg.get("control_kind") == "skillopt_controlled":
-            from .controls import BudgetedControlAdapter, bind_native_control
-            bind_native_control(adapter, cfg["control_task_schedule"], cfg["seed"])
-            adapter = BudgetedControlAdapter(adapter, Path(cfg["out_root"]))
-        return ReflACTTrainer(cfg, adapter).train()
+        from .call_policy import ResearchCallPolicy, use_call_policy
+        limits = dict(cfg.get("research_limits", {}))
+        limits.pop("task_executions", None)
+        with use_call_policy(ResearchCallPolicy(Path(cfg["out_root"]), **limits)):
+            return ReflACTTrainer(cfg, adapter).train()
     finally:
         for key, value in previous.items():
             if value is None:
@@ -285,6 +322,7 @@ def report(directory: Path) -> dict:
         if summary_path.exists():
             summary = json.loads(summary_path.read_text(encoding="utf-8"))
             row.update(status="development_completed", selection_score=summary["best_selection_hard"],
-                       steps=summary["total_steps"], elapsed_s=summary["total_wall_time_s"])
+                       steps=summary["total_steps"], elapsed_s=summary["total_wall_time_s"],
+                       stop_reason=summary.get("status"), final_selection_score=summary.get("final_selection_hard"))
         rows.append(row)
     return {"scope": freeze["scope"], "formal_ready": False, "runs": rows, "external_arms": freeze["external_arms"]}

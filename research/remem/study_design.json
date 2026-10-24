@@ -4,10 +4,37 @@
   "date": "2026-10-24",
   "project": "ReMem-SkillOpt",
   "modules": {
-    "R": {"name": "evidence_guided_controlled_repair", "includes": ["A_evidence_guided_repair", "D_evidence_constrained_edit_budget"]},
-    "M": {"name": "persistent_failure_and_repair_memory", "includes": ["B_independent_failure_ledger", "C_repair_history"]}
+    "R": {
+      "name": "evidence_guided_controlled_repair",
+      "includes": [
+        "A_evidence_guided_repair",
+        "D_evidence_constrained_edit_budget"
+      ]
+    },
+    "M": {
+      "name": "persistent_failure_and_repair_memory",
+      "includes": [
+        "B_independent_failure_ledger",
+        "C_repair_history"
+      ]
+    }
   },
-  "models": {"target_alias": "qwen", "optimizer_alias": "glm", "registry_status": "historical_gateway_unavailable", "backend_candidate": "openai_chat", "auth_mode": "openai_compatible", "development_fallback": {"request_alias": "deepseek-flash", "documented_version": "DeepSeek-V4.1-Flash-1017", "roles": ["target", "optimizer"], "preflight": "small_sample_passed_not_formal"}},
+  "models": {
+    "target_alias": "qwen",
+    "optimizer_alias": "glm",
+    "registry_status": "historical_gateway_unavailable",
+    "backend_candidate": "openai_chat",
+    "auth_mode": "openai_compatible",
+    "development_fallback": {
+      "request_alias": "deepseek-flash",
+      "documented_version": "DeepSeek-V4.1-Flash-1017",
+      "roles": [
+        "target",
+        "optimizer"
+      ],
+      "preflight": "small_sample_passed_not_formal"
+    }
+  },
   "data": {
     "benchmark": "SpreadsheetBench",
     "train_unique": 80,
@@ -21,7 +48,11 @@
     "freeze_task_ids_before_run": true,
     "source_group_leakage_audit_required": true
   },
-  "seeds": [42, 43, 44],
+  "seeds": [
+    42,
+    43,
+    44
+  ],
   "schedule": {
     "steps": 6,
     "batch_size": 20,
@@ -34,19 +65,63 @@
     "lanes": 1
   },
   "arms": [
-    {"id": "core_00", "family": "core", "R": false, "M": false},
-    {"id": "repair_only", "family": "core", "R": true, "M": false},
-    {"id": "memory_only", "family": "core", "R": false, "M": true},
-    {"id": "remem_full", "family": "core", "R": true, "M": true},
-    {"id": "skillopt_controlled", "family": "external", "note": "upstream edit/history/gate, slow/meta off; not full published configuration"},
-    {"id": "cam_reference", "family": "external", "note": "provenance-pinned CAM v3 port, slow/meta off"},
-    {"id": "atomsearch_budgeted", "family": "external", "note": "official or explicitly labeled reproduction; execution-budget capped, not six search iterations"}
+    {
+      "id": "core_00",
+      "family": "core",
+      "R": false,
+      "M": false
+    },
+    {
+      "id": "repair_only",
+      "family": "core",
+      "R": true,
+      "M": false
+    },
+    {
+      "id": "memory_only",
+      "family": "core",
+      "R": false,
+      "M": true
+    },
+    {
+      "id": "remem_full",
+      "family": "core",
+      "R": true,
+      "M": true
+    },
+    {
+      "id": "skillopt_controlled",
+      "family": "external",
+      "note": "upstream edit/history/gate, slow/meta off; not full published configuration"
+    },
+    {
+      "id": "cam_reference",
+      "family": "external",
+      "note": "provenance-pinned CAM v3 port, slow/meta off"
+    },
+    {
+      "id": "atomsearch_budgeted",
+      "family": "external",
+      "note": "official or explicitly labeled reproduction; execution-budget capped, not six search iterations"
+    }
   ],
   "variants": {
-    "recommended_21": {"omit_arms": [], "optimization_runs": 21},
-    "compact_18": {"omit_arms": ["cam_reference"], "optimization_runs": 18}
+    "recommended_21": {
+      "omit_arms": [],
+      "optimization_runs": 21
+    },
+    "compact_18": {
+      "omit_arms": [
+        "cam_reference"
+      ],
+      "optimization_runs": 18
+    }
   },
-  "static_reference": {"optimization_runs": 0, "evaluation_draws": 3, "test_tasks_per_draw": 120},
+  "static_reference": {
+    "optimization_runs": 0,
+    "evaluation_draws": 3,
+    "test_tasks_per_draw": 120
+  },
   "core_controls": {
     "use_slow_update": false,
     "use_meta_skill": false,
@@ -54,8 +129,20 @@
     "native_cross_step_history_when_M_off": false,
     "max_proposals": 4,
     "max_applied_edits": 2,
-    "gate": {"type": "paired_bootstrap", "confidence": 0.95, "samples": 10000, "meaningful_improvement": 0.0, "soft_accept": false, "group_guard": false, "drift_rollback": false},
-    "memory": {"top_k_case_groups": 3, "max_attempts_per_group": 2, "context_character_cap": 12000}
+    "gate": {
+      "type": "paired_bootstrap",
+      "confidence": 0.95,
+      "samples": 10000,
+      "meaningful_improvement": 0.0,
+      "soft_accept": false,
+      "group_guard": false,
+      "drift_rollback": false
+    },
+    "memory": {
+      "top_k_case_groups": 3,
+      "max_attempts_per_group": 2,
+      "context_character_cap": 12000
+    }
   },
   "budget": {
     "optimization_task_executions_per_run": 400,
@@ -66,13 +153,57 @@
     "additional_retries_max": 2,
     "target_workers_initial": 8,
     "analyst_workers_max_initial": 8,
-    "wall_clock_target_hours": [48, 72],
+    "wall_clock_target_hours": [
+      48,
+      72
+    ],
     "includes_final_test_and_reporting": true,
     "excludes_implementation_setup_and_preflight": true,
     "requires_preflight_calibration": true
   },
-  "primary_comparison": ["remem_full", "core_00"],
-  "secondary_comparisons": [["remem_full", "repair_only"], ["remem_full", "memory_only"]],
-  "metrics": ["final_test_success_rate", "fixed_revisit_repair_rate", "fixed_revisit_regression_rate", "failure_capture_coverage", "repeated_ineffective_repair_rate", "task_executions", "http_attempts", "tokens_and_coverage", "wall_time", "skill_length"],
-  "implementation_status": {"R": "implemented_offline_core", "M": "implemented_offline_task_match", "study_runner": "development_core_plus_skillopt_control", "external_controls": {"skillopt_controlled": "implemented_offline", "cam_reference": "planned", "atomsearch_budgeted": "planned_no_official_code_found"}, "transport_accounting": "implemented_for_openai_compatible_development_runs", "model_preflight": "deepseek_small_sample_passed", "formal_experiments": "not_run"}
+  "primary_comparison": [
+    "remem_full",
+    "core_00"
+  ],
+  "secondary_comparisons": [
+    [
+      "remem_full",
+      "repair_only"
+    ],
+    [
+      "remem_full",
+      "memory_only"
+    ]
+  ],
+  "metrics": [
+    "final_test_success_rate",
+    "fixed_revisit_repair_rate",
+    "fixed_revisit_regression_rate",
+    "failure_capture_coverage",
+    "repeated_ineffective_repair_rate",
+    "task_executions",
+    "http_attempts",
+    "tokens_and_coverage",
+    "wall_time",
+    "skill_length"
+  ],
+  "implementation_status": {
+    "R": "implemented_offline_core",
+    "M": "implemented_offline_task_match",
+    "study_runner": "development_all_controls_and_calibration",
+    "external_controls": {
+      "skillopt_controlled": "implemented_offline",
+      "cam_reference": "implemented_offline_mechanism_port",
+      "atomsearch_budgeted": "implemented_offline_independent_reproduction"
+    },
+    "transport_accounting": "implemented_for_openai_compatible_development_runs",
+    "model_preflight": "deepseek_small_sample_passed",
+    "formal_experiments": "not_run"
+  },
+  "atomsearch_decision": {
+    "source": "independent_paper_reproduction",
+    "user_selected_date": "2026-10-24",
+    "method_specification": "docs/remem/12_ATOMSEARCH.md",
+    "formal_required": true
+  }
 }

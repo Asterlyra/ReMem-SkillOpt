@@ -22,6 +22,7 @@ from skillopt.optimizer.update_modes import (
 )
 from skillopt.prompts import load_prompt
 from skillopt.utils import extract_json
+from skillopt.remem.call_policy import fail_research_stage
 
 # ── Internal helpers ──────────────────────────────────────────────────────────
 
@@ -58,11 +59,13 @@ def _merge_batch(
                 e["merge_level"] = level
             return merged
     except Exception:  # noqa: BLE001 — optimizer/provider failures must fall back
+        fail_research_stage("merge_batch")
         warnings.warn(
             "Optimizer call or parsing failed during batch merge; using fallback",
             stacklevel=2,
         )
     else:
+        fail_research_stage("merge_batch")
         warnings.warn(
             "Optimizer returned unusable output during batch merge; using fallback",
             stacklevel=2,
@@ -259,11 +262,13 @@ def merge_patches(
                 )
             return final
     except Exception:  # noqa: BLE001 — optimizer/provider failures must fall back
+        fail_research_stage("merge_final")
         warnings.warn(
             "Optimizer call or parsing failed during final merge; using fallback",
             stacklevel=2,
         )
     else:
+        fail_research_stage("merge_final")
         warnings.warn(
             "Optimizer returned unusable output during final merge; using fallback",
             stacklevel=2,

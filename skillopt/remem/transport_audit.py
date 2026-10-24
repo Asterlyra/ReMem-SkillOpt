@@ -18,6 +18,11 @@ _CALL: ContextVar[tuple[str, str] | None] = ContextVar("remem_audit_call", defau
 _RESPONSE_ID: ContextVar[str | None] = ContextVar("remem_audit_response_id", default=None)
 
 
+def current_call_id() -> str | None:
+    current = _CALL.get()
+    return current[1] if current else None
+
+
 @contextmanager
 def audited_call(stage: str, call_id: str | None = None):
     token = _CALL.set((stage, call_id or uuid.uuid4().hex))
@@ -50,6 +55,10 @@ def client_options(role: str) -> dict[str, Any]:
     def on_request(request: httpx.Request) -> None:
         identity = uuid.uuid4().hex
         current = _CALL.get()
+        from .call_policy import active_policy
+        policy = active_policy()
+        if policy is not None:
+            policy.request(role, current[1] if current else None, identity)
         request.extensions["remem_audit_id"] = identity
         request.extensions["remem_audit_start"] = time.monotonic()
         _write(path, {"kind": "request", "id": identity, "role": role,

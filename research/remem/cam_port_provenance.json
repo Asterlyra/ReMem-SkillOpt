@@ -1,0 +1,54 @@
+{
+  "source_repository": "https://github.com/Lutra11/CAM-SkillOpt",
+  "source_local_head": "016e7efbcec168b25b0e3032c125e6e3a3f8a284",
+  "source_worktree_is_snapshot_not_head": true,
+  "files": [
+    {
+      "source_path": "skillopt/cam/bootstrap_gate.py",
+      "source_sha256": "7b532902b290a9bd0c713f539277ff08ce0b28d41121724eee3f55dcd20125ed",
+      "head_file_sha256": "7b532902b290a9bd0c713f539277ff08ce0b28d41121724eee3f55dcd20125ed",
+      "destination": "skillopt/remem/vendor/cam/bootstrap_gate.py",
+      "destination_sha256": "7b532902b290a9bd0c713f539277ff08ce0b28d41121724eee3f55dcd20125ed"
+    },
+    {
+      "source_path": "skillopt/cam/selection_guard.py",
+      "source_sha256": "d130d4805a9b49f85a40fe9cb924102b57d79e382901bb4a7d12f635f5f4cf2e",
+      "head_file_sha256": "635556e87b1237c3da0323f1901c10445f500886f513699c722262e953268a22",
+      "destination": "skillopt/remem/vendor/cam/selection_guard.py",
+      "destination_sha256": "9f6bcfa3790ae3fdda76d1a8a9d3398117e43855144c790cd9e140067dd1886e"
+    },
+    {
+      "source_path": "skillopt/cam/adaptive_budget.py",
+      "source_sha256": "ca667cbfc5ef604c31abc41350fb8c0e34e7b65a25aa466b1197edec8cd70cc8",
+      "head_file_sha256": "a7ad02d6241ff31cc163edd1e23637497f5e6dc2fbedfa2d5b13cf9223a5f122",
+      "destination": "skillopt/remem/vendor/cam/adaptive_budget.py",
+      "destination_sha256": "ca667cbfc5ef604c31abc41350fb8c0e34e7b65a25aa466b1197edec8cd70cc8"
+    },
+    {
+      "source_path": "skillopt/cam/rejected_memory.py",
+      "source_sha256": "fa46beecf73d9056ad6347441bb7412137a4d6511addc6fd90c4e51eae4167eb",
+      "head_file_sha256": "167c2f41f12a0207884eb0d7ec93f9d174ad4918709804b9a28c4f40f4e861d8",
+      "destination": "skillopt/remem/vendor/cam/rejected_memory.py",
+      "destination_sha256": "fa46beecf73d9056ad6347441bb7412137a4d6511addc6fd90c4e51eae4167eb"
+    },
+    {
+      "source_path": "skillopt/cam/memory_context.py",
+      "source_sha256": "7a45fb09d0f7a36136fd53c6b4a30e53daeb669e8438271df7272f28fe7c0c01",
+      "head_file_sha256": "2226589d482c997d8439942ab8f5ffb0c6b9d055976fe41fd7d65e8bcb501970",
+      "destination": "skillopt/remem/vendor/cam/memory_context.py",
+      "destination_sha256": "f3b8bda8b149ec0cbf25d039a39a544fec4bcca0e0834a85d9ea63e0821d9892"
+    },
+    {
+      "source_path": "skillopt/cam/drift_guard.py",
+      "source_sha256": "f8b1108ec115ec7f8e48f70bb85c10ef7bbe4a113f0312efd6e620d25fe085d1",
+      "head_file_sha256": null,
+      "destination": "skillopt/remem/vendor/cam/drift_guard.py",
+      "destination_sha256": "f8b1108ec115ec7f8e48f70bb85c10ef7bbe4a113f0312efd6e620d25fe085d1"
+    }
+  ],
+  "changes": [
+    "Import namespace adapted; selection_guard infrastructure classifier uses current ReMem result contract.",
+    "Only six CAM mechanism modules are ported; trainer and model clients remain the current SkillOpt implementation.",
+    "CAM reference means v3 mechanisms under the new shared execution protocol, not exact historical executable reproduction."
+  ]
+}

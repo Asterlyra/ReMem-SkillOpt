@@ -28,6 +28,7 @@ import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from skillopt.model import chat_optimizer
+from skillopt.remem.call_policy import fail_research_stage
 from skillopt.optimizer.meta_skill import format_meta_skill_context
 from skillopt.optimizer.skill_aware import (
     augment_error_prompt,
@@ -352,6 +353,7 @@ def run_error_analyst_minibatch(
         )
         result = extract_json(response)
         if not result:
+            fail_research_stage("analyst_failure")
             return None
         notes = extract_appendix_notes(result) if skill_aware_reflection else []
         if "patch" in result:
@@ -372,7 +374,9 @@ def run_error_analyst_minibatch(
                 "appendix_notes": notes,
             }
     except Exception:  # noqa: BLE001
+        fail_research_stage("analyst_failure")
         traceback.print_exc()
+    fail_research_stage("analyst_failure")
     return None
 
 
@@ -456,7 +460,9 @@ def run_success_analyst_minibatch(
                 result["appendix_notes"] = extract_appendix_notes(result)
             return result
     except Exception:  # noqa: BLE001
+        fail_research_stage("analyst_success")
         traceback.print_exc()
+    fail_research_stage("analyst_success")
     return None
 
 

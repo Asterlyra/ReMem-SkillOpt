@@ -374,7 +374,8 @@ def _chat_impl(
     last_err = None
     usage_info = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 
-    audit_identity = uuid.uuid4().hex
+    from skillopt.remem.transport_audit import current_call_id
+    audit_identity = current_call_id() or uuid.uuid4().hex
     for attempt in range(retries):
         try:
             if _needs_responses_api(deployment):
@@ -442,10 +443,16 @@ def _chat_impl(
             return text, usage_info
 
         except Exception as e:  # noqa: BLE001
+            from skillopt.remem.call_policy import CallPolicyError
+            if isinstance(e, CallPolicyError):
+                raise
             last_err = e
             sleep = min(2 ** attempt, 30)
             time.sleep(sleep)
 
+    from skillopt.remem.call_policy import active_policy
+    if active_policy() is not None:
+        raise RuntimeError(f"LLM call failed: {type(last_err).__name__}") from None
     raise RuntimeError(f"LLM call failed after {retries} retries: {last_err}")
 
 
@@ -468,7 +475,8 @@ def _chat_messages_impl(
     last_err = None
     usage_info = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 
-    audit_identity = uuid.uuid4().hex
+    from skillopt.remem.transport_audit import current_call_id
+    audit_identity = current_call_id() or uuid.uuid4().hex
     for attempt in range(retries):
         try:
             if _needs_responses_api(deployment):
@@ -538,10 +546,16 @@ def _chat_messages_impl(
             )
             return (message if return_message else text), usage_info
         except Exception as e:  # noqa: BLE001
+            from skillopt.remem.call_policy import CallPolicyError
+            if isinstance(e, CallPolicyError):
+                raise
             last_err = e
             sleep = min(2 ** attempt, 30)
             time.sleep(sleep)
 
+    from skillopt.remem.call_policy import active_policy
+    if active_policy() is not None:
+        raise RuntimeError(f"LLM message call failed: {type(last_err).__name__}") from None
     raise RuntimeError(f"LLM message call failed after {retries} retries: {last_err}")
 
 

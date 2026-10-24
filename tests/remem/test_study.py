@@ -88,7 +88,7 @@ def test_skillopt_control_uses_same_frozen_task_schedule(prepared):
     core = json.loads((directory / "configs/core_00_42.json").read_text(encoding="utf-8"))
     control = json.loads((directory / "configs/skillopt_controlled_42.json").read_text(encoding="utf-8"))
     assert control["control_task_schedule"] == core["remem"]["task_schedule"]
-    assert control["train_size"] == 120 and "remem" not in control
+    assert control["train_size"] == 80 and "remem" not in control
 
     class Base:
         train_items = [{"id": str(i)} for i in range(80)]
@@ -96,6 +96,30 @@ def test_skillopt_control_uses_same_frozen_task_schedule(prepared):
     batches = FixedScheduleLoader(Base(), control["control_task_schedule"], 42).plan_train_epoch(
         epoch=1, steps_per_epoch=6, accumulation=1, batch_size=20, seed=42)
     assert [[str(row["id"]) for row in batch.payload] for batch in batches] == control["control_task_schedule"]
+
+
+def test_all_external_controls_freeze_as_development(prepared):
+    root, _ = prepared
+    directory = study.prepare("all-controls", root=root, include_skillopt_controlled=True,
+                              include_cam_reference=True, include_atomsearch=True)
+    result = study.verify(directory, root=root)
+    assert result["core_runs"] == 12 and result["external_runs"] == 9
+    cfg = json.loads((directory / "configs/atomsearch_budgeted_42.json").read_text())
+    assert "remem" not in cfg and cfg["atomsearch"]["attempts"] == 30
+    assert cfg["research_limits"]["task_executions"] == 400
+
+
+def test_calibration_is_small_frozen_and_has_no_test_tasks(prepared):
+    root, _ = prepared
+    directory = study.prepare("calibration", root=root, calibration=True, include_skillopt_controlled=True,
+                              include_cam_reference=True, include_atomsearch=True)
+    result = study.verify(directory, root=root)
+    assert result["scope"] == "calibration_only"
+    assert result["core_runs"] == 1 and result["external_runs"] == 3
+    assert json.loads((directory / "calibration_split/test/items.json").read_text()) == []
+    configs = [json.loads(p.read_text()) for p in (directory / "configs").glob("*.json")]
+    assert all(c["train_size"] == 6 and c["sel_env_num"] == 4 for c in configs)
+    assert all(c["research_limits"]["task_executions"] == 32 for c in configs)
 
 
 def test_control_rollout_budget_cache_and_interruption(tmp_path):

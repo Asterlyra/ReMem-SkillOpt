@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from skillopt.remem.call_policy import budget_optimizer
+
 from skillopt.model import azure_openai as _openai
 from skillopt.model import claude_backend as _claude
 from skillopt.model import claude_code_backend as _claude_code
@@ -118,6 +120,7 @@ def get_backend_name() -> str:
     return f"{optimizer}+{target}"
 
 
+@budget_optimizer
 def chat_optimizer(
     system: str,
     user: str,
@@ -280,6 +283,7 @@ def chat_target(
     )
 
 
+@budget_optimizer
 def chat_optimizer_messages(
     messages: list[dict[str, Any]],
     max_completion_tokens: int = 16384,

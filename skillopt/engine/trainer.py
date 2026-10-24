@@ -931,6 +931,8 @@ class ReflACTTrainer:
         steps_per_epoch = math.ceil(train_size / (batch_size * accumulation))
         if remem_options and remem_options.task_schedule:
             steps_per_epoch = len(remem_options.task_schedule)
+        elif cfg.get("control_task_schedule"):
+            steps_per_epoch = len(cfg["control_task_schedule"])
         batches_per_epoch = steps_per_epoch * accumulation
         total_steps = num_epochs * steps_per_epoch
 
@@ -939,7 +941,7 @@ class ReflACTTrainer:
         cfg["train_size"] = train_size
         cfg["steps_per_epoch"] = steps_per_epoch
         cfg["batches_per_epoch"] = batches_per_epoch
-        cfg["samples_per_epoch"] = steps_per_epoch * batch_size if remem_options and remem_options.task_schedule else train_size
+        cfg["samples_per_epoch"] = steps_per_epoch * batch_size if (remem_options and remem_options.task_schedule) or cfg.get("control_task_schedule") else train_size
         cfg["skill_update_mode"] = update_mode
         cfg["lr_control_mode"] = lr_control_mode
         # Record the resolved Qwen thinking policy: it can come from the
@@ -947,12 +949,22 @@ class ReflACTTrainer:
         if "qwen_chat" in (cfg.get("optimizer_backend"), cfg.get("target_backend"), cfg.get("backend")):
             cfg["resolved_qwen_thinking_modes"] = get_qwen_thinking_modes()
 
+        if cfg.get("control_kind") == "atomsearch_budgeted":
+            from skillopt.remem.atomsearch import AtomSearchRuntime
+            with open(os.path.join(out_root, "config.json"), "w", encoding="utf-8") as stream:
+                json.dump(_redact_cfg(cfg), stream, ensure_ascii=False, indent=2)
+            return AtomSearchRuntime(cfg, dataloader, adapter, chat_optimizer).run()
+
         # Save config after deriving runtime values.
         remem = None
         if remem_options:
             from skillopt.remem.runtime import ReMemRuntime
 
             remem = ReMemRuntime(cfg, dataloader, chat_optimizer)
+        elif cfg.get("control_kind") in {"skillopt_controlled", "cam_reference"}:
+            from skillopt.remem.native_control import NativeControlRuntime
+
+            remem = NativeControlRuntime(cfg, dataloader, adapter)
         reflect_strategy = remem.reflect if remem else adapter.reflect
         aggregate_strategy = remem.aggregate if remem else merge_patches
         selection_strategy = remem.rank if remem else rank_and_select
@@ -1084,12 +1096,15 @@ class ReflACTTrainer:
         if use_skill_aware:
             current_skill = inject_empty_appendix_field(current_skill)
 
+        step_buffer: list[dict] = []
+
         def _persist_runtime_state(last_completed_step: int) -> None:
             if remem:
                 remem.checkpoint({"last_completed_step": last_completed_step,
                                   "current_score": current_score, "best_score": best_score,
                                   "best_step": best_step, "current_origin": current_origin,
-                                  "best_origin": best_origin}, history, current_skill, best_skill)
+                                  "best_origin": best_origin,
+                                  "native_step_buffer": step_buffer if cfg.get("control_kind") else []}, history, current_skill, best_skill)
             _save_runtime_state(
                 out_root,
                 {
@@ -1219,7 +1234,7 @@ class ReflACTTrainer:
 
             # Step buffer: accumulates per-step context (failure patterns +
             # rejected edits) within this epoch so optimizers see full history.
-            step_buffer: list[dict] = []
+            step_buffer = list((runtime_state or {}).get("native_step_buffer", [])) if cfg.get("control_kind") and epoch == 1 else []
             active_meta_skill = (
                 _load_meta_skill_content(out_root, epoch - 1)
                 if cfg.get("use_meta_skill", False)
@@ -1313,7 +1328,7 @@ class ReflACTTrainer:
                     pred_dir = os.path.join(rollout_dir, "predictions")
 
                     # Build step context from buffer
-                    step_buffer_context = "" if remem else _format_step_buffer(step_buffer)
+                    step_buffer_context = "" if remem_options else _format_step_buffer(step_buffer)
 
                     raw_patches = reflect_strategy(
                         rollout_results, current_skill, batch_dir,
@@ -1322,7 +1337,7 @@ class ReflACTTrainer:
                         step_buffer_context=step_buffer_context,
                         meta_skill_context=active_meta_skill,
                     )
-                    if remem:
+                    if remem_options:
                         # Keep source IDs intact; batch size is not edit support.
                         failure_patches = [p["patch"] for p in raw_patches]
                         success_patches = []
@@ -1677,7 +1692,7 @@ class ReflACTTrainer:
                 best_skill = gate.best_skill
                 best_score = gate.best_score
                 best_step = gate.best_step
-                if gate.action in {"accept", "accept_new_best", "force_accept"}:
+                if gate.action in {"accept", "accept_new_best", "force_accept", "soft_accept"}:
                     current_origin = f"step_{global_step:04d}"
                 if gate.action == "accept_new_best" or (
                     gate.action == "force_accept" and best_step == global_step
@@ -2534,7 +2549,7 @@ class ReflACTTrainer:
             "token_summary": token_summary,
         }
         if remem:
-            summary["remem"] = remem.summary()
+            summary["remem" if remem_options else "control"] = remem.summary()
         with open(os.path.join(out_root, "summary.json"), "w") as f:
             json.dump(summary, f, indent=2, ensure_ascii=False)
 

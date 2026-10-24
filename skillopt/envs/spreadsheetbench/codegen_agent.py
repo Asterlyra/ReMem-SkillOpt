@@ -195,14 +195,23 @@ def _build_user(
 
 def _llm_call_with_retry(call_fn, *, retries: int = 5, timeout: int | None = 120):
     """Wrap an LLM API call with retry and per-call timeout."""
+    from skillopt.remem.call_policy import CallPolicyError, active_policy
+    policy = active_policy()
+    if policy is not None:
+        retries = min(retries, policy.limits["max_attempts"])
+        timeout = min(timeout or policy.limits["timeout_s"], policy.limits["timeout_s"])
     last_err = None
     for attempt in range(retries):
         try:
             return call_fn(timeout=timeout)
+        except CallPolicyError:
+            raise
         except Exception as e:  # noqa: BLE001
             last_err = e
             sleep = min(2 ** attempt + random.random(), 60)
             time.sleep(sleep)
+    if policy is not None:
+        raise RuntimeError(f"LLM call failed: {type(last_err).__name__}") from None
     raise RuntimeError(f"LLM call failed after {retries} retries: {last_err}")
 
 
@@ -384,6 +393,9 @@ def _chat_call(
     llm_timeout: int | None = 120,
 ) -> str:
     """Single LLM call, no tools. Returns raw text."""
+    from skillopt.remem.call_policy import active_policy
+    if active_policy() is not None:
+        max_output_tokens = min(max_output_tokens, active_policy().limits["output_tokens"])
     reasoning_effort = get_reasoning_effort()
     if _needs_responses_api(deployment):
         # Responses API
