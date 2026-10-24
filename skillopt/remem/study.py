@@ -150,9 +150,10 @@ def prepare(study_id: str, *, root: Path = ROOT, config_path: Path | None = None
         "data_files": data["runtime_files"], "run_order": order,
         "split_dir": split_root.relative_to(root).as_posix(),
         "split_hashes": {s: file_hash(split_root / s / "items.json") for s in ("train", "val", "test")},
-        "formal_blockers": ["model_identity_cost_throughput_preflight", "historical_test_exposure_audit",
-                            "source_template_group_audit", "transport_attempt_usage_accounting",
-                            "external_control_implementations", "final_test_release_protocol"],
+        "formal_blockers": ["model_identity_cost_throughput_calibration",
+                            "fresh_test_source_template_and_quality_audit",
+                            "failed_request_usage_reconciliation",
+                            "cam_atomsearch_control_implementations", "final_test_release_protocol"],
         "external_arms": {"skillopt_controlled": "implemented_development" if include_skillopt_controlled else "planned",
                           "cam_reference": "planned", "atomsearch_budgeted": "planned"},
     }
