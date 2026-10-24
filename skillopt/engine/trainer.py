@@ -696,7 +696,10 @@ class ReflACTTrainer:
 
     def train(self) -> dict:
         """Execute the full ReflACT training loop. Returns summary dict."""
-        cfg = self.cfg
+        from skillopt.remem.config import ReMemConfig
+
+        remem_options = ReMemConfig.parse(self.cfg)
+        cfg = dict(self.cfg) if remem_options else self.cfg
         adapter = self.adapter
         out_root = cfg["out_root"]
         os.makedirs(out_root, exist_ok=True)
@@ -926,6 +929,8 @@ class ReflACTTrainer:
 
         train_size = _resolve_train_size(cfg, dataloader)
         steps_per_epoch = math.ceil(train_size / (batch_size * accumulation))
+        if remem_options and remem_options.task_schedule:
+            steps_per_epoch = len(remem_options.task_schedule)
         batches_per_epoch = steps_per_epoch * accumulation
         total_steps = num_epochs * steps_per_epoch
 
@@ -934,7 +939,7 @@ class ReflACTTrainer:
         cfg["train_size"] = train_size
         cfg["steps_per_epoch"] = steps_per_epoch
         cfg["batches_per_epoch"] = batches_per_epoch
-        cfg["samples_per_epoch"] = train_size
+        cfg["samples_per_epoch"] = steps_per_epoch * batch_size if remem_options and remem_options.task_schedule else train_size
         cfg["skill_update_mode"] = update_mode
         cfg["lr_control_mode"] = lr_control_mode
         # Record the resolved Qwen thinking policy: it can come from the
@@ -943,6 +948,22 @@ class ReflACTTrainer:
             cfg["resolved_qwen_thinking_modes"] = get_qwen_thinking_modes()
 
         # Save config after deriving runtime values.
+        remem = None
+        if remem_options:
+            from skillopt.remem.runtime import ReMemRuntime
+
+            remem = ReMemRuntime(cfg, dataloader, chat_optimizer)
+        reflect_strategy = remem.reflect if remem else adapter.reflect
+        aggregate_strategy = remem.aggregate if remem else merge_patches
+        selection_strategy = remem.rank if remem else rank_and_select
+        application_strategy = remem.apply if remem else apply_patch_with_report
+        gate_strategy = remem.evaluate_gate if remem else evaluate_gate
+
+        def _rollout(env, skill, directory, *, phase, **kwargs):
+            if remem:
+                return remem.rollout(adapter, env, skill, directory, phase=phase, **kwargs)
+            return adapter.rollout(env, skill, directory, **kwargs)
+
         with open(os.path.join(out_root, "config.json"), "w") as f:
             json.dump(_redact_cfg(cfg), f, indent=2, ensure_ascii=False)
 
@@ -982,25 +1003,31 @@ class ReflACTTrainer:
         print(f"  [config] base_seeds={base_seeds}")
 
         # ── Resume check ─────────────────────────────────────────────────
-        history = _load_history(out_root)
-        runtime_state = _load_runtime_state(out_root)
+        remem_checkpoint = remem.restore() if remem else None
+        history = (remem_checkpoint["history"] if remem_checkpoint else []) if remem else _load_history(out_root)
+        runtime_state = (remem_checkpoint["state"] if remem_checkpoint else None) if remem else _load_runtime_state(out_root)
         if runtime_state:
             last_step = int(runtime_state.get("last_completed_step", 0) or 0)
             current_skill_path = runtime_state.get("current_skill_path") or os.path.join(
                 out_root, "skills", f"skill_v{last_step:04d}.md",
             )
-            with open(current_skill_path) as f:
-                current_skill = f.read()
+            if remem_checkpoint:
+                current_skill = remem_checkpoint["current_skill"]
+            else:
+                with open(current_skill_path) as f:
+                    current_skill = f.read()
             best_skill_path = runtime_state.get("best_skill_path") or os.path.join(
                 out_root, "best_skill.md",
             )
-            if os.path.exists(best_skill_path):
+            if remem_checkpoint:
+                best_skill = remem_checkpoint["best_skill"]
+            elif os.path.exists(best_skill_path):
                 with open(best_skill_path) as f:
                     best_skill = f.read()
             else:
                 best_skill = current_skill
-            current_score = float(runtime_state.get("current_score", -1.0) or -1.0)
-            best_score = float(runtime_state.get("best_score", current_score) or current_score)
+            current_score = float(runtime_state.get("current_score", -1.0))
+            best_score = float(runtime_state.get("best_score", current_score))
             best_step = runtime_state.get("best_step", last_step)
             current_origin = str(
                 runtime_state.get("current_origin")
@@ -1058,6 +1085,11 @@ class ReflACTTrainer:
             current_skill = inject_empty_appendix_field(current_skill)
 
         def _persist_runtime_state(last_completed_step: int) -> None:
+            if remem:
+                remem.checkpoint({"last_completed_step": last_completed_step,
+                                  "current_score": current_score, "best_score": best_score,
+                                  "best_step": best_step, "current_origin": current_origin,
+                                  "best_origin": best_origin}, history, current_skill, best_skill)
             _save_runtime_state(
                 out_root,
                 {
@@ -1137,7 +1169,7 @@ class ReflACTTrainer:
             )
             print(f"  Selection items: {sel_n}")
             baseline_dir = os.path.join(out_root, "selection_eval_baseline")
-            baseline_results = adapter.rollout(sel_env, skill_init, baseline_dir)
+            baseline_results = _rollout(sel_env, skill_init, baseline_dir, phase="selection")
             baseline_hard, baseline_soft = compute_score(baseline_results)
             current_score = select_gate_score(
                 baseline_hard, baseline_soft, gate_metric, gate_mixed_weight,
@@ -1166,7 +1198,10 @@ class ReflACTTrainer:
 
         global_step = 0
         for epoch in range(1, num_epochs + 1):
-            if dataloader is not None:
+            if remem and remem.schedule:
+                epoch_batches = remem.batches(seed)
+                shuffled_seeds = [batch.seed for batch in epoch_batches]
+            elif dataloader is not None:
                 epoch_batches = dataloader.plan_train_epoch(
                     epoch=epoch,
                     steps_per_epoch=steps_per_epoch,
@@ -1211,6 +1246,8 @@ class ReflACTTrainer:
                 os.makedirs(step_dir, exist_ok=True)
 
                 tokens_before = get_token_summary()
+                if remem:
+                    remem.begin_step(global_step, current_skill)
 
                 print(
                     f"\n  [STEP {global_step}/{total_steps}] "
@@ -1261,8 +1298,9 @@ class ReflACTTrainer:
                     # ① ROLLOUT ────────────────────────────────────────────
                     t_phase = time.time()
                     print(f"    [1/6 ROLLOUT] train items={train_n} (from pool, batch_seed={batch_seed})")
-                    rollout_results = adapter.rollout(
+                    rollout_results = _rollout(
                         train_env, current_skill, rollout_dir,
+                        phase="train",
                         use_eval_feedback=True,
                     )
                     r_hard, r_soft = compute_score(rollout_results)
@@ -1275,19 +1313,24 @@ class ReflACTTrainer:
                     pred_dir = os.path.join(rollout_dir, "predictions")
 
                     # Build step context from buffer
-                    step_buffer_context = _format_step_buffer(step_buffer)
+                    step_buffer_context = "" if remem else _format_step_buffer(step_buffer)
 
-                    raw_patches = adapter.reflect(
+                    raw_patches = reflect_strategy(
                         rollout_results, current_skill, batch_dir,
                         prediction_dir=pred_dir, patches_dir=patches_dir,
                         random_seed=batch_seed,
                         step_buffer_context=step_buffer_context,
                         meta_skill_context=active_meta_skill,
                     )
-                    failure_patches, success_patches = _normalise_patches(
-                        raw_patches,
-                        update_mode=update_mode,
-                    )
+                    if remem:
+                        # Keep source IDs intact; batch size is not edit support.
+                        failure_patches = [p["patch"] for p in raw_patches]
+                        success_patches = []
+                    else:
+                        failure_patches, success_patches = _normalise_patches(
+                            raw_patches,
+                            update_mode=update_mode,
+                        )
                     all_failure_patches.extend(failure_patches)
                     all_success_patches.extend(success_patches)
                     all_raw_patches.extend(raw_patches)
@@ -1361,7 +1404,7 @@ class ReflACTTrainer:
 
                 # ③ AGGREGATE ──────────────────────────────────────────────
                 t_phase = time.time()
-                merged_patch = merge_patches(
+                merged_patch = aggregate_strategy(
                     current_skill, all_failure_patches, all_success_patches,
                     batch_size=merge_bs, verbose=True,
                     workers=cfg["analyst_workers"],
@@ -1413,7 +1456,7 @@ class ReflACTTrainer:
                             }, ensure_ascii=False) + "\n")
                     else:
                         edit_budget = scheduler.step()
-                    ranked_patch = rank_and_select(
+                    ranked_patch = selection_strategy(
                         current_skill, merged_patch,
                         max_edits=edit_budget,
                         update_mode=update_mode,
@@ -1499,7 +1542,7 @@ class ReflACTTrainer:
                         candidate_skill = current_skill
                         apply_report = []
                 else:
-                    candidate_skill, apply_report = apply_patch_with_report(current_skill, ranked_patch)
+                    candidate_skill, apply_report = application_strategy(current_skill, ranked_patch)
                 with open(os.path.join(step_dir, "candidate_skill.md"), "w") as f:
                     f.write(candidate_skill)
                 if apply_report:
@@ -1573,14 +1616,14 @@ class ReflACTTrainer:
                     )
                     print(f"    [6/6 EVALUATE] selection items={sel_n}")
                     sel_eval_dir = os.path.join(step_dir, "selection_eval")
-                    sel_results = adapter.rollout(sel_env, candidate_skill, sel_eval_dir)
+                    sel_results = _rollout(sel_env, candidate_skill, sel_eval_dir, phase="selection")
                     cand_hard, cand_soft = compute_score(sel_results)
                     sel_cache[cand_hash] = (cand_hard, cand_soft)
 
                 step_rec["selection_hard"] = cand_hard
                 step_rec["selection_soft"] = cand_soft
 
-                gate = evaluate_gate(
+                gate = gate_strategy(
                     candidate_skill=candidate_skill,
                     cand_hard=cand_hard,
                     current_skill=current_skill,
@@ -2490,6 +2533,8 @@ class ReflACTTrainer:
             "total_wall_time_s": round(total_wall, 1),
             "token_summary": token_summary,
         }
+        if remem:
+            summary["remem"] = remem.summary()
         with open(os.path.join(out_root, "summary.json"), "w") as f:
             json.dump(summary, f, indent=2, ensure_ascii=False)
 

@@ -93,7 +93,7 @@ def main() -> None:
     print(json.dumps({"status": "passed", "scope": "handoff_structure_only", "required_files": len(required),
                       "core_runs": len(core) * len(design["seeds"]),
                       "recommended_runs": design["variants"]["recommended_21"]["optimization_runs"],
-                      "model_calls": 0, "algorithms_implemented": False}, ensure_ascii=False))
+                      "model_calls": 0, "declared_implementation_status": design["implementation_status"]}, ensure_ascii=False))
 
 
 if __name__ == "__main__":

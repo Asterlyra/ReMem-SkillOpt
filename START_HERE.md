@@ -1,6 +1,6 @@
 # ReMem-SkillOpt：新项目入口
 
-本项目从 Microsoft SkillOpt 重新克隆，**不是 CAM 工作目录的复制品**。当前完成的是研究方案、工程交接与实验规格；ReMem 的两个模块尚未实现，也没有开始模型实验。
+本项目从 Microsoft SkillOpt 重新克隆，**不是 CAM 工作目录的复制品**。截至 2026-10-24，已配置独立环境和 Verified 400 数据，实现 R/M 策略、公共失败账本、配对门控与 trainer 离线集成；开发版实验框架已建立，尚未调用模型或开始正式实验。
 
 工作标题：**ReMem-Skill: Evidence-Guided Repair with Persistent Failure Memory for Agent Skill Optimization**。
 
@@ -23,6 +23,8 @@
 8. [近期文献及相似工作](docs/remem/07_RELATED_WORK.md)
 9. [CAM 复用地图](docs/remem/08_CAM_REUSE.md)
 10. [可靠性、数据与冻结要求](docs/remem/09_REPRODUCIBILITY.md)
+11. [环境与数据准备](docs/remem/10_ENVIRONMENT.md)
+12. [框架实现、验收与后续边界](docs/remem/11_FRAMEWORK.md)
 
 机器可读规格：[研究设计 JSON](research/remem/study_design.json)。它是**未冻结的实验规格，不是 train.py 可直接加载的配置**。
 
@@ -35,10 +37,10 @@
 
 ## 当前能做什么
 
-可以阅读方案，审查上游调用链，按阶段实现并做离线验证。不能把计划文件中的模块路径当成已实现，也不能直接用旧 CAM 训练命令启动本项目。
+可以运行离线测试、重新验证数据、准备并验证开发版核心 12 格配置。使用 `scripts/remem/python.ps1` 固定项目解释器与 UTF-8。具体命令见框架文档；正式 18/21 格、外部对照、模型探活与最终测试发布尚未完成，不能直接套用旧 CAM 命令。
 
 在仓库根目录执行 `python scripts/remem/validate_handoff.py` 可检查交接文件、研究矩阵和凭据模板；该检查不调用模型。
 
 环境密钥模板位于 [research/remem/model.env.example](research/remem/model.env.example)，没有任何真实密钥。历史模型档案不代表当前网关已再次探活。
 
-本轮交付与验证记录：[BOOTSTRAP_REPORT.md](research/remem/BOOTSTRAP_REPORT.md)。
+初始交接记录：[BOOTSTRAP_REPORT.md](research/remem/BOOTSTRAP_REPORT.md)。当前实现记录：[FOUNDATION_REPORT.md](research/remem/FOUNDATION_REPORT.md)。

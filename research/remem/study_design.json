@@ -71,5 +71,5 @@
   "primary_comparison": ["remem_full", "core_00"],
   "secondary_comparisons": [["remem_full", "repair_only"], ["remem_full", "memory_only"]],
   "metrics": ["final_test_success_rate", "fixed_revisit_repair_rate", "fixed_revisit_regression_rate", "failure_capture_coverage", "repeated_ineffective_repair_rate", "task_executions", "http_attempts", "tokens_and_coverage", "wall_time", "skill_length"],
-  "implementation_status": {"R": "planned", "M": "planned", "study_runner": "planned", "model_preflight": "not_run", "formal_experiments": "not_run"}
+  "implementation_status": {"R": "implemented_offline_core", "M": "implemented_offline_task_match", "study_runner": "development_core_only", "external_controls": "planned", "transport_accounting": "planned", "model_preflight": "not_run", "formal_experiments": "not_run"}
 }

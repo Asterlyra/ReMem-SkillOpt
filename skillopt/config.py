@@ -308,6 +308,12 @@ def flatten_config(cfg: dict) -> dict:
     If *cfg* is already flat, returns a normalized copy.
     """
     cfg = _normalize_codex_config_aliases(cfg)
+    if isinstance(cfg.get("remem"), dict) and cfg["remem"].get("enabled", True):
+        # Legacy configuration remains permissive. Research configurations must
+        # never silently drop a misspelled control during flattening.
+        from skillopt.remem.config import validate_source_config
+
+        validate_source_config(cfg, _FLATTEN_MAP, _STRUCTURED_SECTIONS)
     if not is_structured(cfg):
         return dict(cfg)
 

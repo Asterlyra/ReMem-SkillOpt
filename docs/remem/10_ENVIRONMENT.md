@@ -7,8 +7,8 @@
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r research/remem/environment-windows-py312.txt
 .\.venv\Scripts\python.exe -m pip install -r requirements-remem.txt
-.\.venv\Scripts\python.exe scripts/remem/prepare_data.py
-.\.venv\Scripts\python.exe scripts/remem/verify_environment.py
+.\scripts\remem\python.ps1 scripts/remem/prepare_data.py
+.\scripts\remem\python.ps1 scripts/remem/verify_environment.py
 ```
 
 `prepare_data.py` 固定 Hugging Face revision
@@ -32,3 +32,6 @@ https://huggingface.co/datasets/KAKA22/SpreadsheetBench 。
 
 环境验证只执行合成表格程序与评分器，不调用模型、不读取测试成绩。
 模型凭据、后端身份、吞吐、费用与正式协议仍须后续联调和冻结。
+
+后续命令使用 `scripts/remem/python.ps1`，它为当前进程启用 UTF-8，避免上游部分
+未指定编码的文件读写受 Windows 系统代码页影响；退出后恢复原环境变量。

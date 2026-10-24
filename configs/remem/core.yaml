@@ -1,0 +1,62 @@
+# Development template. The study runner supplies a fixed task schedule.
+model:
+  backend: azure_openai
+  optimizer: glm
+  target: qwen
+  optimizer_backend: openai_chat
+  target_backend: openai_chat
+  optimizer_azure_openai_auth_mode: openai_compatible
+  target_azure_openai_auth_mode: openai_compatible
+  reasoning_effort: ""
+train:
+  num_epochs: 1
+  train_size: 80
+  batch_size: 20
+  accumulation: 1
+  seed: 42
+gradient:
+  minibatch_size: 8
+  merge_batch_size: 8
+  analyst_workers: 8
+  failure_only: false
+optimizer:
+  learning_rate: 2
+  min_learning_rate: 1
+  lr_scheduler: constant
+  lr_control_mode: fixed
+  skill_update_mode: patch
+  use_slow_update: false
+  use_meta_skill: false
+  use_skill_aware_reflection: false
+evaluation:
+  use_gate: true
+  gate_metric: hard
+  sel_env_num: 40
+  test_env_num: 0
+  eval_test: false
+env:
+  name: spreadsheetbench
+  skill_init: skillopt/envs/spreadsheetbench/skills/initial.md
+  out_root: ""
+  split_mode: split_dir
+  data_root: data/spreadsheetbench_remem_400
+  split_dir: data/spreadsheetbench_split
+  mode: single
+  workers: 8
+  max_turns: 30
+  exec_timeout: 600
+  max_completion_tokens: 16384
+remem:
+  enabled: true
+  repair: true
+  memory: true
+  max_proposals: 4
+  max_edits: 2
+  top_k: 3
+  max_attempts: 2
+  memory_character_cap: 12000
+  bootstrap_samples: 10000
+  confidence: 0.95
+  optimizer_calls: 80
+  optimizer_output_tokens: 16384
+  task_executions: 400

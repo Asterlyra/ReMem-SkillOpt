@@ -4,7 +4,7 @@
 
 在 Microsoft SkillOpt 上研究两个相互配合的模块：**R：证据驱动的受控修复**与 **M：持续失败与修复记忆**。模型权重保持冻结，优化对象为可复用的 skill 文本。
 
-> **当前状态：研究交接与实验设计已建立，R/M 尚未实现，正式实验尚未运行。** 上游框架代码已全新克隆；本仓库目前不提供 ReMem 的性能结论。
+> **当前状态：独立环境、数据准备、R/M 策略与 trainer 离线集成已建立；正式实验尚未运行。** 开发版框架支持固定核心任务计划、冻结校验和只读报告。本仓库不提供 ReMem 性能结论。
 
 ## 从这里开始
 
@@ -14,6 +14,7 @@
 - [实验协议](docs/remem/04_EXPERIMENT_PROTOCOL.md) · [指标定义](docs/remem/05_METRICS.md)
 - [模型接入档案](docs/remem/06_MODEL_REGISTRY.md) · [相关文献](docs/remem/07_RELATED_WORK.md)
 - [CAM 复用地图](docs/remem/08_CAM_REUSE.md) · [复现要求](docs/remem/09_REPRODUCIBILITY.md)
+- [环境配置](docs/remem/10_ENVIRONMENT.md) · [框架实现与验收](docs/remem/11_FRAMEWORK.md)
 
 ## 方法范围
 
