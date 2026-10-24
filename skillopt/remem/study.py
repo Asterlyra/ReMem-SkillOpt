@@ -251,6 +251,8 @@ def execute_config(cfg: dict, *, key_file: Path | None = None) -> dict:
     from skillopt.engine.trainer import ReflACTTrainer
     env_keys = ("OPTIMIZER_AZURE_OPENAI_API_KEY", "TARGET_AZURE_OPENAI_API_KEY", "REMEM_TRANSPORT_AUDIT_PATH")
     previous = {key: os.environ.get(key) for key in env_keys}
+    from skillopt.model import azure_openai as backend
+    previous_backend_keys = backend.OPTIMIZER_API_KEY, backend.TARGET_API_KEY
     try:
         if key_file is not None:
             key_file = key_file.resolve()
@@ -269,6 +271,10 @@ def execute_config(cfg: dict, *, key_file: Path | None = None) -> dict:
             os.environ["OPTIMIZER_AZURE_OPENAI_API_KEY"] = key
             os.environ["TARGET_AZURE_OPENAI_API_KEY"] = key
         os.environ["REMEM_TRANSPORT_AUDIT_PATH"] = str((Path(cfg["out_root"]) / "remem/transport.jsonl").resolve())
+        # Model modules were imported before loading the ignored key file. Refresh
+        # their in-memory credentials explicitly without placing secrets in cfg.
+        backend.configure_azure_openai(optimizer_api_key=os.environ.get(env_keys[0]),
+                                       target_api_key=os.environ.get(env_keys[1]))
         adapter = get_adapter(cfg)
         from .call_policy import ResearchCallPolicy, use_call_policy
         limits = dict(cfg.get("research_limits", {}))
@@ -276,6 +282,12 @@ def execute_config(cfg: dict, *, key_file: Path | None = None) -> dict:
         with use_call_policy(ResearchCallPolicy(Path(cfg["out_root"]), **limits)):
             return ReflACTTrainer(cfg, adapter).train()
     finally:
+        backend.OPTIMIZER_API_KEY, backend.TARGET_API_KEY = previous_backend_keys
+        for client_name in ("_optimizer_client", "_target_client"):
+            client = getattr(backend, client_name)
+            if client is not None:
+                client.close()
+            setattr(backend, client_name, None)
         for key, value in previous.items():
             if value is None:
                 os.environ.pop(key, None)

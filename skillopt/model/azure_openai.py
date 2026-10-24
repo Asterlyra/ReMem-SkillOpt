@@ -443,9 +443,11 @@ def _chat_impl(
             return text, usage_info
 
         except Exception as e:  # noqa: BLE001
-            from skillopt.remem.call_policy import CallPolicyError
+            from skillopt.remem.call_policy import CallPolicyError, active_policy
             if isinstance(e, CallPolicyError):
                 raise
+            if active_policy() is not None and getattr(e, "status_code", None) in {400, 401, 403, 404, 422}:
+                raise RuntimeError(f"LLM call failed: HTTP {e.status_code}") from None
             last_err = e
             sleep = min(2 ** attempt, 30)
             time.sleep(sleep)
@@ -546,9 +548,11 @@ def _chat_messages_impl(
             )
             return (message if return_message else text), usage_info
         except Exception as e:  # noqa: BLE001
-            from skillopt.remem.call_policy import CallPolicyError
+            from skillopt.remem.call_policy import CallPolicyError, active_policy
             if isinstance(e, CallPolicyError):
                 raise
+            if active_policy() is not None and getattr(e, "status_code", None) in {400, 401, 403, 404, 422}:
+                raise RuntimeError(f"LLM call failed: HTTP {e.status_code}") from None
             last_err = e
             sleep = min(2 ** attempt, 30)
             time.sleep(sleep)

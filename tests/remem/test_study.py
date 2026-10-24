@@ -122,6 +122,38 @@ def test_calibration_is_small_frozen_and_has_no_test_tasks(prepared):
     assert all(c["research_limits"]["task_executions"] == 32 for c in configs)
 
 
+def test_local_key_refreshes_preimported_backend_without_entering_config(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    from scripts import train
+    from skillopt.engine import trainer
+    from skillopt.model import azure_openai as backend
+    from skillopt.remem.call_policy import active_policy
+    monkeypatch.setattr(study, "ROOT", tmp_path)
+    monkeypatch.setattr(study.subprocess, "run", lambda *a, **kw: SimpleNamespace(returncode=0))
+    monkeypatch.setattr(train, "get_adapter", lambda cfg: object())
+    monkeypatch.setattr(backend, "OPTIMIZER_API_KEY", "previous-optimizer")
+    monkeypatch.setattr(backend, "TARGET_API_KEY", "previous-target")
+    monkeypatch.setattr(backend, "configure_azure_openai", lambda **kw: (
+        setattr(backend, "OPTIMIZER_API_KEY", kw["optimizer_api_key"]),
+        setattr(backend, "TARGET_API_KEY", kw["target_api_key"])))
+    monkeypatch.setattr(backend, "_optimizer_client", None)
+    monkeypatch.setattr(backend, "_target_client", None)
+    key_file = tmp_path / ".env.fake.local"
+    key_file.write_text("DEEPSEEK_API_KEY=unit-test-placeholder\n")
+    cfg = {"out_root": str(tmp_path / "run"), "optimizer_model": "deepseek-flash", "target_model": "deepseek-flash",
+           "optimizer_azure_openai_endpoint": "https://api.deepseek.com", "target_azure_openai_endpoint": "https://api.deepseek.com"}
+    class Trainer:
+        def __init__(self, actual, adapter):
+            assert actual == cfg and "unit-test-placeholder" not in json.dumps(actual)
+        def train(self):
+            assert backend.OPTIMIZER_API_KEY == backend.TARGET_API_KEY == "unit-test-placeholder"
+            assert active_policy() is not None
+            return {"ok": True}
+    monkeypatch.setattr(trainer, "ReflACTTrainer", Trainer)
+    assert study.execute_config(cfg, key_file=key_file) == {"ok": True}
+    assert backend.OPTIMIZER_API_KEY == "previous-optimizer" and backend.TARGET_API_KEY == "previous-target"
+
+
 def test_control_rollout_budget_cache_and_interruption(tmp_path):
     class Adapter:
         calls = 0

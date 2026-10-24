@@ -116,6 +116,8 @@ class RuntimeAudit:
             raise InfrastructureFailure("Missing, duplicate or foreign rollout results; valid failures preserved")
         bad = [r for r in rows if classify(r)[0] == "infra_failure"]
         if bad:
+            self.store.append("rollout_invalid:" + key, "infra_failure", {"step": self.step,
+                "phase": phase, "task_ids": [str(r["id"]) for r in bad], "kind": "invalid_task_execution"})
             raise InfrastructureFailure("Infrastructure failure in rollout; valid training failures were preserved")
         if phase == "selection":
             aligned_scores(rows)

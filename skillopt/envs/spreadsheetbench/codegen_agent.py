@@ -208,6 +208,8 @@ def _llm_call_with_retry(call_fn, *, retries: int = 5, timeout: int | None = 120
             raise
         except Exception as e:  # noqa: BLE001
             last_err = e
+            if policy is not None and getattr(e, "status_code", None) in {400, 401, 403, 404, 422}:
+                raise RuntimeError(f"LLM call failed: HTTP {e.status_code}") from None
             sleep = min(2 ** attempt + random.random(), 60)
             time.sleep(sleep)
     if policy is not None:
