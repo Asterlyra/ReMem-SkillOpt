@@ -15,6 +15,8 @@ import re
 import sqlite3
 import subprocess
 import sys
+import time
+import uuid
 from pathlib import Path
 
 from skillopt.config import flatten_config, load_config
@@ -279,8 +281,19 @@ def execute_config(cfg: dict, *, key_file: Path | None = None) -> dict:
         from .call_policy import ResearchCallPolicy, use_call_policy
         limits = dict(cfg.get("research_limits", {}))
         limits.pop("task_executions", None)
-        with use_call_policy(ResearchCallPolicy(Path(cfg["out_root"]), **limits)):
-            return ReflACTTrainer(cfg, adapter).train()
+        policy = ResearchCallPolicy(Path(cfg["out_root"]), **limits)
+        invocation, started, error_type = uuid.uuid4().hex, time.monotonic(), None
+        policy.store.append(invocation, "execution_started", {"invocation": invocation})
+        try:
+            with use_call_policy(policy):
+                return ReflACTTrainer(cfg, adapter).train()
+        except BaseException as exc:
+            error_type = type(exc).__name__
+            raise
+        finally:
+            policy.store.append(invocation + ":finished", "execution_finished", {"invocation": invocation,
+                "elapsed_s": time.monotonic() - started, "error_type": error_type,
+                "scope": "trainer_including_setup_baseline_optimization_summary"})
     finally:
         backend.OPTIMIZER_API_KEY, backend.TARGET_API_KEY = previous_backend_keys
         for client_name in ("_optimizer_client", "_target_client"):
@@ -327,6 +340,16 @@ def report(directory: Path) -> dict:
             row["infra_failures"] = sum(k in {"infra_failure", "optimizer_error"} for k, p in records)
             row["no_change"] = sum(k == "attempt" and p["gate_action"] == "no_change" for k, p in records)
             row["proposal_invalid"] = sum(k == "proposal_invalid" or (k == "proposal_result" and p["status"] == "proposal_invalid") for k, p in records)
+        calls = folder / "remem/calls/ledger.sqlite3"
+        if calls.exists():
+            with sqlite3.connect(calls.resolve().as_uri() + "?mode=ro", uri=True) as db:
+                records = [(kind, json.loads(body)) for kind, body in db.execute("SELECT kind,payload FROM records")]
+            starts = [p for k, p in records if k == "execution_started"]
+            finishes = [p for k, p in records if k == "execution_finished"]
+            timing_complete = bool(starts) and {r["invocation"] for r in starts} == {r["invocation"] for r in finishes}
+            row["execution_timing_complete"] = timing_complete
+            row["execution_wall_time_s"] = sum(r["elapsed_s"] for r in finishes) if timing_complete else None
+            row["optimizer_logical_calls"] = sum(k == "start" for k, _ in records)
         control_journal = folder / "remem/control_rollouts.jsonl"
         if control_journal.exists():
             entries = [json.loads(line) for line in control_journal.read_text(encoding="utf-8").splitlines() if line]

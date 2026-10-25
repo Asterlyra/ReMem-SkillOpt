@@ -152,6 +152,13 @@ def test_local_key_refreshes_preimported_backend_without_entering_config(tmp_pat
     monkeypatch.setattr(trainer, "ReflACTTrainer", Trainer)
     assert study.execute_config(cfg, key_file=key_file) == {"ok": True}
     assert backend.OPTIMIZER_API_KEY == "previous-optimizer" and backend.TARGET_API_KEY == "previous-target"
+    import sqlite3
+    with sqlite3.connect(tmp_path / "run/remem/calls/ledger.sqlite3") as db:
+        starts = [json.loads(b) for (b,) in db.execute("SELECT payload FROM records WHERE kind='execution_started'")]
+        finishes = [json.loads(b) for (b,) in db.execute("SELECT payload FROM records WHERE kind='execution_finished'")]
+    assert len(starts) == len(finishes) == 1
+    assert starts[0]["invocation"] == finishes[0]["invocation"]
+    assert finishes[0]["elapsed_s"] >= 0 and finishes[0]["error_type"] is None
 
 
 def test_control_rollout_budget_cache_and_interruption(tmp_path):

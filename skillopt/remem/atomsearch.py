@@ -33,7 +33,9 @@ status is proposals or no_change. For no_change, explain why and return two empt
 For proposals, contrast at least one current failed task with at least one current
 successful task. Each specification has exactly: id, support_ids, counterexample_ids,
 hypothesis, scope, expected_effect, operation_rationale. IDs must be strings.
-support_ids must cite failures; counterexample_ids must cite successes to preserve.
+support_ids must use task_id strings from allowed_support_ids; counterexample_ids
+must use task_id strings from allowed_counterexample_ids. Never use event_id,
+case_id, artifact_hash, row positions, or filenames as task IDs.
 Each ranked edit has exactly: criterion_id, operation, rule_id, content.
 Use one specification per edit. operation is add, rewrite, or delete. For add use
 rule_id=document_end. For rewrite/delete use one supplied rule_id. Content is one
@@ -262,7 +264,9 @@ class AtomSearchRuntime(RuntimeAudit):
         self.refills += 1
         request = {"skill": node.skill, "rules": rule_index(node.skill), "current_training_observations": self.current,
                    "outcome_memory": self._memory_context(), "max_specs": self.search["max_specs"],
-                   "edit_budget": self.search["edit_budget"]}
+                   "edit_budget": self.search["edit_budget"],
+                   "allowed_support_ids": sorted(row["task_id"] for row in self.current if row["outcome"] == "failure"),
+                   "allowed_counterexample_ids": sorted(row["task_id"] for row in self.current if row["outcome"] == "success")}
         identity = f"atom_proposal:{self.step}"
         outcomes = {row["outcome"] for row in self.current}
         if not {"failure", "success"} <= outcomes:
@@ -279,10 +283,15 @@ class AtomSearchRuntime(RuntimeAudit):
         text, _ = self.chat(system=PROPOSAL_SYSTEM, user=canonical(request), stage="atomsearch_proposal",
                             max_completion_tokens=16384, retries=3)
         assert_calls_healthy()
+        # Assistant text only, in the ignored local ledger. No headers, credentials,
+        # provider envelope, or model content is included in committed reports.
+        response_hash = self.store.artifact({"assistant_text": text})
+        self.store.append(identity + ":response", "optimizer_response", {"step": self.step, "artifact_hash": response_hash})
         try:
             candidates, reason = parse_proposal(text, node.skill, self.current, self.search)
-        except ProposalInvalid:
-            self.store.append(identity + ":invalid", "proposal_invalid", {"step": self.step})
+        except ProposalInvalid as exc:
+            self.store.append(identity + ":invalid", "proposal_invalid", {"step": self.step,
+                "category": str(exc.__cause__), "response_artifact_hash": response_hash})
             record_format_error("atomsearch_proposal")
             raise
         self.store.append(identity, "optimizer_completed", {"step": self.step,
