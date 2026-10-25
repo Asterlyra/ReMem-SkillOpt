@@ -36,7 +36,7 @@
       "source_sha256": "7a45fb09d0f7a36136fd53c6b4a30e53daeb669e8438271df7272f28fe7c0c01",
       "head_file_sha256": "2226589d482c997d8439942ab8f5ffb0c6b9d055976fe41fd7d65e8bcb501970",
       "destination": "skillopt/remem/vendor/cam/memory_context.py",
-      "destination_sha256": "f3b8bda8b149ec0cbf25d039a39a544fec4bcca0e0834a85d9ea63e0821d9892"
+      "destination_sha256": "4d0c8eda20264248eece5c78f6402d672dfe61cbbfb0e6a2a1b0476935c50a34"
     },
     {
       "source_path": "skillopt/cam/drift_guard.py",
@@ -50,5 +50,9 @@
     "Import namespace adapted; selection_guard infrastructure classifier uses current ReMem result contract.",
     "Only six CAM mechanism modules are ported; trainer and model clients remain the current SkillOpt implementation.",
     "CAM reference means v3 mechanisms under the new shared execution protocol, not exact historical executable reproduction."
+  ],
+  "public_head_checked_2026_10_25": "016e7efbcec168b25b0e3032c125e6e3a3f8a284",
+  "additional_deviations": [
+    "Model-visible CAM outcome memory omits paired validation IDs; aggregate support count is retained. Detailed IDs remain only in offline audit."
   ]
 }

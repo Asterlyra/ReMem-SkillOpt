@@ -25,11 +25,23 @@ def current_call_id() -> str | None:
 
 @contextmanager
 def audited_call(stage: str, call_id: str | None = None):
-    token = _CALL.set((stage, call_id or uuid.uuid4().hex))
+    previous = _CALL.get()
+    identity = call_id or uuid.uuid4().hex
+    nested = previous is not None and previous[1] == identity
+    token = _CALL.set((stage, identity))
     response_token = _RESPONSE_ID.set(None)
+    started = time.monotonic()
+    error_type = None
     try:
         yield
+    except BaseException as exc:
+        error_type = type(exc).__name__
+        raise
     finally:
+        path = audit_path()
+        if path is not None and not nested:
+            _write(path, {"kind": "logical_completion", "stage": stage, "call_id": identity,
+                          "elapsed_s": time.monotonic() - started, "error_type": error_type})
         _RESPONSE_ID.reset(response_token)
         _CALL.reset(token)
 
@@ -109,6 +121,10 @@ def summarize(path: Path) -> dict[str, Any]:
     requests = [record for record in records if record["kind"] == "request"]
     responses = [record for record in records if record["kind"] == "response"]
     usage = [record for record in records if record["kind"] == "usage"]
+    completions = [record for record in records if record["kind"] == "logical_completion"]
+    call_ids = {record.get("call_id") for record in requests}
+    timing_complete = (bool(requests) and None not in call_ids and len(completions) == len(call_ids)
+                       and {record["call_id"] for record in completions} == call_ids)
     ok_responses = sum(200 <= record["status"] < 300 for record in responses)
     successful_ids = {record["id"] for record in responses if 200 <= record["status"] < 300}
     complete = (bool(requests) and len(requests) == len(responses) and len(usage) == ok_responses
@@ -125,6 +141,9 @@ def summarize(path: Path) -> dict[str, Any]:
             "request_stages": {stage: sum(record.get("stage") == stage for record in requests)
                                for stage in sorted({record["stage"] for record in requests if record.get("stage")})},
             "http_elapsed_s_sum": sum(record["elapsed_s"] for record in responses),
+            "http_response_headers_elapsed_s_sum": sum(record["elapsed_s"] for record in responses),
+            "logical_timing_complete": timing_complete,
+            "logical_call_elapsed_s_sum": sum(record["elapsed_s"] for record in completions) if timing_complete else None,
             "successful_http_responses": ok_responses,
             "reported_usage_responses": len(usage), "usage_complete": complete,
             "known_prompt_tokens": sum(record["prompt_tokens"] for record in usage if record["prompt_tokens"] is not None),

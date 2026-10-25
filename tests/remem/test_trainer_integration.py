@@ -153,6 +153,7 @@ def test_native_controls_preserve_history_and_resume(make_run, monkeypatch, kind
     result = engine.ReflACTTrainer(cfg, adapter).train()
     assert result["total_steps"] == 2 and result["control"]["gates"] >= 1
     assert contexts[1].strip()  # Original native history is not suppressed as in core_00.
+    assert all(f"v{i}" not in canonical(contexts) for i in range(4))
     before = len(adapter.calls), len(contexts)
     resumed = engine.ReflACTTrainer(cfg, adapter).train()
     assert resumed["total_steps"] == 2

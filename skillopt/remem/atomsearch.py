@@ -264,6 +264,11 @@ class AtomSearchRuntime(RuntimeAudit):
                    "outcome_memory": self._memory_context(), "max_specs": self.search["max_specs"],
                    "edit_budget": self.search["edit_budget"]}
         identity = f"atom_proposal:{self.step}"
+        outcomes = {row["outcome"] for row in self.current}
+        if not {"failure", "success"} <= outcomes:
+            self.store.append(identity + ":insufficient", "atom_no_change", {"step": self.step,
+                "reason": "insufficient_contrastive_evidence", "artifact_hash": self.store.artifact(request)})
+            return []
         old = self.store.get(identity)
         if old:
             return [c for c in self.store.read_artifact(old["artifact_hash"])["candidates"] if c["key"] not in node.tried]

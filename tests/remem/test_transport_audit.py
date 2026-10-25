@@ -25,9 +25,26 @@ def test_transport_audit_counts_attempts_without_request_secrets(tmp_path, monke
     assert summary["usage_complete"] is True
     assert summary["prompt_tokens"] == 10
     assert summary["cached_prompt_tokens"] == 3
+    assert summary["logical_timing_complete"] is True
+    assert summary["logical_call_elapsed_s_sum"] >= 0
     assert "secret" not in path.read_text(encoding="utf-8")
     assert "private prompt" not in path.read_text(encoding="utf-8")
     client.close()
+
+
+def test_nested_audit_identity_has_one_completion_and_errors_have_timing(tmp_path, monkeypatch):
+    import json
+
+    import pytest
+    path = tmp_path / "audit.jsonl"
+    monkeypatch.setenv("REMEM_TRANSPORT_AUDIT_PATH", str(path))
+    with pytest.raises(TimeoutError):
+        with audited_call("outer", "same"):
+            with audited_call("inner", "same"):
+                raise TimeoutError("private provider body")
+    rows = [json.loads(line) for line in path.read_text().splitlines()]
+    assert len(rows) == 1 and rows[0]["error_type"] == "TimeoutError"
+    assert "private provider body" not in path.read_text()
 
 
 def test_missing_usage_remains_missing(tmp_path, monkeypatch):

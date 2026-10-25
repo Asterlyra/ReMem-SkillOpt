@@ -311,6 +311,8 @@ def report(directory: Path) -> dict:
             row["http_attempts"] = audit["http_attempts"]
             row["retry_attempts"] = audit["retry_attempts"]
             row["http_elapsed_s_sum"] = audit["http_elapsed_s_sum"]
+            row["logical_timing_complete"] = audit["logical_timing_complete"]
+            row["logical_call_elapsed_s_sum"] = audit["logical_call_elapsed_s_sum"]
             row["tokens"] = ({"prompt": audit["prompt_tokens"], "completion": audit["completion_tokens"],
                               "cached_prompt": audit["cached_prompt_tokens"]} if audit["usage_complete"] else None)
             row["usage_complete"] = audit["usage_complete"]

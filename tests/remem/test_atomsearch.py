@@ -149,3 +149,17 @@ def test_bad_proposal_does_not_silently_become_no_change(tmp_path):
     assert runtime.store.records("proposal_invalid")
     assert runtime.store.records("observation")
     assert not (runtime.root / "summary.json").exists()
+
+
+def test_no_success_counterexample_is_explicit_no_change_without_fabrication(tmp_path):
+    runtime, adapter, _, _ = make_runtime(tmp_path, chat=lambda **kw: pytest.fail("No valid contrast exists"))
+    original = adapter.rollout
+    def rollout(*args, **kwargs):
+        rows = original(*args, **kwargs)
+        return [{**row, "hard": 0} for row in rows]
+    adapter.rollout = rollout
+    result = runtime.run()
+    assert result["nodes"] == 1 and result["refills"] == 2
+    assert len(runtime.store.records("atom_no_change")) == 2
+    assert len(runtime.store.records("observation")) == 4
+    assert not runtime.store.records("optimizer_started")
