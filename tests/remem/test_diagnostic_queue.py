@@ -1,0 +1,101 @@
+from __future__ import annotations
+
+import json
+from types import SimpleNamespace
+
+import pytest
+
+from scripts.remem import audit_medium, run_diagnostic_queue
+
+
+def test_report_retains_missing_model_and_usage_without_sorting_none_with_strings(tmp_path, monkeypatch):
+    split = tmp_path / "split/val"
+    split.mkdir(parents=True)
+    (split / "items.json").write_text("[]")
+    (tmp_path / "freeze.json").write_text(
+        json.dumps({"study_id": "fixture", "git_head": "fixture", "split_dir": str(split.parent)})
+    )
+    folder = tmp_path / "runs/arm/remem"
+    folder.mkdir(parents=True)
+    records = []
+    for number, model in enumerate(("glm", None)):
+        identity = str(number)
+        records.extend(
+            [
+                {"kind": "request", "id": identity, "role": "optimizer", "stage": "analyst", "call_id": identity},
+                {"kind": "response", "id": identity, "role": "optimizer", "status": 200, "elapsed_s": 0.1},
+                {
+                    "kind": "usage",
+                    "id": identity,
+                    "role": "optimizer",
+                    "call_id": identity,
+                    "response_model": model,
+                    "finish_reason": "stop" if model else None,
+                    "prompt_tokens": 10 if model else None,
+                    "completion_tokens": 20 if model else None,
+                    "cached_prompt_tokens": None,
+                },
+                {"kind": "logical_completion", "call_id": identity, "elapsed_s": 0.1},
+            ]
+        )
+    (folder / "transport.jsonl").write_text("\n".join(json.dumps(r) for r in records))
+    monkeypatch.setattr(
+        audit_medium, "report", lambda _: {"runs": [{"run": "arm", "status": "incomplete", "task_executions": 0}]}
+    )
+    audit_medium.audit(tmp_path)
+    row = json.loads((tmp_path / "operational_audit.json").read_text())["runs"][0]
+    assert row["response_models_by_role"]["optimizer"] == ["glm"]
+    assert row["response_model_missing_by_role"]["optimizer"] == 1
+    assert row["transport"]["usage_complete"] is False
+    assert row["transport"]["prompt_tokens"] is None and row["transport"]["known_prompt_tokens"] == 10
+
+
+@pytest.mark.parametrize("reporting_exit", [0, 1])
+def test_explicit_resume_starts_only_unstarted_arms_and_records_reporter_failures(
+    tmp_path, monkeypatch, reporting_exit
+):
+    (tmp_path / "freeze.json").write_text(
+        json.dumps({"study_id": "fixture", "run_order": ["complete", "failed", "pending"]})
+    )
+    progress = {
+        "study_id": "fixture",
+        "status": "running",
+        "pid": 999999,
+        "runs": [
+            {"run": "complete", "status": "finished", "exit_code": 0},
+            {"run": "failed", "status": "failed", "exit_code": 1},
+        ],
+    }
+    (tmp_path / "queue.json").write_text(json.dumps(progress))
+    monkeypatch.setattr(run_diagnostic_queue, "verify", lambda _: None)
+    monkeypatch.setattr(run_diagnostic_queue, "active_study_processes", lambda _: [])
+    monkeypatch.setattr(
+        run_diagnostic_queue, "report", lambda _: {"runs": [{"run": "pending", "status": "development_completed"}]}
+    )
+    monkeypatch.setattr(
+        run_diagnostic_queue.subprocess, "run", lambda *a, **k: SimpleNamespace(returncode=reporting_exit)
+    )
+    started = []
+
+    def launch(args, **kwargs):
+        started.append(args[args.index("--name") + 1])
+        return SimpleNamespace(pid=42, wait=lambda: 0)
+
+    monkeypatch.setattr(run_diagnostic_queue.subprocess, "Popen", launch)
+    code = run_diagnostic_queue.main(tmp_path, tmp_path / ".env.fake.local", resume_unstarted=True)
+    saved = json.loads((tmp_path / "queue.json").read_text())
+    assert started == ["pending"]
+    assert saved["runs"][:2] == progress["runs"]
+    assert len(list(tmp_path.glob("queue.before_resume_*.json"))) == 1
+    assert code == reporting_exit
+    assert saved["status"] == ("stopped_reporting_failure" if reporting_exit else "completed_with_failures")
+    if reporting_exit:
+        assert saved["reporting_errors"][0]["exit_code"] == 1
+
+
+def test_live_process_guard_rejects_duplicate_queue_before_any_launch(tmp_path, monkeypatch):
+    monkeypatch.setattr(run_diagnostic_queue, "verify", lambda _: None)
+    monkeypatch.setattr(run_diagnostic_queue, "active_study_processes", lambda _: [{"pid": 42}])
+    with pytest.raises(RuntimeError, match="still live"):
+        run_diagnostic_queue.main(tmp_path, tmp_path / ".env.fake.local")
+    assert not (tmp_path / "queue.json").exists()
