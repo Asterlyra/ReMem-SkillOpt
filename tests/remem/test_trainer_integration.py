@@ -158,6 +158,10 @@ def test_native_controls_preserve_history_and_resume(make_run, monkeypatch, kind
     resumed = engine.ReflACTTrainer(cfg, adapter).train()
     assert resumed["total_steps"] == 2
     assert (len(adapter.calls), len(contexts)) == before
+    if kind == "cam_reference":
+        store = native_control.NativeControlRuntime(cfg, adapter.loader, adapter).store
+        budgets = store.records("cam_budget")
+        assert budgets and all(row["step"] in (1, 2) for row in budgets)
 
 
 @pytest.mark.parametrize("repair,memory", [(False, False), (True, False), (False, True), (True, True)])

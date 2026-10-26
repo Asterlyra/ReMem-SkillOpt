@@ -134,7 +134,8 @@ class NativeControlRuntime(RuntimeAudit):
             decision = compute_evidence_budget(edits, total_failures=sum(row["hard"] == 0 for row in self.training_rows),
                 min_budget=min(2, kwargs["max_edits"]), max_budget=kwargs["max_edits"],
                 min_support_tasks=self.cam_cfg["cam_budget_min_support_tasks"], recent_score_changes=changes)
-            self.store.append(f"cam_budget:{self.step}", "cam_budget", {**asdict(decision), "discarded_ids": sorted(discarded)})
+            self.store.append(f"cam_budget:{self.step}", "cam_budget", {"step": self.step,
+                **asdict(decision), "discarded_ids": sorted(discarded)})
             patch = {**patch, "edits": decision.eligible_edits}
             kwargs["max_edits"] = decision.budget
             if not decision.budget:

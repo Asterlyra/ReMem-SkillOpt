@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 from types import SimpleNamespace
 
 import pytest
@@ -17,6 +18,12 @@ def test_report_retains_missing_model_and_usage_without_sorting_none_with_string
     )
     folder = tmp_path / "runs/arm/remem"
     folder.mkdir(parents=True)
+    with sqlite3.connect(folder / "ledger.sqlite3") as db:
+        db.execute("CREATE TABLE records (seq INTEGER PRIMARY KEY, kind TEXT, payload TEXT)")
+        db.execute(
+            "INSERT INTO records(kind,payload) VALUES (?,?)",
+            ("cam_budget", json.dumps({"budget": 2, "reason": "legacy_event_without_step"})),
+        )
     records = []
     for number, model in enumerate(("glm", None)):
         identity = str(number)
@@ -48,6 +55,7 @@ def test_report_retains_missing_model_and_usage_without_sorting_none_with_string
     assert row["response_model_missing_by_role"]["optimizer"] == 1
     assert row["transport"]["usage_complete"] is False
     assert row["transport"]["prompt_tokens"] is None and row["transport"]["known_prompt_tokens"] == 10
+    assert row["cam_budget_reasons"] == [{"step": None, "reason": "legacy_event_without_step", "budget": 2}]
 
 
 @pytest.mark.parametrize("reporting_exit", [0, 1])

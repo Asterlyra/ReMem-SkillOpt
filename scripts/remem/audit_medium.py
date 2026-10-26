@@ -44,7 +44,7 @@ def audit(directory):
             dict(step=p["step"], hit_count=p["hit_count"], status=p["status"]) for k, p in events if k == "cam_context"
         ]
         row["cam_budget_reasons"] = [
-            dict(step=p["step"], reason=p.get("reason"), budget=p["budget"]) for k, p in events if k == "cam_budget"
+            dict(step=p.get("step"), reason=p.get("reason"), budget=p["budget"]) for k, p in events if k == "cam_budget"
         ]
         row["optimizer_call_errors"] = dict(
             Counter(p.get("error_type", "unspecified") for k, p in calls if k == "error")
