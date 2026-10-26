@@ -73,11 +73,15 @@ def client_options(role: str) -> dict[str, Any]:
             policy.request(role, current[1] if current else None, identity)
         request.extensions["remem_audit_id"] = identity
         request.extensions["remem_audit_start"] = time.monotonic()
+        try:
+            body_bytes = len(request.content)
+        except httpx.RequestNotRead:
+            body_bytes = None
         _write(path, {"kind": "request", "id": identity, "role": role,
                       "stage": current[0] if current else None,
                       "call_id": current[1] if current else None,
                       "host": request.url.host, "path": request.url.path,
-                      "method": request.method, "time_ns": time.time_ns()})
+                      "method": request.method, "time_ns": time.time_ns(), "body_bytes": body_bytes})
 
     def on_response(response: httpx.Response) -> None:
         request = response.request
@@ -105,10 +109,20 @@ def record_usage(role: str, stage: str, response: Any) -> None:
     cached = getattr(prompt_details, "cached_tokens", None)
     completion_details = getattr(usage, "completion_tokens_details", None)
     choices = getattr(response, "choices", None) or []
+    extras = getattr(response, "model_extra", None)
+    error = extras.get("error") if isinstance(extras, dict) else None
+    code = error.get("code") or error.get("type") if isinstance(error, dict) else None
+    known_codes = {"context_length_exceeded", "invalid_request_error", "invalid_argument", "rate_limit_exceeded",
+                   "insufficient_quota", "insufficient_balance", "invalid_api_key", "model_not_found",
+                   "service_unavailable", "internal_server_error", "overloaded_error", "timeout_error", "content_filter"}
+    error_category = code if isinstance(code, str) and code in known_codes else "unclassified" if error else None
     current = _CALL.get()
     _write(path, {"kind": "usage", "role": role, "stage": stage,
                   "id": _RESPONSE_ID.get(), "call_id": current[1] if current else None,
                   "response_model": getattr(response, "model", None),
+                  "response_contract": {"has_model": bool(getattr(response, "model", None)),
+                                        "has_choices": bool(choices), "provider_error_present": bool(error),
+                                        "provider_error_category": error_category},
                   "finish_reason": getattr(choices[0], "finish_reason", None) if choices else None,
                   "prompt_tokens": prompt, "completion_tokens": completion,
                   "total_tokens": getattr(usage, "total_tokens", None),

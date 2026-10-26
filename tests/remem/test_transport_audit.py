@@ -6,6 +6,7 @@ from skillopt.remem.transport_audit import audited_call, client_options, record_
 
 
 def test_transport_audit_counts_attempts_without_request_secrets(tmp_path, monkeypatch):
+    import json
     path = tmp_path / "transport.jsonl"
     monkeypatch.setenv("REMEM_TRANSPORT_AUDIT_PATH", str(path))
     options = client_options("target")
@@ -29,7 +30,25 @@ def test_transport_audit_counts_attempts_without_request_secrets(tmp_path, monke
     assert summary["logical_call_elapsed_s_sum"] >= 0
     assert "secret" not in path.read_text(encoding="utf-8")
     assert "private prompt" not in path.read_text(encoding="utf-8")
+    records = [json.loads(line) for line in path.read_text().splitlines()]
+    assert next(row for row in records if row["kind"] == "request")["body_bytes"] == len(b"private prompt")
     client.close()
+
+
+def test_provider_error_metadata_keeps_only_allowlisted_category_and_missing_usage(tmp_path, monkeypatch):
+    import json
+
+    path = tmp_path / "metadata.jsonl"
+    monkeypatch.setenv("REMEM_TRANSPORT_AUDIT_PATH", str(path))
+    for code in ("context_length_exceeded", "private-secret-value"):
+        response = SimpleNamespace(model=None, choices=None, usage=None,
+                                   model_extra={"error": {"code": code, "message": "private provider body"}})
+        record_usage("optimizer", "analyst", response)
+    rows = [json.loads(line) for line in path.read_text().splitlines()]
+    assert [row["response_contract"]["provider_error_category"] for row in rows] == ["context_length_exceeded", "unclassified"]
+    assert all(row["response_contract"]["provider_error_present"] and not row["response_contract"]["has_choices"] for row in rows)
+    assert "private" not in path.read_text()
+    assert summarize(path)["prompt_tokens"] is None and summarize(path)["usage_complete"] is False
 
 
 def test_nested_audit_identity_has_one_completion_and_errors_have_timing(tmp_path, monkeypatch):
