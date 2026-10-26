@@ -23,6 +23,8 @@ Chat Completions 响应也只返回该别名，不能仅凭响应字段证明内
 
 以下章节仅描述旧网关档案。
 
+2026-10-26 重新验证：用户确认内网已接通，使用下述既有网关和角色别名。qwen/glm 最小聊天均成功，响应标识仍分别为 `Qwen3.6-35B-A3B` / `glm-5.3-private-19428658`；需仅对 `hub.zgci.org` 设置进程内 NO_PROXY，否则本机代理会阻断连接。新模板 `configs/remem/intranet-development.yaml`、本地忽略配置 `.env.intranet.local`。此前两次代理连接失败单独留档；当前价格和额度仍未独立核实，不继承旧“免费”断言。
+
 来源：旧项目 `docs/experiments/ZGCI_MODEL_HUB_API.md`、`CAM_SKILLOPT_ZGCI_EXPERIMENT_PLAN.md`、`configs/experiments/zgci_cam_matrix.yaml`、v3 实际运行记录。旧文档的“仅某模型能 JSON”“全部免费”等断言改为有日期的观察，不推广成模型本身永久能力限制。
 
 ## 1. 文本模型

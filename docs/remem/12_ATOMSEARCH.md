@@ -34,7 +34,7 @@
 
 开发矩阵生成支持 `scripts/remem/study.py prepare <id> --include-skillopt-controlled --include-cam-reference --include-atomsearch`。加入 `--calibration` 生成 6 个训练任务、4 个选择任务、空测试集、两次训练重现/搜索尝试的独立预实验；各方法上限 32 次任务执行、20 次优化器调用。源码变动必须新建 ID。`run` 默认不调用模型，显式 `--execute` 才执行。
 
-正式实验仍需：真实联调、数据质量审查、完整预算校准和最终测试发布流程。该复现本身不能作为正式实验已经完成的证据。
+两步真实联调已经完成，见 research/remem/LOOP_CONTROL_REPORT.md。正式实验仍需：中等诊断、数据质量审查、完整预算校准和最终测试发布流程。该复现本身不能作为正式实验已经完成的证据。
 
 2026-10-25 联调修正：全失败 minibatch 无成功对比时，预检查记录 `insufficient_contrastive_evidence` 并继续下一次有预算的尝试。新子节点初始访问数为 1，自扩展次数为 0；这是本复现明确采用的计数约定。
 

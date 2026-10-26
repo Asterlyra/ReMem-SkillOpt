@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "draft_not_executable_not_frozen",
-  "date": "2026-10-24",
+  "date": "2026-10-26",
   "project": "ReMem-SkillOpt",
   "modules": {
     "R": {
@@ -188,16 +188,16 @@
     "skill_length"
   ],
   "implementation_status": {
-    "R": "implemented_offline_core",
-    "M": "implemented_offline_task_match",
+    "R": "small_sample_loop_checked",
+    "M": "small_sample_persistent_history_checked",
     "study_runner": "development_all_controls_and_calibration",
     "external_controls": {
-      "skillopt_controlled": "implemented_offline",
-      "cam_reference": "implemented_offline_mechanism_port",
-      "atomsearch_budgeted": "implemented_offline_independent_reproduction"
+      "skillopt_controlled": "small_sample_loop_checked",
+      "cam_reference": "small_sample_mechanism_port_checked",
+      "atomsearch_budgeted": "small_sample_independent_reproduction_checked"
     },
     "transport_accounting": "implemented_for_openai_compatible_development_runs",
-    "model_preflight": "deepseek_small_sample_passed",
+    "model_preflight": "intranet_qwen_glm_minimal_chat_passed",
     "formal_experiments": "not_run"
   },
   "atomsearch_decision": {
@@ -205,5 +205,21 @@
     "user_selected_date": "2026-10-24",
     "method_specification": "docs/remem/12_ATOMSEARCH.md",
     "formal_required": true
+  },
+  "medium_diagnostic": {
+    "status": "preparing",
+    "user_selected_date": "2026-10-26",
+    "arms": 7,
+    "seeds": [
+      42
+    ],
+    "train_unique": 40,
+    "selection_unique": 20,
+    "test_unique": 0,
+    "steps": 3,
+    "batch_size": 20,
+    "task_execution_limit": 160,
+    "optimizer_call_limit": 40,
+    "atomsearch_attempt_limit": 6
   }
 }

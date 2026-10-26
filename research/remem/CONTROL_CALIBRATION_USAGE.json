@@ -1,0 +1,869 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-26",
+  "scope": "control_loop_calibration_including_failed_attempts",
+  "formal_ready": false,
+  "prices_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+  "cost_scope": "Token-price estimates, not account billing; unknown usage excluded, never imputed zero.",
+  "runs": [
+    {
+      "run": "remem_full_42",
+      "status": "incomplete",
+      "task_executions": 4,
+      "http_attempts": 12,
+      "retry_attempts": 8,
+      "cache_hits": 0,
+      "tokens": null,
+      "http_elapsed_s_sum": 0.939999999885913,
+      "logical_timing_complete": false,
+      "logical_call_elapsed_s_sum": null,
+      "usage_complete": false,
+      "task_failures": 0,
+      "infra_failures": 0,
+      "no_change": 0,
+      "proposal_invalid": 0,
+      "execution_timing_complete": false,
+      "execution_wall_time_s": null,
+      "optimizer_logical_calls": 0,
+      "study_id": "deepseek-controls-cal-20261024-v1",
+      "git_head": "9403e807b204e025fa9a04fe68b9faa3c8377851",
+      "git_dirty": false,
+      "freeze_sha256": "4d2310186a1d718d1d01b1bdfb7cd814adc2ed83bbf64d442f87eaecd9db62d4",
+      "transport_sha256": "89395b024404e32048472e667c6f163aae4e96621d87ca4433c78751c440627e",
+      "transport": {
+        "http_attempts": 12,
+        "http_responses": 12,
+        "logical_calls": 4,
+        "retry_attempts": 8,
+        "request_stages": {
+          "rollout": 12
+        },
+        "http_elapsed_s_sum": 0.939999999885913,
+        "http_response_headers_elapsed_s_sum": 0.939999999885913,
+        "logical_timing_complete": false,
+        "logical_call_elapsed_s_sum": null,
+        "successful_http_responses": 0,
+        "reported_usage_responses": 0,
+        "usage_complete": false,
+        "known_prompt_tokens": 0,
+        "known_completion_tokens": 0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [
+          401,
+          401,
+          401,
+          401,
+          401,
+          401,
+          401,
+          401,
+          401,
+          401,
+          401,
+          401
+        ],
+        "roles": {
+          "target": 12
+        }
+      },
+      "event_counts": {
+        "identity": 1,
+        "rollout_started": 1,
+        "rollout_completed": 1
+      },
+      "task_executions_by_phase": {
+        "selection": 4
+      },
+      "rollout_wall_time_s_sum": 17.85899999999674,
+      "optimizer_stage_wall_time_s_sum": 0,
+      "known_cached_prompt_tokens": 0,
+      "usage_by_role": {},
+      "native_gate_actions": [],
+      "atom_outcomes": [],
+      "test_task_executions": 0,
+      "scope": "calibration_only_not_comparable_efficacy",
+      "classification": "authentication_failure",
+      "known_usage_cost_usd_offpeak": 0.0,
+      "known_usage_cost_usd_peak": 0.0,
+      "cost_is_complete_token_estimate": false
+    },
+    {
+      "run": "remem_full_42",
+      "status": "development_completed",
+      "task_executions": 24,
+      "http_attempts": 26,
+      "retry_attempts": 0,
+      "cache_hits": 0,
+      "tokens": {
+        "prompt": 74378,
+        "completion": 176543,
+        "cached_prompt": 14848
+      },
+      "http_elapsed_s_sum": 3.9080000000540167,
+      "logical_timing_complete": false,
+      "logical_call_elapsed_s_sum": null,
+      "usage_complete": true,
+      "task_failures": 8,
+      "infra_failures": 0,
+      "no_change": 0,
+      "proposal_invalid": 0,
+      "execution_timing_complete": false,
+      "execution_wall_time_s": null,
+      "optimizer_logical_calls": 2,
+      "selection_score": 0.0,
+      "steps": 2,
+      "elapsed_s": 540.8,
+      "stop_reason": null,
+      "final_selection_score": null,
+      "study_id": "deepseek-controls-cal-20261024-v2",
+      "git_head": "e0460355f9a5c4c09d1397366e6c55f6f163ea92",
+      "git_dirty": false,
+      "freeze_sha256": "bcb689fa5b974bc3531063cc226bd1a9d350be812346a1fcc52583ccd9d711ee",
+      "transport_sha256": "7baa2ecdba37c1a4b78d0a4542b392aa39a4551dc3077531dcb0b2d4f0212391",
+      "transport": {
+        "http_attempts": 26,
+        "http_responses": 26,
+        "logical_calls": 26,
+        "retry_attempts": 0,
+        "request_stages": {
+          "remem_proposal": 2,
+          "rollout": 24
+        },
+        "http_elapsed_s_sum": 3.9080000000540167,
+        "http_response_headers_elapsed_s_sum": 3.9080000000540167,
+        "logical_timing_complete": false,
+        "logical_call_elapsed_s_sum": null,
+        "successful_http_responses": 26,
+        "reported_usage_responses": 26,
+        "usage_complete": true,
+        "known_prompt_tokens": 74378,
+        "known_completion_tokens": 176543,
+        "prompt_tokens": 74378,
+        "completion_tokens": 176543,
+        "cached_prompt_tokens": 14848,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 2,
+          "target": 24
+        }
+      },
+      "event_counts": {
+        "identity": 1,
+        "rollout_started": 5,
+        "rollout_completed": 5,
+        "selection": 3,
+        "checkpoint": 3,
+        "observation": 12,
+        "context": 2,
+        "optimizer_started": 2,
+        "optimizer_completed": 2,
+        "proposal_result": 2,
+        "proposal_budget": 2,
+        "gate": 2,
+        "attempt": 2
+      },
+      "task_executions_by_phase": {
+        "selection": 12,
+        "train": 12
+      },
+      "rollout_wall_time_s_sum": 519.6109999999753,
+      "optimizer_stage_wall_time_s_sum": 91.88999999998487,
+      "known_cached_prompt_tokens": 14848,
+      "usage_by_role": {
+        "target": {
+          "responses": 24,
+          "prompt": 29483,
+          "completion": 159262,
+          "cached_prompt": 14336
+        },
+        "optimizer": {
+          "responses": 2,
+          "prompt": 44895,
+          "completion": 17281,
+          "cached_prompt": 512
+        }
+      },
+      "native_gate_actions": [],
+      "atom_outcomes": [],
+      "test_task_executions": 0,
+      "scope": "calibration_only_not_comparable_efficacy",
+      "classification": "completed_small_sample",
+      "known_usage_cost_usd_offpeak": 0.114899844,
+      "known_usage_cost_usd_peak": 0.229799688,
+      "cost_is_complete_token_estimate": true
+    },
+    {
+      "run": "skillopt_controlled_42",
+      "status": "development_completed",
+      "task_executions": 24,
+      "http_attempts": 32,
+      "retry_attempts": 0,
+      "cache_hits": 0,
+      "tokens": {
+        "prompt": 92132,
+        "completion": 165089,
+        "cached_prompt": 20348
+      },
+      "http_elapsed_s_sum": 4.563999999925727,
+      "logical_timing_complete": false,
+      "logical_call_elapsed_s_sum": null,
+      "usage_complete": true,
+      "task_failures": 6,
+      "infra_failures": 0,
+      "no_change": 0,
+      "proposal_invalid": 0,
+      "execution_timing_complete": false,
+      "execution_wall_time_s": null,
+      "optimizer_logical_calls": 8,
+      "selection_score": 0.75,
+      "steps": 2,
+      "elapsed_s": 451.0,
+      "stop_reason": null,
+      "final_selection_score": null,
+      "study_id": "deepseek-controls-cal-20261024-v2",
+      "git_head": "e0460355f9a5c4c09d1397366e6c55f6f163ea92",
+      "git_dirty": false,
+      "freeze_sha256": "bcb689fa5b974bc3531063cc226bd1a9d350be812346a1fcc52583ccd9d711ee",
+      "transport_sha256": "db982406c6b8072e0cf2ce46a09a80e66aaac0e3dd48e36980dfadecac9fe931",
+      "transport": {
+        "http_attempts": 32,
+        "http_responses": 32,
+        "logical_calls": 32,
+        "retry_attempts": 0,
+        "request_stages": {
+          "analyst": 4,
+          "merge": 2,
+          "ranking": 2,
+          "rollout": 24
+        },
+        "http_elapsed_s_sum": 4.563999999925727,
+        "http_response_headers_elapsed_s_sum": 4.563999999925727,
+        "logical_timing_complete": false,
+        "logical_call_elapsed_s_sum": null,
+        "successful_http_responses": 32,
+        "reported_usage_responses": 32,
+        "usage_complete": true,
+        "known_prompt_tokens": 92132,
+        "known_completion_tokens": 165089,
+        "prompt_tokens": 92132,
+        "completion_tokens": 165089,
+        "cached_prompt_tokens": 20348,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 8,
+          "target": 24
+        }
+      },
+      "event_counts": {
+        "identity": 1,
+        "rollout_started": 5,
+        "rollout_completed": 5,
+        "selection": 3,
+        "checkpoint": 3,
+        "observation": 12,
+        "native_stage_started": 6,
+        "native_stage_completed": 6,
+        "native_gate": 2
+      },
+      "task_executions_by_phase": {
+        "selection": 12,
+        "train": 12
+      },
+      "rollout_wall_time_s_sum": 442.6389999999956,
+      "optimizer_stage_wall_time_s_sum": 87.40599999998813,
+      "known_cached_prompt_tokens": 20348,
+      "usage_by_role": {
+        "target": {
+          "responses": 24,
+          "prompt": 33101,
+          "completion": 150252,
+          "cached_prompt": 18940
+        },
+        "optimizer": {
+          "responses": 8,
+          "prompt": 59031,
+          "completion": 14837,
+          "cached_prompt": 1408
+        }
+      },
+      "native_gate_actions": [
+        "accept_new_best",
+        "reject"
+      ],
+      "atom_outcomes": [],
+      "test_task_executions": 0,
+      "scope": "calibration_only_not_comparable_efficacy",
+      "classification": "completed_small_sample",
+      "known_usage_cost_usd_offpeak": 0.109882044,
+      "known_usage_cost_usd_peak": 0.219764088,
+      "cost_is_complete_token_estimate": true
+    },
+    {
+      "run": "atomsearch_budgeted_42",
+      "status": "incomplete",
+      "task_executions": 10,
+      "http_attempts": 11,
+      "retry_attempts": 0,
+      "cache_hits": 0,
+      "tokens": {
+        "prompt": 33431,
+        "completion": 65411,
+        "cached_prompt": 10492
+      },
+      "http_elapsed_s_sum": 1.5479999999515712,
+      "logical_timing_complete": false,
+      "logical_call_elapsed_s_sum": null,
+      "usage_complete": true,
+      "task_failures": 4,
+      "infra_failures": 0,
+      "no_change": 0,
+      "proposal_invalid": 1,
+      "execution_timing_complete": false,
+      "execution_wall_time_s": null,
+      "optimizer_logical_calls": 1,
+      "study_id": "deepseek-controls-cal-20261024-v2",
+      "git_head": "e0460355f9a5c4c09d1397366e6c55f6f163ea92",
+      "git_dirty": false,
+      "freeze_sha256": "bcb689fa5b974bc3531063cc226bd1a9d350be812346a1fcc52583ccd9d711ee",
+      "transport_sha256": "cfdc6f39e28010661d7b92ed55d147a7e1a009c4094e3b6e24706ff672f2310c",
+      "transport": {
+        "http_attempts": 11,
+        "http_responses": 11,
+        "logical_calls": 11,
+        "retry_attempts": 0,
+        "request_stages": {
+          "atomsearch_proposal": 1,
+          "rollout": 10
+        },
+        "http_elapsed_s_sum": 1.5479999999515712,
+        "http_response_headers_elapsed_s_sum": 1.5479999999515712,
+        "logical_timing_complete": false,
+        "logical_call_elapsed_s_sum": null,
+        "successful_http_responses": 11,
+        "reported_usage_responses": 11,
+        "usage_complete": true,
+        "known_prompt_tokens": 33431,
+        "known_completion_tokens": 65411,
+        "prompt_tokens": 33431,
+        "completion_tokens": 65411,
+        "cached_prompt_tokens": 10492,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 1,
+          "target": 10
+        }
+      },
+      "event_counts": {
+        "identity": 1,
+        "rollout_started": 2,
+        "rollout_completed": 2,
+        "selection": 1,
+        "observation": 6,
+        "optimizer_started": 1,
+        "proposal_invalid": 1
+      },
+      "task_executions_by_phase": {
+        "selection": 4,
+        "train": 6
+      },
+      "rollout_wall_time_s_sum": 178.06300000002375,
+      "optimizer_stage_wall_time_s_sum": 29.046999999991385,
+      "known_cached_prompt_tokens": 10492,
+      "usage_by_role": {
+        "target": {
+          "responses": 10,
+          "prompt": 12132,
+          "completion": 60631,
+          "cached_prompt": 10492
+        },
+        "optimizer": {
+          "responses": 1,
+          "prompt": 21299,
+          "completion": 4780,
+          "cached_prompt": 0
+        }
+      },
+      "native_gate_actions": [],
+      "atom_outcomes": [],
+      "test_task_executions": 0,
+      "scope": "calibration_only_not_comparable_efficacy",
+      "classification": "optimizer_format_failure",
+      "known_usage_cost_usd_offpeak": 0.042718926,
+      "known_usage_cost_usd_peak": 0.085437852,
+      "cost_is_complete_token_estimate": true
+    },
+    {
+      "run": "cam_reference_42",
+      "status": "incomplete",
+      "task_executions": 20,
+      "http_attempts": 24,
+      "retry_attempts": 0,
+      "cache_hits": 0,
+      "tokens": null,
+      "http_elapsed_s_sum": 3.968999999924563,
+      "logical_timing_complete": false,
+      "logical_call_elapsed_s_sum": null,
+      "usage_complete": false,
+      "task_failures": 4,
+      "infra_failures": 0,
+      "no_change": 0,
+      "proposal_invalid": 0,
+      "execution_timing_complete": false,
+      "execution_wall_time_s": null,
+      "optimizer_logical_calls": 4,
+      "study_id": "deepseek-controls-cal-20261024-v2",
+      "git_head": "e0460355f9a5c4c09d1397366e6c55f6f163ea92",
+      "git_dirty": false,
+      "freeze_sha256": "bcb689fa5b974bc3531063cc226bd1a9d350be812346a1fcc52583ccd9d711ee",
+      "transport_sha256": "8fc85a291d6dd393cbf86588d0653ff53a21101dd518b78343c11067146d5288",
+      "transport": {
+        "http_attempts": 24,
+        "http_responses": 24,
+        "logical_calls": 24,
+        "retry_attempts": 0,
+        "request_stages": {
+          "analyst": 2,
+          "merge": 1,
+          "ranking": 1,
+          "rollout": 20
+        },
+        "http_elapsed_s_sum": 3.968999999924563,
+        "http_response_headers_elapsed_s_sum": 3.968999999924563,
+        "logical_timing_complete": false,
+        "logical_call_elapsed_s_sum": null,
+        "successful_http_responses": 24,
+        "reported_usage_responses": 23,
+        "usage_complete": false,
+        "known_prompt_tokens": 52701,
+        "known_completion_tokens": 104851,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 4,
+          "target": 20
+        }
+      },
+      "event_counts": {
+        "identity": 1,
+        "rollout_started": 4,
+        "rollout_completed": 3,
+        "selection": 2,
+        "checkpoint": 2,
+        "observation": 6,
+        "cam_context": 1,
+        "native_stage_started": 3,
+        "native_stage_completed": 3,
+        "cam_budget": 1,
+        "cam_gate": 1,
+        "native_gate": 1
+      },
+      "task_executions_by_phase": {
+        "selection": 8,
+        "train": 12
+      },
+      "rollout_wall_time_s_sum": 237.85999999998603,
+      "optimizer_stage_wall_time_s_sum": 49.578999999997905,
+      "known_cached_prompt_tokens": 25212,
+      "usage_by_role": {
+        "target": {
+          "responses": 19,
+          "prompt": 24916,
+          "completion": 96282,
+          "cached_prompt": 18684
+        },
+        "optimizer": {
+          "responses": 4,
+          "prompt": 27785,
+          "completion": 8569,
+          "cached_prompt": 6528
+        }
+      },
+      "native_gate_actions": [
+        "cam_re_evaluate"
+      ],
+      "atom_outcomes": [],
+      "test_task_executions": 0,
+      "scope": "calibration_only_not_comparable_efficacy",
+      "classification": "intentional_interruption_for_context_isolation_fix",
+      "known_usage_cost_usd_offpeak": 0.067109586,
+      "known_usage_cost_usd_peak": 0.134219172,
+      "cost_is_complete_token_estimate": false
+    },
+    {
+      "run": "atomsearch_budgeted_42",
+      "status": "incomplete",
+      "task_executions": 10,
+      "http_attempts": 11,
+      "retry_attempts": 0,
+      "cache_hits": 0,
+      "tokens": {
+        "prompt": 33318,
+        "completion": 68985,
+        "cached_prompt": 10620
+      },
+      "http_elapsed_s_sum": 1.952999999950407,
+      "logical_timing_complete": true,
+      "logical_call_elapsed_s_sum": 361.2019999999902,
+      "usage_complete": true,
+      "task_failures": 4,
+      "infra_failures": 0,
+      "no_change": 0,
+      "proposal_invalid": 1,
+      "execution_timing_complete": false,
+      "execution_wall_time_s": null,
+      "optimizer_logical_calls": 1,
+      "study_id": "deepseek-controls-cal-20261025-v3",
+      "git_head": "1a20fa5ee69f66bc1d45365b3620fe6f13c52185",
+      "git_dirty": false,
+      "freeze_sha256": "eb0abc312134bdc3d780fb525be00f774025726847b5cc68fc864d3ab9a50344",
+      "transport_sha256": "f5266b1198e65c1547cd02728334e8722f76b29d4f77e4a27c676dc5023aff0f",
+      "transport": {
+        "http_attempts": 11,
+        "http_responses": 11,
+        "logical_calls": 11,
+        "retry_attempts": 0,
+        "request_stages": {
+          "atomsearch_proposal": 1,
+          "rollout": 10
+        },
+        "http_elapsed_s_sum": 1.952999999950407,
+        "http_response_headers_elapsed_s_sum": 1.952999999950407,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 361.2019999999902,
+        "successful_http_responses": 11,
+        "reported_usage_responses": 11,
+        "usage_complete": true,
+        "known_prompt_tokens": 33318,
+        "known_completion_tokens": 68985,
+        "prompt_tokens": 33318,
+        "completion_tokens": 68985,
+        "cached_prompt_tokens": 10620,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 1,
+          "target": 10
+        }
+      },
+      "event_counts": {
+        "identity": 1,
+        "rollout_started": 2,
+        "rollout_completed": 2,
+        "selection": 1,
+        "observation": 6,
+        "optimizer_started": 1,
+        "proposal_invalid": 1
+      },
+      "task_executions_by_phase": {
+        "selection": 4,
+        "train": 6
+      },
+      "rollout_wall_time_s_sum": 183.125,
+      "optimizer_stage_wall_time_s_sum": 46.594000000011874,
+      "known_cached_prompt_tokens": 10620,
+      "usage_by_role": {
+        "target": {
+          "responses": 10,
+          "prompt": 12132,
+          "completion": 61232,
+          "cached_prompt": 10492
+        },
+        "optimizer": {
+          "responses": 1,
+          "prompt": 21186,
+          "completion": 7753,
+          "cached_prompt": 128
+        }
+      },
+      "native_gate_actions": [],
+      "atom_outcomes": [],
+      "test_task_executions": 0,
+      "scope": "calibration_only_not_comparable_efficacy",
+      "classification": "optimizer_format_failure",
+      "known_usage_cost_usd_offpeak": 0.044827559999999995,
+      "known_usage_cost_usd_peak": 0.08965511999999999,
+      "cost_is_complete_token_estimate": true
+    },
+    {
+      "run": "atomsearch_budgeted_42",
+      "status": "development_completed",
+      "task_executions": 32,
+      "http_attempts": 34,
+      "retry_attempts": 0,
+      "cache_hits": 0,
+      "tokens": {
+        "prompt": 83944,
+        "completion": 216790,
+        "cached_prompt": 19452
+      },
+      "http_elapsed_s_sum": 4.731999999872642,
+      "logical_timing_complete": true,
+      "logical_call_elapsed_s_sum": 1111.2309999999998,
+      "usage_complete": true,
+      "task_failures": 6,
+      "infra_failures": 0,
+      "no_change": 0,
+      "proposal_invalid": 0,
+      "execution_timing_complete": true,
+      "execution_wall_time_s": 739.3590000000258,
+      "optimizer_logical_calls": 2,
+      "selection_score": 0.75,
+      "steps": 2,
+      "elapsed_s": 739.3120000000054,
+      "stop_reason": "attempt_limit",
+      "final_selection_score": 0.25,
+      "study_id": "deepseek-controls-cal-20261025-v4",
+      "git_head": "27cd1587a30d64a74f0567c8a490f7177c995db3",
+      "git_dirty": false,
+      "freeze_sha256": "f5b1b3cee42911a7e39d4288805007415ff5e610621e159b651a287b8d1e72a3",
+      "transport_sha256": "63b7fdeadfdf1c14c9afd8eb593f734eafba4eea9eefa769e4e97c997607acfe",
+      "transport": {
+        "http_attempts": 34,
+        "http_responses": 34,
+        "logical_calls": 34,
+        "retry_attempts": 0,
+        "request_stages": {
+          "atomsearch_proposal": 2,
+          "rollout": 32
+        },
+        "http_elapsed_s_sum": 4.731999999872642,
+        "http_response_headers_elapsed_s_sum": 4.731999999872642,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 1111.2309999999998,
+        "successful_http_responses": 34,
+        "reported_usage_responses": 34,
+        "usage_complete": true,
+        "known_prompt_tokens": 83944,
+        "known_completion_tokens": 216790,
+        "prompt_tokens": 83944,
+        "completion_tokens": 216790,
+        "cached_prompt_tokens": 19452,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 2,
+          "target": 32
+        }
+      },
+      "event_counts": {
+        "identity": 1,
+        "rollout_started": 7,
+        "rollout_completed": 7,
+        "selection": 5,
+        "observation": 12,
+        "optimizer_started": 2,
+        "optimizer_response": 2,
+        "optimizer_completed": 2,
+        "atom_outcome": 4,
+        "atom_checkpoint": 2,
+        "atom_finished": 1
+      },
+      "task_executions_by_phase": {
+        "selection": 20,
+        "train": 12
+      },
+      "rollout_wall_time_s_sum": 690.6080000000075,
+      "optimizer_stage_wall_time_s_sum": 48.26600000000326,
+      "known_cached_prompt_tokens": 19452,
+      "usage_by_role": {
+        "target": {
+          "responses": 32,
+          "prompt": 38097,
+          "completion": 209134,
+          "cached_prompt": 19196
+        },
+        "optimizer": {
+          "responses": 2,
+          "prompt": 45847,
+          "completion": 7656,
+          "cached_prompt": 256
+        }
+      },
+      "native_gate_actions": [],
+      "atom_outcomes": [
+        {
+          "tag": "primitive",
+          "attribution": "single_edit"
+        },
+        {
+          "tag": "composition",
+          "attribution": "update_bundle"
+        },
+        {
+          "tag": "primitive",
+          "attribution": "single_edit"
+        },
+        {
+          "tag": "composition",
+          "attribution": "update_bundle"
+        }
+      ],
+      "test_task_executions": 0,
+      "scope": "calibration_only_not_comparable_efficacy",
+      "classification": "completed_small_sample",
+      "known_usage_cost_usd_offpeak": 0.139806156,
+      "known_usage_cost_usd_peak": 0.279612312,
+      "cost_is_complete_token_estimate": true
+    },
+    {
+      "run": "cam_reference_42",
+      "status": "development_completed",
+      "task_executions": 24,
+      "http_attempts": 32,
+      "retry_attempts": 0,
+      "cache_hits": 0,
+      "tokens": {
+        "prompt": 89408,
+        "completion": 134041,
+        "cached_prompt": 33020
+      },
+      "http_elapsed_s_sum": 5.362999999924796,
+      "logical_timing_complete": true,
+      "logical_call_elapsed_s_sum": 712.3429999999644,
+      "usage_complete": true,
+      "task_failures": 8,
+      "infra_failures": 0,
+      "no_change": 0,
+      "proposal_invalid": 0,
+      "execution_timing_complete": true,
+      "execution_wall_time_s": 459.56299999999464,
+      "optimizer_logical_calls": 8,
+      "selection_score": 0.0,
+      "steps": 2,
+      "elapsed_s": 390.6,
+      "stop_reason": null,
+      "final_selection_score": null,
+      "study_id": "deepseek-controls-cal-20261025-v4",
+      "git_head": "27cd1587a30d64a74f0567c8a490f7177c995db3",
+      "git_dirty": false,
+      "freeze_sha256": "f5b1b3cee42911a7e39d4288805007415ff5e610621e159b651a287b8d1e72a3",
+      "transport_sha256": "0e2810eb7ae4972d03c81b86fd2f313d5d88f7ec08705f5650119ae215cbd157",
+      "transport": {
+        "http_attempts": 32,
+        "http_responses": 32,
+        "logical_calls": 32,
+        "retry_attempts": 0,
+        "request_stages": {
+          "analyst": 4,
+          "merge": 2,
+          "ranking": 2,
+          "rollout": 24
+        },
+        "http_elapsed_s_sum": 5.362999999924796,
+        "http_response_headers_elapsed_s_sum": 5.362999999924796,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 712.3429999999644,
+        "successful_http_responses": 32,
+        "reported_usage_responses": 32,
+        "usage_complete": true,
+        "known_prompt_tokens": 89408,
+        "known_completion_tokens": 134041,
+        "prompt_tokens": 89408,
+        "completion_tokens": 134041,
+        "cached_prompt_tokens": 33020,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 8,
+          "target": 24
+        }
+      },
+      "event_counts": {
+        "identity": 1,
+        "rollout_started": 5,
+        "rollout_completed": 5,
+        "selection": 3,
+        "checkpoint": 3,
+        "observation": 12,
+        "cam_context": 2,
+        "native_stage_started": 6,
+        "native_stage_completed": 6,
+        "cam_budget": 2,
+        "cam_gate": 2,
+        "native_gate": 2
+      },
+      "task_executions_by_phase": {
+        "selection": 12,
+        "train": 12
+      },
+      "rollout_wall_time_s_sum": 414.1110000000335,
+      "optimizer_stage_wall_time_s_sum": 60.702000000019325,
+      "known_cached_prompt_tokens": 33020,
+      "usage_by_role": {
+        "target": {
+          "responses": 24,
+          "prompt": 31455,
+          "completion": 123725,
+          "cached_prompt": 22012
+        },
+        "optimizer": {
+          "responses": 8,
+          "prompt": 57953,
+          "completion": 10316,
+          "cached_prompt": 11008
+        }
+      },
+      "native_gate_actions": [
+        "cam_re_evaluate",
+        "cam_re_evaluate"
+      ],
+      "atom_outcomes": [],
+      "test_task_executions": 0,
+      "scope": "calibration_only_not_comparable_efficacy",
+      "classification": "completed_small_sample",
+      "known_usage_cost_usd_offpeak": 0.08898185999999998,
+      "known_usage_cost_usd_peak": 0.17796371999999996,
+      "cost_is_complete_token_estimate": true
+    },
+    {
+      "study_id": "atomsearch-contract-debug-20261025-v1",
+      "run": "optimizer_contract_only",
+      "scope": "diagnostic_not_search",
+      "classification": "completed_contract_debug",
+      "task_executions": 0,
+      "test_task_executions": 0,
+      "freeze_sha256": "44ddc20dff383fefc9a167a10c8b41197ef8feec41662c0534dc092678e462de",
+      "transport_sha256": "8a4fb478ba486e59d623d7ec91a284735263ed2ca87914e27593709e7d7a08f6",
+      "transport": {
+        "http_attempts": 1,
+        "http_responses": 1,
+        "logical_calls": 1,
+        "retry_attempts": 0,
+        "request_stages": {
+          "atomsearch_contract_debug": 1
+        },
+        "http_elapsed_s_sum": 0.48499999998603016,
+        "http_response_headers_elapsed_s_sum": 0.48499999998603016,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 28.23399999999674,
+        "successful_http_responses": 1,
+        "reported_usage_responses": 1,
+        "usage_complete": true,
+        "known_prompt_tokens": 21255,
+        "known_completion_tokens": 4176,
+        "prompt_tokens": 21255,
+        "completion_tokens": 4176,
+        "cached_prompt_tokens": 0,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 1
+        }
+      },
+      "known_usage_cost_usd_offpeak": 0.00569385,
+      "known_usage_cost_usd_peak": 0.0113877,
+      "cost_is_complete_token_estimate": true
+    }
+  ],
+  "totals": {
+    "http_attempts": 183,
+    "retry_attempts": 8,
+    "task_executions_started": 148,
+    "test_task_executions": 0,
+    "usage_complete": false,
+    "known_prompt_tokens": 480567,
+    "known_completion_tokens": 935886,
+    "known_usage_cost_usd_offpeak": 0.613919826,
+    "known_usage_cost_usd_peak": 1.227839652
+  }
+}

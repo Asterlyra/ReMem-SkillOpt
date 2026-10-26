@@ -1,6 +1,6 @@
 # ReMem-SkillOpt：新项目入口
 
-本项目从 Microsoft SkillOpt 重新克隆，**不是 CAM 工作目录的复制品**。截至 2026-10-24，已配置独立环境和 Verified 400 数据，实现 R/M 策略、公共失败账本、配对门控与 trainer 离线集成；开发版实验框架已建立，已做小样本模型探活，尚未开始正式实验。
+本项目从 Microsoft SkillOpt 重新克隆，**不是 CAM 工作目录的复制品**。截至 2026-10-26，已配置独立环境和 Verified 400 数据，实现 R/M 策略、公共失败账本、配对门控与 trainer 离线集成；开发版实验框架已建立，已做小样本模型探活，尚未开始正式实验。
 
 工作标题：**ReMem-Skill: Evidence-Guided Repair with Persistent Failure Memory for Agent Skill Optimization**。
 
@@ -37,7 +37,7 @@
 
 ## 当前能做什么
 
-可以运行离线测试、重新验证数据、准备并验证开发版核心 12 格及原生 SkillOpt 对照 3 格配置。使用 `scripts/remem/python.ps1` 固定项目解释器与 UTF-8。DeepSeek 小样本探活与旧结果暴露审计见 [预实验报告](research/remem/PREFLIGHT_REPORT.md)；CAM 机制移植与 AtomSearch 独立复现已有离线实现；真实联调、正式矩阵与最终测试发布尚未完成，不能直接套用旧 CAM 命令。
+可以运行离线测试、重新验证数据、准备并验证开发版核心 12 格及原生 SkillOpt 对照 3 格配置。使用 `scripts/remem/python.ps1` 固定项目解释器与 UTF-8。DeepSeek 小样本探活与旧结果暴露审计见 [预实验报告](research/remem/PREFLIGHT_REPORT.md)；CAM 机制移植与 AtomSearch 独立复现已完成两步真实联调；内网 qwen/glm 已恢复连通，中等规模诊断准备中；正式矩阵与最终测试发布尚未完成，不能直接套用旧 CAM 命令。
 
 在仓库根目录执行 `python scripts/remem/validate_handoff.py` 可检查交接文件、研究矩阵和凭据模板；该检查不调用模型。
 
@@ -46,3 +46,5 @@
 初始交接记录：[BOOTSTRAP_REPORT.md](research/remem/BOOTSTRAP_REPORT.md)。当前实现记录：[FOUNDATION_REPORT.md](research/remem/FOUNDATION_REPORT.md)。
 
 新增：[AtomSearch 独立复现边界](docs/remem/12_ATOMSEARCH.md)与[对照实施记录](research/remem/CONTROL_IMPLEMENTATION_REPORT.md)。
+
+最新：[多步联调、用量与预算报告](research/remem/LOOP_CONTROL_REPORT.md)。用户已选择七方法、单 seed、三步的内网中等诊断，最终测试保持关闭。

@@ -122,8 +122,10 @@ def test_calibration_is_small_frozen_and_has_no_test_tasks(prepared):
     assert all(c["research_limits"]["task_executions"] == 32 for c in configs)
 
 
-def test_local_key_refreshes_preimported_backend_without_entering_config(tmp_path, monkeypatch):
+@pytest.mark.parametrize("intranet", [False, True])
+def test_local_key_refreshes_preimported_backend_without_entering_config(tmp_path, monkeypatch, intranet):
     from types import SimpleNamespace
+
     from scripts import train
     from skillopt.engine import trainer
     from skillopt.model import azure_openai as backend
@@ -139,19 +141,29 @@ def test_local_key_refreshes_preimported_backend_without_entering_config(tmp_pat
     monkeypatch.setattr(backend, "_optimizer_client", None)
     monkeypatch.setattr(backend, "_target_client", None)
     key_file = tmp_path / ".env.fake.local"
-    key_file.write_text("DEEPSEEK_API_KEY=unit-test-placeholder\n")
-    cfg = {"out_root": str(tmp_path / "run"), "optimizer_model": "deepseek-flash", "target_model": "deepseek-flash",
-           "optimizer_azure_openai_endpoint": "https://api.deepseek.com", "target_azure_openai_endpoint": "https://api.deepseek.com"}
+    endpoint = "https://hub.zgci.org/v1" if intranet else "https://api.deepseek.com"
+    key_file.write_text("\n".join(f"{role}_AZURE_OPENAI_API_KEY=unit-test-placeholder\n{role}_AZURE_OPENAI_ENDPOINT={endpoint}"
+                                  for role in ("OPTIMIZER", "TARGET")) + "\nNO_PROXY=hub.zgci.org\n" if intranet else
+                        "DEEPSEEK_API_KEY=unit-test-placeholder\n")
+    monkeypatch.setenv("NO_PROXY", "localhost")
+    monkeypatch.setenv("no_proxy", "localhost")
+    cfg = {"out_root": str(tmp_path / "run"), "optimizer_model": "glm" if intranet else "deepseek-flash",
+           "target_model": "qwen" if intranet else "deepseek-flash",
+           "optimizer_azure_openai_endpoint": endpoint, "target_azure_openai_endpoint": endpoint}
     class Trainer:
         def __init__(self, actual, adapter):
             assert actual == cfg and "unit-test-placeholder" not in json.dumps(actual)
         def train(self):
             assert backend.OPTIMIZER_API_KEY == backend.TARGET_API_KEY == "unit-test-placeholder"
             assert active_policy() is not None
+            import os
+            assert ("hub.zgci.org" in os.environ["NO_PROXY"]) is intranet
             return {"ok": True}
     monkeypatch.setattr(trainer, "ReflACTTrainer", Trainer)
     assert study.execute_config(cfg, key_file=key_file) == {"ok": True}
     assert backend.OPTIMIZER_API_KEY == "previous-optimizer" and backend.TARGET_API_KEY == "previous-target"
+    import os
+    assert os.environ["NO_PROXY"] == os.environ["no_proxy"] == "localhost"
     import sqlite3
     with sqlite3.connect(tmp_path / "run/remem/calls/ledger.sqlite3") as db:
         starts = [json.loads(b) for (b,) in db.execute("SELECT payload FROM records WHERE kind='execution_started'")]
@@ -159,6 +171,45 @@ def test_local_key_refreshes_preimported_backend_without_entering_config(tmp_pat
     assert len(starts) == len(finishes) == 1
     assert starts[0]["invocation"] == finishes[0]["invocation"]
     assert finishes[0]["elapsed_s"] >= 0 and finishes[0]["error_type"] is None
+
+
+def test_medium_diagnostic_has_seven_arms_three_steps_and_no_test(prepared):
+    root, _ = prepared
+    directory = study.prepare("medium", root=root, diagnostic=True, include_skillopt_controlled=True,
+                              include_cam_reference=True, include_atomsearch=True)
+    result = study.verify(directory, root=root)
+    assert result["scope"] == "medium_diagnostic_only"
+    assert result["core_runs"] == 4 and result["external_runs"] == 3
+    configs = [json.loads(p.read_text()) for p in (directory / "configs").glob("*.json")]
+    schedules = [c.get("control_task_schedule", c.get("remem", {}).get("task_schedule")) for c in configs]
+    assert all(s == schedules[0] for s in schedules)
+    assert len(schedules[0]) == 3 and len(set(schedules[0][0] + schedules[0][1])) == 40
+    assert len(set(schedules[0][2])) == 20
+    assert set(schedules[0][2]) <= set(schedules[0][0] + schedules[0][1])
+    assert all(c["train_size"] == 40 and c["sel_env_num"] == 20 and not c["eval_test"] for c in configs)
+    assert all(c["research_limits"]["task_executions"] == 160 for c in configs)
+    assert json.loads((directory / "diagnostic_split/test/items.json").read_text()) == []
+    with pytest.raises(ValueError, match="not both"):
+        study.prepare("bad", root=root, diagnostic=True, calibration=True)
+
+
+@pytest.mark.parametrize("wrong_endpoint", [True, False])
+def test_role_credentials_refuse_cross_endpoint_or_unrelated_proxy_bypass(tmp_path, monkeypatch, wrong_endpoint):
+    import os
+    monkeypatch.setattr(study, "ROOT", tmp_path)
+    from types import SimpleNamespace
+    monkeypatch.setattr(study.subprocess, "run", lambda *a, **kw: SimpleNamespace(returncode=0))
+    endpoint = "https://hub.zgci.org/v1"
+    key_file = tmp_path / ".env.fake.local"
+    key_file.write_text("\n".join(f"{role}_AZURE_OPENAI_API_KEY=unit-test-placeholder\n{role}_AZURE_OPENAI_ENDPOINT="
+                                  + ("https://different.invalid" if wrong_endpoint else endpoint)
+                                  for role in ("OPTIMIZER", "TARGET")) + "\nNO_PROXY=unrelated.invalid\n")
+    cfg = {"out_root": str(tmp_path / "run"), "optimizer_model": "glm", "target_model": "qwen",
+           "optimizer_azure_openai_endpoint": endpoint, "target_azure_openai_endpoint": endpoint}
+    before = dict(os.environ)
+    with pytest.raises(ValueError, match="endpoint|bypass"):
+        study.execute_config(cfg, key_file=key_file)
+    assert dict(os.environ) == before
 
 
 def test_control_rollout_budget_cache_and_interruption(tmp_path):

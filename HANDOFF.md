@@ -1,6 +1,6 @@
 # ReMem-SkillOpt 工作交接
 
-更新日期：2026-10-24。阶段：**environment/framework，R/M 已有离线实现，已做小样本探活，正式实验未运行**。
+更新日期：2026-10-26。阶段：**多步真实联调已完成；内网 qwen/glm 最小探活成功，七方法中等诊断准备中，正式实验未运行**。
 
 当前实现、命令与局限以 [框架文档](docs/remem/11_FRAMEWORK.md) 和
 [实施报告](research/remem/FOUNDATION_REPORT.md) 为准。以下初始路线仍用于检查尚未完成的正式实验要求。
@@ -52,3 +52,7 @@
 ## 2026-10-24 对照决策
 
 用户明确保留 AtomSearch，并选择按论文独立复现。不得再把来源选择列为待确认。实现与限制见 `docs/remem/12_ATOMSEARCH.md`；CAM 来源见 `research/remem/cam_port_provenance.json`。统一调用限额和小规模预实验入口已接入，正式实验仍未授权立即启动或宣称完成。
+
+## 2026-10-26 内网与中等诊断
+
+用户确认按既有文档使用 qwen target、glm optimizer，并选择七方法、单 seed、三步诊断。网关需要仅对 hub.zgci.org 绕过本机代理；本地角色凭据放在忽略的 .env.intranet.local，必须绑定配置 endpoint，不打印或提交值。DeepSeek 四方法完成两步联调，全部失败尝试保留；见 [多步联调报告](research/remem/LOOP_CONTROL_REPORT.md)。CAM 审计的 result_action 才是最终动作。中等诊断不开放测试集，后续按实际状态继续，不复跑旧工件。

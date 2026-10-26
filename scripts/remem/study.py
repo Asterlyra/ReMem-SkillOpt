@@ -19,20 +19,22 @@ def main():
     prepare.add_argument("--include-cam-reference", action="store_true")
     prepare.add_argument("--include-atomsearch", action="store_true")
     prepare.add_argument("--calibration", action="store_true", help="Freeze two-step non-test preflight, not a formal study")
+    prepare.add_argument("--diagnostic", action="store_true", help="Freeze seven-arm, one-seed medium diagnostic with no test tasks")
     for name in ("verify", "report", "run"):
         command = sub.add_parser(name)
         command.add_argument("directory", type=Path)
         if name == "run":
             command.add_argument("--name", required=True)
             command.add_argument("--execute", action="store_true", help="Make real model calls for a development run")
-            command.add_argument("--key-file", type=Path, help="Git-ignored DeepSeek key file for explicit execution")
+            command.add_argument("--key-file", type=Path, help="Git-ignored endpoint-bound role credentials for explicit execution")
     args = parser.parse_args()
     if args.command == "prepare":
         result = {"directory": str(study.prepare(args.study_id, config_path=args.config,
                                                  data_manifest_path=args.data_manifest,
                                                  include_skillopt_controlled=args.include_skillopt_controlled,
                                                  include_cam_reference=args.include_cam_reference,
-                                                 include_atomsearch=args.include_atomsearch, calibration=args.calibration)), "model_calls": 0}
+                                                 include_atomsearch=args.include_atomsearch, calibration=args.calibration,
+                                                 diagnostic=args.diagnostic)), "model_calls": 0}
     elif args.command == "verify":
         result = study.verify(args.directory.resolve())
     elif args.command == "report":

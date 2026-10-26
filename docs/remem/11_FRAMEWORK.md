@@ -1,6 +1,6 @@
 # ReMem 核心框架实现与边界
 
-更新：2026-10-24。用户选择方案 2：有限范围的策略接口重构，继续共用上游 trainer。
+更新：2026-10-26。用户选择方案 2：有限范围的策略接口重构，继续共用上游 trainer。
 本阶段完成环境、离线开发基础和 DeepSeek 小样本探活，不声明方法效果或正式实验就绪。
 
 ## 结构与调用链
@@ -83,14 +83,16 @@ configs/remem/deepseek-development.yaml --data-manifest data/remem_fresh_test_ma
 .env.deepseek.local` 会真正调用模型；prepare/verify/默认 run/report 仍不调用。
 OpenAI-compatible HTTP 路径的请求、重试、响应、token 与缓存信息按运行单独留档；
 缺失或失败请求的总用量仍标缺失。原生对照继承固定六步训练序列与 400 次
-任务执行预算，但 CAM 与 AtomSearch 对照尚未完成，不能把该矩阵当正式对照集。
+任务执行预算，CAM 与 AtomSearch 已完成两步真实联调，完整矩阵仍是开发配置。
 
 ## 正式实验前仍需完成
 
 1. 在 DeepSeek 小样本探活基础上，校准并发、超时、输出上限、费用及完整工作负载的响应身份。
 2. OpenAI-compatible 路径已有 HTTP/用量审计；其余后端的同等覆盖、失败请求可能产生的账单及中断对账仍须验证。
 3. 旧 280 题全暴露；新候选 120 题的来源模板分组及未人工验证质量仍须审查。
-4. SkillOpt controlled 已实现离线接入；CAM 和 AtomSearch 仍须实现或诚实缩减正式矩阵。
+4. 三类外部对照已实现并完成两步真实联调；仍需内网中等诊断、复现偏差审查和完整任务预算验收。
 5. 依校准冻结正式 18/21 格协议；全部最终 skill 固定后的统一测试发布和正式统计报告。
 
-没有迁移 CAM 源代码；现阶段配对门控等代码为本项目新实现。CAM 参考目录保持只读。
+已选择性迁移六个 CAM 机制模块；来源哈希与许可证见 research/remem/cam_port_provenance.json。CAM 参考目录保持只读。
+
+中等诊断入口：prepare --diagnostic --include-skillopt-controlled --include-cam-reference --include-atomsearch。它生成七方法、单 seed、三步、空测试集；内网配置为 configs/remem/intranet-development.yaml。角色凭据文件须绑定冻结 endpoint，NO_PROXY 仅能列这些 endpoint 的主机，运行结束恢复原进程环境。

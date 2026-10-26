@@ -84,7 +84,9 @@ def source_files(root: Path) -> list[Path]:
 def prepare(study_id: str, *, root: Path = ROOT, config_path: Path | None = None,
             data_manifest_path: Path | None = None, include_skillopt_controlled: bool = False,
             include_cam_reference: bool = False, include_atomsearch: bool = False,
-            calibration: bool = False) -> Path:
+            calibration: bool = False, diagnostic: bool = False) -> Path:
+    if calibration and diagnostic:
+        raise ValueError("Choose calibration or medium diagnostic, not both")
     if not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}", study_id):
         raise ValueError("Invalid study ID")
     directory = root / "outputs/remem" / study_id
@@ -109,7 +111,7 @@ def prepare(study_id: str, *, root: Path = ROOT, config_path: Path | None = None
     if base["data_root"] != data["runtime_data_root"] or "runtime_files" not in data:
         raise ValueError("Study config and data manifest differ")
     directory.mkdir(parents=True)
-    if calibration:
+    if calibration or diagnostic:
         def subset(rows, count, seed):
             groups = {}
             for row in sorted(rows, key=lambda r: str(r["id"])):
@@ -118,16 +120,19 @@ def prepare(study_id: str, *, root: Path = ROOT, config_path: Path | None = None
             for group in groups.values():
                 rng.shuffle(group)
             return [row for _, _, row in sorted((i/len(g), k, r) for k, g in groups.items() for i, r in enumerate(g))][:count]
-        train, selection = subset(train, 6, 20261024), subset(selection, 4, 20261025)
-        split_root = directory / "calibration_split"
+        train, selection = (subset(train, 6, 20261024), subset(selection, 4, 20261025)) if calibration else (
+            subset(train, 40, 20261026), subset(selection, 20, 20261027))
+        split_root = directory / ("calibration_split" if calibration else "diagnostic_split")
         for split, rows in (("train", train), ("val", selection), ("test", [])):
             write_json(split_root / split / "items.json", rows)
-        base.update(train_size=6, batch_size=6, sel_env_num=4, test_env_num=0, split_dir=str(split_root))
-        base["remem"].update(task_executions=32, optimizer_calls=20)
+        base.update(train_size=len(train), batch_size=6 if calibration else 20,
+                    sel_env_num=len(selection), test_env_num=0, split_dir=str(split_root))
+        base["remem"].update(task_executions=32 if calibration else 160, optimizer_calls=20 if calibration else 40)
     config_hashes = {}
     order = []
-    for seed in ((42,) if calibration else (42, 43, 44)):
-        schedule = ([[str(r["id"]) for r in train]] * 2 if calibration else task_plan(train, seed))
+    for seed in ((42,) if calibration or diagnostic else (42, 43, 44)):
+        schedule = ([[str(r["id"]) for r in train]] * 2 if calibration else
+                    task_plan(train, seed, revisit=20) if diagnostic else task_plan(train, seed))
         arms = ["remem_full"] if calibration else list(CORE_ARMS)
         if include_skillopt_controlled:
             arms.append("skillopt_controlled")
@@ -146,12 +151,14 @@ def prepare(study_id: str, *, root: Path = ROOT, config_path: Path | None = None
                                           max_attempts=3, timeout_s=120, target_calls=400)
             if calibration:
                 cfg["research_limits"].update(task_executions=32, target_calls=32, optimizer_calls=20)
+            elif diagnostic:
+                cfg["research_limits"].update(task_executions=160, target_calls=160, optimizer_calls=40)
             if arm not in CORE_ARMS:
                 cfg.pop("remem")
                 cfg.update(train_size=len(train), control_task_schedule=schedule, control_kind=arm)
                 if arm == "atomsearch_budgeted":
                     from .atomsearch import DEFAULTS
-                    cfg["atomsearch"] = {**DEFAULTS, **({"attempts": 2} if calibration else {})}
+                    cfg["atomsearch"] = {**DEFAULTS, **({"attempts": 2} if calibration else {"attempts": 6} if diagnostic else {})}
                 if arm == "cam_reference":
                     from .native_control import CAM_V3
                     cfg["cam_control"] = dict(CAM_V3)
@@ -172,7 +179,7 @@ def prepare(study_id: str, *, root: Path = ROOT, config_path: Path | None = None
         snapshot[relative.as_posix()] = file_hash(dest)
     manifest = {
         "schema_version": 1, "study_id": study_id,
-        "scope": "calibration_only" if calibration else "development_with_external_controls" if any((include_skillopt_controlled, include_cam_reference, include_atomsearch)) else "development_core_only",
+        "scope": "calibration_only" if calibration else "medium_diagnostic_only" if diagnostic else "development_with_external_controls" if any((include_skillopt_controlled, include_cam_reference, include_atomsearch)) else "development_core_only",
         "formal_ready": False,
         "git_head": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
         "git_dirty": bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=root, text=True).strip()),
@@ -210,7 +217,8 @@ def verify(directory: Path, *, root: Path = ROOT) -> dict:
             raise ValueError("Frozen config changed")
         config = json.loads((directory / path).read_text(encoding="utf-8"))
         if config.get("control_kind") in {"skillopt_controlled", "cam_reference", "atomsearch_budgeted"}:
-            if len(config.get("control_task_schedule", [])) != (2 if freeze["scope"] == "calibration_only" else 6) or config.get("eval_test"):
+            expected_steps = {"calibration_only": 2, "medium_diagnostic_only": 3}.get(freeze["scope"], 6)
+            if len(config.get("control_task_schedule", [])) != expected_steps or config.get("eval_test"):
                 raise ValueError("Invalid SkillOpt control config")
         else:
             ReMemConfig.parse(config)
@@ -251,7 +259,8 @@ def execute_config(cfg: dict, *, key_file: Path | None = None) -> dict:
     # Explicit --execute starts real development calls; never a formal claim.
     from scripts.train import get_adapter
     from skillopt.engine.trainer import ReflACTTrainer
-    env_keys = ("OPTIMIZER_AZURE_OPENAI_API_KEY", "TARGET_AZURE_OPENAI_API_KEY", "REMEM_TRANSPORT_AUDIT_PATH")
+    env_keys = ("OPTIMIZER_AZURE_OPENAI_API_KEY", "TARGET_AZURE_OPENAI_API_KEY", "REMEM_TRANSPORT_AUDIT_PATH",
+                "NO_PROXY", "no_proxy")
     previous = {key: os.environ.get(key) for key in env_keys}
     from skillopt.model import azure_openai as backend
     previous_backend_keys = backend.OPTIMIZER_API_KEY, backend.TARGET_API_KEY
@@ -260,18 +269,32 @@ def execute_config(cfg: dict, *, key_file: Path | None = None) -> dict:
             key_file = key_file.resolve()
             if not key_file.is_relative_to(ROOT) or subprocess.run(
                     ["git", "check-ignore", "-q", "--", str(key_file)], cwd=ROOT, check=False).returncode != 0:
-                raise ValueError("DeepSeek key file must be Git-ignored inside this repository")
-            if (cfg.get("optimizer_model") != "deepseek-flash" or cfg.get("target_model") != "deepseek-flash"
-                    or cfg.get("optimizer_azure_openai_endpoint") != "https://api.deepseek.com"
-                    or cfg.get("target_azure_openai_endpoint") != "https://api.deepseek.com"):
-                raise ValueError("Local DeepSeek key file requires the pinned DeepSeek profile")
-            entries = dict(line.split("=", 1) for line in key_file.read_text(encoding="utf-8").splitlines()
-                           if line and not line.startswith("#") and "=" in line)
-            key = entries.get("DEEPSEEK_API_KEY", "")
-            if not key:
-                raise ValueError("Local DeepSeek API key missing")
-            os.environ["OPTIMIZER_AZURE_OPENAI_API_KEY"] = key
-            os.environ["TARGET_AZURE_OPENAI_API_KEY"] = key
+                raise ValueError("Key file must be Git-ignored inside this repository")
+            entries = dict(line.strip().split("=", 1) for line in key_file.read_text(encoding="utf-8-sig").splitlines()
+                           if line.strip() and not line.lstrip().startswith("#") and "=" in line)
+            for role in ("optimizer", "target"):
+                key_name = role.upper() + "_AZURE_OPENAI_API_KEY"
+                endpoint_name = role.upper() + "_AZURE_OPENAI_ENDPOINT"
+                if "DEEPSEEK_API_KEY" in entries:
+                    if (cfg.get(role + "_model") != "deepseek-flash"
+                            or cfg.get(role + "_azure_openai_endpoint") != "https://api.deepseek.com"):
+                        raise ValueError("Local DeepSeek key file requires the pinned DeepSeek profile")
+                    key = entries["DEEPSEEK_API_KEY"]
+                else:
+                    if not entries.get(endpoint_name) or entries[endpoint_name] != cfg.get(role + "_azure_openai_endpoint"):
+                        raise ValueError("Credential endpoint does not match the frozen role endpoint")
+                    key = entries.get(key_name, "")
+                if not key:
+                    raise ValueError("Local role API key missing")
+                os.environ[key_name] = key
+            if entries.get("NO_PROXY"):
+                from urllib.parse import urlsplit
+                hosts = {urlsplit(cfg.get(role + "_azure_openai_endpoint", "")).hostname for role in ("optimizer", "target")}
+                bypass = [h.strip() for h in entries["NO_PROXY"].split(",") if h.strip()]
+                if not bypass or not set(bypass) <= hosts:
+                    raise ValueError("Local proxy bypass must name only the frozen role endpoint hosts")
+                for name in ("NO_PROXY", "no_proxy"):
+                    os.environ[name] = ",".join(filter(None, [previous[name], *bypass]))
         os.environ["REMEM_TRANSPORT_AUDIT_PATH"] = str((Path(cfg["out_root"]) / "remem/transport.jsonl").resolve())
         # Model modules were imported before loading the ignored key file. Refresh
         # their in-memory credentials explicitly without placing secrets in cfg.
@@ -338,7 +361,9 @@ def report(directory: Path) -> dict:
             row["cache_hits"] = sum(k == "cache_hit" for k, _ in records)
             row["task_failures"] = sum(k == "observation" and p["outcome"] == "failure" for k, p in records)
             row["infra_failures"] = sum(k in {"infra_failure", "optimizer_error"} for k, p in records)
-            row["no_change"] = sum(k == "attempt" and p["gate_action"] == "no_change" for k, p in records)
+            row["no_change"] = sum((k == "attempt" and p["gate_action"] == "no_change")
+                                   or k == "native_no_change" or (k == "atom_outcome" and p["tag"] == "no_change")
+                                   for k, p in records)
             row["proposal_invalid"] = sum(k == "proposal_invalid" or (k == "proposal_result" and p["status"] == "proposal_invalid") for k, p in records)
         calls = folder / "remem/calls/ledger.sqlite3"
         if calls.exists():
