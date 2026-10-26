@@ -174,6 +174,17 @@ def main(directory, key_file, resume_unstarted=False, reporter=Path(__file__).wi
                     provider_error_categories=sorted(codes & permanent),
                 )
                 break
+            malformed = sum(
+                x["kind"] == "usage"
+                and x.get("response_contract", {}).get("has_model") is False
+                and x.get("response_contract", {}).get("has_choices") is False
+                for x in raw
+            )
+            if malformed:
+                progress.update(
+                    status="stopped_malformed_provider_response", stop_run=name, malformed_provider_responses=malformed
+                )
+                break
     else:
         progress["status"] = "completed_with_failures" if any(r["exit_code"] for r in progress["runs"]) else "completed"
     progress["finished_at_utc"] = now()

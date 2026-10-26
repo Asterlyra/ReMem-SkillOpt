@@ -129,13 +129,14 @@ def test_recovery_subset_does_not_start_other_frozen_methods(tmp_path, monkeypat
     assert json.loads((tmp_path / "queue.json").read_text())["selected_run_order"] == ["failed"]
 
 
-def test_nontransient_provider_error_stops_before_next_recovery_arm(tmp_path, monkeypatch):
+@pytest.mark.parametrize(
+    "contract", [{"provider_error_category": "context_length_exceeded"}, {"has_model": False, "has_choices": False}]
+)
+def test_nontransient_provider_error_stops_before_next_recovery_arm(tmp_path, monkeypatch, contract):
     (tmp_path / "freeze.json").write_text(json.dumps({"study_id": "fixture", "run_order": ["first", "second"]}))
     folder = tmp_path / "runs/first/remem"
     folder.mkdir(parents=True)
-    (folder / "transport.jsonl").write_text(
-        json.dumps({"kind": "usage", "response_contract": {"provider_error_category": "context_length_exceeded"}})
-    )
+    (folder / "transport.jsonl").write_text(json.dumps({"kind": "usage", "response_contract": contract}))
     monkeypatch.setattr(run_diagnostic_queue, "verify", lambda _: None)
     monkeypatch.setattr(run_diagnostic_queue, "active_study_processes", lambda _: [])
     monkeypatch.setattr(run_diagnostic_queue, "report", lambda _: {"runs": [{"run": "first", "status": "incomplete"}]})
@@ -149,4 +150,9 @@ def test_nontransient_provider_error_stops_before_next_recovery_arm(tmp_path, mo
     monkeypatch.setattr(run_diagnostic_queue.subprocess, "Popen", launch)
     assert run_diagnostic_queue.main(tmp_path, tmp_path / ".env.fake.local") == 1
     assert started == ["first"]
-    assert json.loads((tmp_path / "queue.json").read_text())["status"] == "stopped_provider_contract_failure"
+    status = json.loads((tmp_path / "queue.json").read_text())["status"]
+    assert status == (
+        "stopped_provider_contract_failure"
+        if "provider_error_category" in contract
+        else "stopped_malformed_provider_response"
+    )
