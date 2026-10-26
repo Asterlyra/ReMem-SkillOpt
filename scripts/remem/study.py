@@ -20,6 +20,8 @@ def main():
     prepare.add_argument("--include-atomsearch", action="store_true")
     prepare.add_argument("--calibration", action="store_true", help="Freeze two-step non-test preflight, not a formal study")
     prepare.add_argument("--diagnostic", action="store_true", help="Freeze seven-arm, one-seed medium diagnostic with no test tasks")
+    prepare.add_argument("--request-timeout-s", type=int, default=120,
+                         help="Shared target/optimizer HTTP timeout, frozen before execution")
     for name in ("verify", "report", "run"):
         command = sub.add_parser(name)
         command.add_argument("directory", type=Path)
@@ -34,7 +36,8 @@ def main():
                                                  include_skillopt_controlled=args.include_skillopt_controlled,
                                                  include_cam_reference=args.include_cam_reference,
                                                  include_atomsearch=args.include_atomsearch, calibration=args.calibration,
-                                                 diagnostic=args.diagnostic)), "model_calls": 0}
+                                                 diagnostic=args.diagnostic,
+                                                 request_timeout_s=args.request_timeout_s)), "model_calls": 0}
     elif args.command == "verify":
         result = study.verify(args.directory.resolve())
     elif args.command == "report":

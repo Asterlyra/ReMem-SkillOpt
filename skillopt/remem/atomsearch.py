@@ -16,7 +16,7 @@ from skillopt.datasets.base import BatchSpec
 from skillopt.optimizer.skill import apply_patch_with_report
 
 from .audit_runtime import BudgetExhausted, InfrastructureFailure, RuntimeAudit
-from .call_policy import assert_calls_healthy, record_format_error
+from .call_policy import CallBudgetExceeded, assert_calls_healthy, record_format_error
 from .evidence import rule_index, validate_edit
 from .store import EventStore
 from .types import canonical, digest
@@ -291,8 +291,16 @@ class AtomSearchRuntime(RuntimeAudit):
             raise InfrastructureFailure("Interrupted AtomSearch proposal requires reconciliation")
         self.store.append(identity + ":start", "optimizer_started", {"step": self.step,
             "request_hash": digest(canonical(request)), "artifact_hash": self.store.artifact(request)})
-        text, _ = self.chat(system=PROPOSAL_SYSTEM, user=canonical(request), stage="atomsearch_proposal",
-                            max_completion_tokens=16384, retries=3)
+        started = time.monotonic()
+        try:
+            text, _ = self.chat(system=PROPOSAL_SYSTEM, user=canonical(request), stage="atomsearch_proposal",
+                                max_completion_tokens=16384, retries=3)
+        except CallBudgetExceeded:
+            raise
+        except Exception as exc:
+            self.store.append(identity + ":error", "optimizer_error", {"step": self.step,
+                "error_type": type(exc).__name__, "elapsed_s": time.monotonic()-started})
+            raise
         assert_calls_healthy()
         # Assistant text only, in the ignored local ledger. No headers, credentials,
         # provider envelope, or model content is included in committed reports.

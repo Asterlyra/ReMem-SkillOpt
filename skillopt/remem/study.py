@@ -84,7 +84,9 @@ def source_files(root: Path) -> list[Path]:
 def prepare(study_id: str, *, root: Path = ROOT, config_path: Path | None = None,
             data_manifest_path: Path | None = None, include_skillopt_controlled: bool = False,
             include_cam_reference: bool = False, include_atomsearch: bool = False,
-            calibration: bool = False, diagnostic: bool = False) -> Path:
+            calibration: bool = False, diagnostic: bool = False, request_timeout_s: int = 120) -> Path:
+    if type(request_timeout_s) is not int or request_timeout_s <= 0:
+        raise ValueError("Request timeout must be a positive integer")
     if calibration and diagnostic:
         raise ValueError("Choose calibration or medium diagnostic, not both")
     if not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}", study_id):
@@ -148,7 +150,7 @@ def prepare(study_id: str, *, root: Path = ROOT, config_path: Path | None = None
             for key in ("skill_init", "data_root", "split_dir"):
                 cfg[key] = str((root / cfg[key]).resolve())
             cfg["research_limits"] = dict(task_executions=400, optimizer_calls=80, output_tokens=16384,
-                                          max_attempts=3, timeout_s=120, target_calls=400)
+                                          max_attempts=3, timeout_s=request_timeout_s, target_calls=400)
             if calibration:
                 cfg["research_limits"].update(task_executions=32, target_calls=32, optimizer_calls=20)
             elif diagnostic:

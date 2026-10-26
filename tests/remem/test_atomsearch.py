@@ -153,6 +153,23 @@ def test_bad_proposal_does_not_silently_become_no_change(tmp_path):
     assert not (runtime.root / "summary.json").exists()
 
 
+def test_optimizer_service_failure_is_recorded_and_cannot_become_no_change_or_silent_resume(tmp_path):
+    def fail(**kwargs):
+        raise TimeoutError("synthetic service failure")
+    runtime, adapter, _, loader = make_runtime(tmp_path, chat=fail)
+    with pytest.raises(TimeoutError):
+        runtime.run()
+    assert runtime.store.records("optimizer_error")[0]["error_type"] == "TimeoutError"
+    assert len(runtime.store.records("observation")) == 2
+    assert not runtime.store.records("atom_no_change") and not (runtime.root / "summary.json").exists()
+    calls_before = len(adapter.calls)
+    again = AtomSearchRuntime(runtime.cfg, loader, adapter, lambda **kwargs: pytest.fail("Unreconciled retry"))
+    from skillopt.remem.audit_runtime import InfrastructureFailure
+    with pytest.raises(InfrastructureFailure, match="requires reconciliation"):
+        again.run()
+    assert len(adapter.calls) == calls_before
+
+
 def test_no_success_counterexample_is_explicit_no_change_without_fabrication(tmp_path):
     runtime, adapter, _, _ = make_runtime(tmp_path, chat=lambda **kw: pytest.fail("No valid contrast exists"))
     original = adapter.rollout

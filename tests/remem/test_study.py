@@ -193,6 +193,21 @@ def test_medium_diagnostic_has_seven_arms_three_steps_and_no_test(prepared):
         study.prepare("bad", root=root, diagnostic=True, calibration=True)
 
 
+def test_shared_timeout_can_change_only_in_new_frozen_study_without_other_budget_changes(prepared):
+    root, _ = prepared
+    directory = study.prepare("timeout-recovery", root=root, diagnostic=True, request_timeout_s=240,
+                              include_skillopt_controlled=True, include_cam_reference=True, include_atomsearch=True)
+    assert study.verify(directory, root=root)["external_runs"] == 3
+    for path in (directory / "configs").glob("*.json"):
+        cfg = json.loads(path.read_text())
+        assert cfg["research_limits"] == dict(task_executions=160, optimizer_calls=40,
+                                              output_tokens=16384, max_attempts=3, timeout_s=240, target_calls=160)
+        assert not cfg["eval_test"] and cfg["test_env_num"] == 0
+    for invalid in (0, -1, True, 1.5):
+        with pytest.raises(ValueError, match="positive integer"):
+            study.prepare("invalid-timeout", root=root, request_timeout_s=invalid)
+
+
 @pytest.mark.parametrize("wrong_endpoint", [True, False])
 def test_role_credentials_refuse_cross_endpoint_or_unrelated_proxy_bypass(tmp_path, monkeypatch, wrong_endpoint):
     import os
