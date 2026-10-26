@@ -1,0 +1,359 @@
+{
+  "scope": "medium_diagnostic_only",
+  "formal_ready": false,
+  "runs": [
+    {
+      "run": "core_00_42",
+      "status": "not_started",
+      "task_executions": null,
+      "http_attempts": null,
+      "retry_attempts": null,
+      "cache_hits": null,
+      "tokens": null,
+      "event_counts": {},
+      "training_by_step": {},
+      "training_failure_by_step": {},
+      "context_history_groups": [],
+      "attempt_actions": [],
+      "cam_final_actions": [],
+      "cam_retrieval": [],
+      "cam_budget_reasons": [],
+      "optimizer_call_errors": {},
+      "optimizer_format_errors": 0,
+      "limits_reached": 0,
+      "test_executions": 0,
+      "memory_validation_id_matches": []
+    },
+    {
+      "run": "atomsearch_budgeted_42",
+      "status": "development_completed",
+      "task_executions": 160,
+      "http_attempts": 164,
+      "retry_attempts": 1,
+      "cache_hits": 0,
+      "tokens": null,
+      "http_elapsed_s_sum": 6841.415999999619,
+      "logical_timing_complete": true,
+      "logical_call_elapsed_s_sum": 6850.660999999964,
+      "usage_complete": false,
+      "task_failures": 42,
+      "infra_failures": 0,
+      "no_change": 0,
+      "proposal_invalid": 0,
+      "execution_timing_complete": true,
+      "execution_wall_time_s": 4039.4380000000237,
+      "optimizer_logical_calls": 3,
+      "selection_score": 0.6,
+      "steps": 2,
+      "elapsed_s": 4039.375,
+      "stop_reason": "budget_exhausted",
+      "final_selection_score": 0.6,
+      "event_counts": {
+        "identity": 1,
+        "rollout_started": 8,
+        "rollout_completed": 8,
+        "selection": 5,
+        "observation": 60,
+        "optimizer_started": 3,
+        "optimizer_response": 3,
+        "optimizer_completed": 3,
+        "atom_outcome": 4,
+        "atom_checkpoint": 2,
+        "budget_exhausted": 1,
+        "atom_finished": 1
+      },
+      "training_by_step": {
+        "1": 20,
+        "2": 20,
+        "3": 20
+      },
+      "training_failure_by_step": {
+        "1": 16,
+        "2": 10,
+        "3": 16
+      },
+      "context_history_groups": [],
+      "attempt_actions": [],
+      "cam_final_actions": [],
+      "cam_retrieval": [],
+      "cam_budget_reasons": [],
+      "optimizer_call_errors": {},
+      "optimizer_format_errors": 0,
+      "limits_reached": 0,
+      "test_executions": 0,
+      "memory_validation_id_matches": [],
+      "transport": {
+        "http_attempts": 164,
+        "http_responses": 163,
+        "logical_calls": 163,
+        "retry_attempts": 1,
+        "request_stages": {
+          "atomsearch_proposal": 3,
+          "rollout": 161
+        },
+        "http_elapsed_s_sum": 6841.415999999619,
+        "http_response_headers_elapsed_s_sum": 6841.415999999619,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 6850.660999999964,
+        "successful_http_responses": 163,
+        "reported_usage_responses": 163,
+        "usage_complete": false,
+        "known_prompt_tokens": 372555,
+        "known_completion_tokens": 1039150,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 3,
+          "target": 161
+        }
+      },
+      "response_models_by_role": {
+        "target": [
+          "Qwen3.6-35B-A3B"
+        ],
+        "optimizer": [
+          "glm-5.3-private-19428658"
+        ]
+      },
+      "response_model_missing_by_role": {
+        "target": 0,
+        "optimizer": 0
+      },
+      "finish_reasons": {
+        "stop": 162,
+        "length": 1
+      }
+    },
+    {
+      "run": "skillopt_controlled_42",
+      "status": "incomplete",
+      "task_executions": 40,
+      "http_attempts": 76,
+      "retry_attempts": 36,
+      "cache_hits": 0,
+      "tokens": null,
+      "http_elapsed_s_sum": 900.1540000000969,
+      "logical_timing_complete": true,
+      "logical_call_elapsed_s_sum": 1637.2459999998682,
+      "usage_complete": false,
+      "task_failures": 2,
+      "infra_failures": 19,
+      "no_change": 0,
+      "proposal_invalid": 0,
+      "execution_timing_complete": true,
+      "execution_wall_time_s": 875.0160000000033,
+      "optimizer_logical_calls": 0,
+      "event_counts": {
+        "identity": 1,
+        "rollout_started": 2,
+        "rollout_completed": 2,
+        "selection": 1,
+        "checkpoint": 1,
+        "observation": 2,
+        "infra_failure": 19
+      },
+      "training_by_step": {
+        "1": 2
+      },
+      "training_failure_by_step": {
+        "1": 2
+      },
+      "context_history_groups": [],
+      "attempt_actions": [],
+      "cam_final_actions": [],
+      "cam_retrieval": [],
+      "cam_budget_reasons": [],
+      "optimizer_call_errors": {},
+      "optimizer_format_errors": 0,
+      "limits_reached": 0,
+      "test_executions": 0,
+      "memory_validation_id_matches": [],
+      "transport": {
+        "http_attempts": 76,
+        "http_responses": 22,
+        "logical_calls": 40,
+        "retry_attempts": 36,
+        "request_stages": {
+          "rollout": 76
+        },
+        "http_elapsed_s_sum": 900.1540000000969,
+        "http_response_headers_elapsed_s_sum": 900.1540000000969,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 1637.2459999998682,
+        "successful_http_responses": 22,
+        "reported_usage_responses": 22,
+        "usage_complete": false,
+        "known_prompt_tokens": 24280,
+        "known_completion_tokens": 144804,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [],
+        "roles": {
+          "target": 76
+        }
+      },
+      "response_models_by_role": {
+        "target": [
+          "Qwen3.6-35B-A3B"
+        ],
+        "optimizer": []
+      },
+      "response_model_missing_by_role": {
+        "target": 0,
+        "optimizer": 0
+      },
+      "finish_reasons": {
+        "stop": 22
+      }
+    },
+    {
+      "run": "repair_only_42",
+      "status": "incomplete",
+      "task_executions": 20,
+      "http_attempts": 60,
+      "retry_attempts": 40,
+      "cache_hits": 0,
+      "tokens": null,
+      "http_elapsed_s_sum": 0,
+      "logical_timing_complete": true,
+      "logical_call_elapsed_s_sum": 775.6529999997583,
+      "usage_complete": false,
+      "task_failures": 0,
+      "infra_failures": 1,
+      "no_change": 0,
+      "proposal_invalid": 0,
+      "execution_timing_complete": true,
+      "execution_wall_time_s": 391.204000000027,
+      "optimizer_logical_calls": 0,
+      "event_counts": {
+        "identity": 1,
+        "rollout_started": 1,
+        "rollout_completed": 1,
+        "infra_failure": 1
+      },
+      "training_by_step": {},
+      "training_failure_by_step": {},
+      "context_history_groups": [],
+      "attempt_actions": [],
+      "cam_final_actions": [],
+      "cam_retrieval": [],
+      "cam_budget_reasons": [],
+      "optimizer_call_errors": {},
+      "optimizer_format_errors": 0,
+      "limits_reached": 0,
+      "test_executions": 0,
+      "memory_validation_id_matches": [],
+      "transport": {
+        "http_attempts": 60,
+        "http_responses": 0,
+        "logical_calls": 20,
+        "retry_attempts": 40,
+        "request_stages": {
+          "rollout": 60
+        },
+        "http_elapsed_s_sum": 0,
+        "http_response_headers_elapsed_s_sum": 0,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 775.6529999997583,
+        "successful_http_responses": 0,
+        "reported_usage_responses": 0,
+        "usage_complete": false,
+        "known_prompt_tokens": 0,
+        "known_completion_tokens": 0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [],
+        "roles": {
+          "target": 60
+        }
+      },
+      "response_models_by_role": {
+        "target": [],
+        "optimizer": []
+      },
+      "response_model_missing_by_role": {
+        "target": 0,
+        "optimizer": 0
+      },
+      "finish_reasons": {}
+    },
+    {
+      "run": "remem_full_42",
+      "status": "not_started",
+      "task_executions": null,
+      "http_attempts": null,
+      "retry_attempts": null,
+      "cache_hits": null,
+      "tokens": null,
+      "event_counts": {},
+      "training_by_step": {},
+      "training_failure_by_step": {},
+      "context_history_groups": [],
+      "attempt_actions": [],
+      "cam_final_actions": [],
+      "cam_retrieval": [],
+      "cam_budget_reasons": [],
+      "optimizer_call_errors": {},
+      "optimizer_format_errors": 0,
+      "limits_reached": 0,
+      "test_executions": 0,
+      "memory_validation_id_matches": []
+    },
+    {
+      "run": "cam_reference_42",
+      "status": "not_started",
+      "task_executions": null,
+      "http_attempts": null,
+      "retry_attempts": null,
+      "cache_hits": null,
+      "tokens": null,
+      "event_counts": {},
+      "training_by_step": {},
+      "training_failure_by_step": {},
+      "context_history_groups": [],
+      "attempt_actions": [],
+      "cam_final_actions": [],
+      "cam_retrieval": [],
+      "cam_budget_reasons": [],
+      "optimizer_call_errors": {},
+      "optimizer_format_errors": 0,
+      "limits_reached": 0,
+      "test_executions": 0,
+      "memory_validation_id_matches": []
+    },
+    {
+      "run": "memory_only_42",
+      "status": "not_started",
+      "task_executions": null,
+      "http_attempts": null,
+      "retry_attempts": null,
+      "cache_hits": null,
+      "tokens": null,
+      "event_counts": {},
+      "training_by_step": {},
+      "training_failure_by_step": {},
+      "context_history_groups": [],
+      "attempt_actions": [],
+      "cam_final_actions": [],
+      "cam_retrieval": [],
+      "cam_budget_reasons": [],
+      "optimizer_call_errors": {},
+      "optimizer_format_errors": 0,
+      "limits_reached": 0,
+      "test_executions": 0,
+      "memory_validation_id_matches": []
+    }
+  ],
+  "external_arms": {
+    "skillopt_controlled": "implemented_development",
+    "cam_reference": "implemented_development",
+    "atomsearch_budgeted": "independent_reproduction_development"
+  },
+  "study_id": "intranet-recovery-20261027-v1",
+  "source_git_head": "32b3e2e08a9e917d27670b613fb475148ee540f9",
+  "test_released": false
+}
