@@ -23,7 +23,7 @@ def reply(contents=("CHECK", "PRESERVE")):
 OBSERVATIONS = [{"task_id": "t0", "outcome": "failure"}, {"task_id": "t1", "outcome": "success"}]
 
 
-@pytest.mark.parametrize("mutation", ["foreign", "wrong_outcome", "shared_spec", "non_atomic", "empty", "orphan"])
+@pytest.mark.parametrize("mutation", ["foreign", "wrong_outcome", "shared_spec", "non_atomic", "empty", "orphan", "extra_spec_key"])
 def test_reject_unsubstantiated_or_non_atomic_edits(mutation):
     obj = json.loads(reply())
     if mutation == "foreign":
@@ -36,6 +36,8 @@ def test_reject_unsubstantiated_or_non_atomic_edits(mutation):
         obj["edits"][0]["content"] = "a\nb"
     elif mutation == "empty":
         obj["specifications"][0]["scope"] = ""
+    elif mutation == "extra_spec_key":
+        obj["specifications"][0]["criterion_id"] = obj["specifications"][0]["id"]
     else:
         obj["edits"].pop()
     with pytest.raises(ProposalInvalid):

@@ -56,3 +56,7 @@
 ## 2026-10-26 内网与中等诊断
 
 用户确认按既有文档使用 qwen target、glm optimizer，并选择七方法、单 seed、三步诊断。网关需要仅对 hub.zgci.org 绕过本机代理；本地角色凭据放在忽略的 .env.intranet.local，必须绑定配置 endpoint，不打印或提交值。DeepSeek 四方法完成两步联调，全部失败尝试保留；见 [多步联调报告](research/remem/LOOP_CONTROL_REPORT.md)。CAM 审计的 result_action 才是最终动作。中等诊断不开放测试集，后续按实际状态继续，不复跑旧工件。
+
+## 中等诊断巡检续接
+
+2026-10-26 21:22 巡检已确认 v1 两个已启动格均终止，其余五格未派发；原记录保留。公共执行超时分类修复已合入，AtomSearch 的 JSON 提示已澄清字段位置，严格解析不变。新诊断使用 intranet-medium-20261026-v2，见 [巡检与修复记录](research/remem/MEDIUM_DIAGNOSTIC_PROGRESS.md)。每 30 分钟的本对话巡检 remem-30 已获用户授权，可修复、测试、保存 Git 并在新冻结版本继续；禁止覆盖旧工件或自动启动正式实验。当前运行位置以 .remem-local/current_diagnostic.json 和实际进程核验为准。

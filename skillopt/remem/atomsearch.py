@@ -37,6 +37,17 @@ support_ids must use task_id strings from allowed_support_ids; counterexample_id
 must use task_id strings from allowed_counterexample_ids. Never use event_id,
 case_id, artifact_hash, row positions, or filenames as task IDs.
 Each ranked edit has exactly: criterion_id, operation, rule_id, content.
+The specification key is id; criterion_id belongs ONLY inside an edit and must
+equal that specification's id. Never add criterion_id to a specification.
+Exact proposals shape (replace illustrative values with evidence-grounded values):
+{"status":"proposals","reason":"operation and edit-count rationale",
+ "specifications":[{"id":"s1","support_ids":["FAILED_TASK_ID"],
+ "counterexample_ids":["SUCCESS_TASK_ID"],"hypothesis":"behavioral distinction",
+ "scope":"applicability and exclusions","expected_effect":"repair and preservation",
+ "operation_rationale":"why this operation"}],
+ "edits":[{"criterion_id":"s1","operation":"add","rule_id":"document_end",
+ "content":"One local rule."}]}
+Use only supplied task IDs in place of the illustrative ID placeholders. No extra keys.
 Use one specification per edit. operation is add, rewrite, or delete. For add use
 rule_id=document_end. For rewrite/delete use one supplied rule_id. Content is one
 local rule (one nonempty line); delete has empty content. Do not rewrite the full skill.

@@ -48,3 +48,5 @@
 新增：[AtomSearch 独立复现边界](docs/remem/12_ATOMSEARCH.md)与[对照实施记录](research/remem/CONTROL_IMPLEMENTATION_REPORT.md)。
 
 最新：[多步联调、用量与预算报告](research/remem/LOOP_CONTROL_REPORT.md)。用户已选择七方法、单 seed、三步的内网中等诊断，最终测试保持关闭。
+
+中等诊断当前修订与已发现问题见 [巡检记录](research/remem/MEDIUM_DIAGNOSTIC_PROGRESS.md)；真实运行位置以忽略目录 `.remem-local/current_diagnostic.json` 和进程核验为准。
