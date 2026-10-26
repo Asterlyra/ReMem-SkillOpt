@@ -65,4 +65,4 @@
 
 v2 七个方法全部已终止：core_00 完成三步，其余六格在优化器服务/响应阶段失败。详见 [v2 结束报告](research/remem/MEDIUM_DIAGNOSTIC_V2_REPORT.md) 与 [机器用量记录](research/remem/MEDIUM_DIAGNOSTIC_V2_USAGE.json)。终止后已把独立诊断分支快进合入主分支，151 项测试通过。下一阶段 intranet-recovery-20261027-v1 使用共同 240 秒 HTTP 超时，其余执行与调用上限保持不变；只运行六个失败格，不复跑 core_00，记录为独立恢复版本，不能拼接成 v2 的完整性能表。若恢复遇到明确的上下文、额度、认证等不可自动重试问题，调度器将停止派发。模型与原始响应只留本地忽略目录；继续每30分钟巡检。实际状态以 .remem-local/current_diagnostic.json 和真实进程核验为准。
 
-04:08 更新：恢复版 AtomSearch 已按 160 任务预算正常结束；随后网关 TLS 连接失败，SkillOpt/R-only 终止，后续三格未派发，调度器已停止，等待连接恢复。见 [恢复与网络中止记录](research/remem/RECOVERY_20261027_REPORT.md)。此报告在独立诊断分支保存，暂不合入主运行目录，以保持其冻结源文件清单不变。不得重复执行已完成格或清除失败后伪装首次尝试。
+04:06 更新：恢复版 AtomSearch 已按 160 任务预算正常结束；随后网关 TLS 连接失败，SkillOpt/R-only 终止，后续三格未派发，调度器已停止，等待连接恢复。见 [恢复与网络中止记录](research/remem/RECOVERY_20261027_REPORT.md)。此报告在独立诊断分支保存，暂不合入主运行目录，以保持其冻结源文件清单不变。不得重复执行已完成格或清除失败后伪装首次尝试。
