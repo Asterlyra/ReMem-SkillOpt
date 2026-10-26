@@ -22,10 +22,21 @@ def test_infrastructure_not_mistaken_for_task_failure(reason):
     assert classify({"id": "x", "hard": 0, "fail_reason": reason})[0] == "infra_failure"
 
 
-def test_executor_timeout_and_evaluator_load_errors_are_infrastructure():
+def test_unattributed_timeout_and_evaluator_load_errors_are_infrastructure():
     for field, message in [("error", "timeout after 30s"), ("reason", "load error: missing workbook")]:
         assert classify({"hard": 0, "llm_ok": True, "cases": [{field: message}]})[0] == "infra_failure"
     assert classify({"hard": 0, "llm_ok": True, "fail_reason": "eval-mismatch: wrong value"})[0] == "failure"
+
+
+def test_confirmed_generated_code_timeout_is_task_failure_with_infra_precedence():
+    row = {"hard": 0, "llm_ok": True, "fail_reason": "exec-error: timeout after 120s",
+           "cases": [{"stage": "exec", "ok": False, "error": "timeout after 120s"}]}
+    assert classify(row) == ("failure", "generated_code_timeout")
+    assert classify({**row, "llm_ok": False})[0] == "infra_failure"
+    assert classify({**row, "outcome": "infra_failure"})[0] == "infra_failure"
+    assert classify({**row, "hard": 1}) == ("infra_failure", "invalid_result_contract")
+    evaluator = {"stage": "eval", "error": "eval-exception: timeout after 120s"}
+    assert classify({**row, "cases": row["cases"] + [evaluator]})[0] == "infra_failure"
 
 
 def test_gate_pairs_ids_not_list_position_and_has_three_outcomes():

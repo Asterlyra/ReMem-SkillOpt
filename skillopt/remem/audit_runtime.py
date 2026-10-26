@@ -23,13 +23,23 @@ class BudgetExhausted(RuntimeError):
 def classify(row: dict) -> tuple[str, str]:
     reason = str(row.get("fail_reason", ""))
     infra_prefixes = ("llm-call-failed", "no-test-cases", "unsafe-task-id", "timeout", "task-timeout", "load error", "missing-file", "unexpected:", "worker-error")
-    case_errors = [str(c.get("error", "")) + str(c.get("reason", "")) for c in row.get("cases", []) if isinstance(c, dict)]
+    cases = [c for c in row.get("cases", []) if isinstance(c, dict)]
+    # The executor has already run model-generated code under a fixed limit.
+    # Its bounded execution failure is a task outcome, distinct from a worker,
+    # service, evaluator, or whole-task timeout. Require the structured stage.
+    code_timeout = (row.get("llm_ok") is True and reason.startswith("exec-error: timeout after ")
+                    and any(c.get("stage") == "exec" and c.get("ok") is False
+                            and str(c.get("error", "")).startswith("timeout after ") for c in cases))
+    case_errors = [(c, str(c.get("error", "")) + str(c.get("reason", ""))) for c in cases]
     if (row.get("outcome") == "infra_failure" or row.get("llm_ok") is False or reason.startswith(infra_prefixes)
-            or any("timeout after" in e or "eval-exception:" in e or "load error:" in e for e in case_errors)):
+            or any(("timeout after" in e and not (code_timeout and c.get("stage") == "exec"))
+                   or "eval-exception:" in e or "load error:" in e for c, e in case_errors)):
         return "infra_failure", reason.split(":", 1)[0] or "infrastructure"
     score = row.get("hard")
     if not isinstance(score, (int, float)) or not math.isfinite(score) or score not in (0, 1):
         return "infra_failure", "invalid_result_contract"
+    if code_timeout:
+        return ("failure", "generated_code_timeout") if score == 0 else ("infra_failure", "invalid_result_contract")
     if score == 1:
         return "success", "none"
     # This signature is an observed outcome category, not a causal diagnosis.
