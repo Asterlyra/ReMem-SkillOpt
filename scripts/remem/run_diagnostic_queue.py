@@ -44,7 +44,7 @@ def active_study_processes(directory):
     return found
 
 
-def main(directory, key_file, resume_unstarted=False, reporter=Path(__file__).with_name("audit_medium.py")):
+def main(directory, key_file, resume_unstarted=False, reporter=Path(__file__).with_name("audit_medium.py"), only=None):
     verify(directory)
     if active_study_processes(directory):
         raise RuntimeError("A verified study process is still live; do not start a duplicate queue")
@@ -62,6 +62,15 @@ def main(directory, key_file, resume_unstarted=False, reporter=Path(__file__).wi
     elif resume_unstarted:
         raise FileNotFoundError("Explicit resume needs an existing queue")
     freeze = json.loads((directory / "freeze.json").read_text())
+    selected = (
+        list(only)
+        if only is not None
+        else (previous.get("selected_run_order", freeze["run_order"]) if resume_unstarted else freeze["run_order"])
+    )
+    if not selected or len(selected) != len(set(selected)) or not set(selected) <= set(freeze["run_order"]):
+        raise ValueError("Selected recovery runs must be unique members of the frozen matrix")
+    if resume_unstarted and selected != previous.get("selected_run_order", freeze["run_order"]):
+        raise ValueError("Recovery selection cannot change while resuming a queue")
     progress = {
         "study_id": freeze["study_id"],
         "status": "running",
@@ -69,13 +78,21 @@ def main(directory, key_file, resume_unstarted=False, reporter=Path(__file__).wi
         "started_at_utc": now(),
         "runs": [],
         "final_test_released": False,
+        "selected_run_order": selected,
     }
     if resume_unstarted:
         progress = previous
+        terminal = {key: progress.pop(key) for key in ("finished_at_utc", "stop_run") if key in progress}
         progress.setdefault("scheduler_invocations", []).append(
-            {"previous_pid": previous["pid"], "new_pid": os.getpid(), "resumed_at_utc": now(), "mode": "unstarted_only"}
+            {
+                "previous_pid": previous["pid"],
+                "new_pid": os.getpid(),
+                "resumed_at_utc": now(),
+                "mode": "unstarted_only",
+                "previous_termination": terminal,
+            }
         )
-        progress.update(status="running", pid=os.getpid())
+        progress.update(status="running", pid=os.getpid(), selected_run_order=selected)
     attempted = {r["run"] for r in progress["runs"]}
 
     def save():
@@ -84,7 +101,7 @@ def main(directory, key_file, resume_unstarted=False, reporter=Path(__file__).wi
         temporary.replace(progress_path)
 
     save()
-    for name in freeze["run_order"]:
+    for name in selected:
         if name in attempted:
             continue
         started = time.monotonic()
@@ -139,6 +156,24 @@ def main(directory, key_file, resume_unstarted=False, reporter=Path(__file__).wi
             if any(x["kind"] == "response" and x["status"] in (401, 403) for x in raw):
                 progress.update(status="stopped_authentication_failure", stop_run=name)
                 break
+            permanent = {
+                "context_length_exceeded",
+                "invalid_request_error",
+                "invalid_argument",
+                "insufficient_quota",
+                "insufficient_balance",
+                "invalid_api_key",
+                "model_not_found",
+                "content_filter",
+            }
+            codes = {x.get("response_contract", {}).get("provider_error_category") for x in raw if x["kind"] == "usage"}
+            if codes & permanent:
+                progress.update(
+                    status="stopped_provider_contract_failure",
+                    stop_run=name,
+                    provider_error_categories=sorted(codes & permanent),
+                )
+                break
     else:
         progress["status"] = "completed_with_failures" if any(r["exit_code"] for r in progress["runs"]) else "completed"
     progress["finished_at_utc"] = now()
@@ -156,5 +191,10 @@ if __name__ == "__main__":
     parser.add_argument("--key-file", type=Path, required=True)
     parser.add_argument("--resume-unstarted", action="store_true")
     parser.add_argument("--reporter", type=Path, default=Path(__file__).with_name("audit_medium.py"))
+    parser.add_argument(
+        "--only", nargs="+", help="Explicit failed-arm recovery subset; never replay completed arms implicitly"
+    )
     args = parser.parse_args()
-    raise SystemExit(main(args.directory.resolve(), args.key_file.resolve(), args.resume_unstarted, args.reporter))
+    raise SystemExit(
+        main(args.directory.resolve(), args.key_file.resolve(), args.resume_unstarted, args.reporter, args.only)
+    )

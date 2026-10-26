@@ -107,3 +107,46 @@ def test_live_process_guard_rejects_duplicate_queue_before_any_launch(tmp_path, 
     with pytest.raises(RuntimeError, match="still live"):
         run_diagnostic_queue.main(tmp_path, tmp_path / ".env.fake.local")
     assert not (tmp_path / "queue.json").exists()
+
+
+def test_recovery_subset_does_not_start_other_frozen_methods(tmp_path, monkeypatch):
+    (tmp_path / "freeze.json").write_text(json.dumps({"study_id": "fixture", "run_order": ["complete", "failed"]}))
+    monkeypatch.setattr(run_diagnostic_queue, "verify", lambda _: None)
+    monkeypatch.setattr(run_diagnostic_queue, "active_study_processes", lambda _: [])
+    monkeypatch.setattr(
+        run_diagnostic_queue, "report", lambda _: {"runs": [{"run": "failed", "status": "development_completed"}]}
+    )
+    monkeypatch.setattr(run_diagnostic_queue.subprocess, "run", lambda *a, **k: SimpleNamespace(returncode=0))
+    started = []
+
+    def launch(args, **kwargs):
+        started.append(args[args.index("--name") + 1])
+        return SimpleNamespace(pid=42, wait=lambda: 0)
+
+    monkeypatch.setattr(run_diagnostic_queue.subprocess, "Popen", launch)
+    assert run_diagnostic_queue.main(tmp_path, tmp_path / ".env.fake.local", only=["failed"]) == 0
+    assert started == ["failed"]
+    assert json.loads((tmp_path / "queue.json").read_text())["selected_run_order"] == ["failed"]
+
+
+def test_nontransient_provider_error_stops_before_next_recovery_arm(tmp_path, monkeypatch):
+    (tmp_path / "freeze.json").write_text(json.dumps({"study_id": "fixture", "run_order": ["first", "second"]}))
+    folder = tmp_path / "runs/first/remem"
+    folder.mkdir(parents=True)
+    (folder / "transport.jsonl").write_text(
+        json.dumps({"kind": "usage", "response_contract": {"provider_error_category": "context_length_exceeded"}})
+    )
+    monkeypatch.setattr(run_diagnostic_queue, "verify", lambda _: None)
+    monkeypatch.setattr(run_diagnostic_queue, "active_study_processes", lambda _: [])
+    monkeypatch.setattr(run_diagnostic_queue, "report", lambda _: {"runs": [{"run": "first", "status": "incomplete"}]})
+    monkeypatch.setattr(run_diagnostic_queue.subprocess, "run", lambda *a, **k: SimpleNamespace(returncode=0))
+    started = []
+
+    def launch(args, **kwargs):
+        started.append(args[args.index("--name") + 1])
+        return SimpleNamespace(pid=42, wait=lambda: 1)
+
+    monkeypatch.setattr(run_diagnostic_queue.subprocess, "Popen", launch)
+    assert run_diagnostic_queue.main(tmp_path, tmp_path / ".env.fake.local") == 1
+    assert started == ["first"]
+    assert json.loads((tmp_path / "queue.json").read_text())["status"] == "stopped_provider_contract_failure"
