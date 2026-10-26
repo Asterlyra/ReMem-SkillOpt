@@ -176,6 +176,27 @@ def test_actual_trainer_four_arms_and_no_history_leak(make_run, repair, memory):
     assert all(c.status == "unresolved" for c in store.cases(digest(Path(cfg["skill_init"]).read_text()), before_step=3))
 
 
+def test_generated_code_timeout_preserves_failure_and_allows_next_training_step(make_run):
+    cfg, adapter, prompts = make_run(replies="no_change")
+    rollout = adapter.rollout
+
+    def with_code_timeout(*args, **kwargs):
+        rows = rollout(*args, **kwargs)
+        for row in rows:
+            if row["hard"] == 0:
+                row.update(fail_reason="exec-error: timeout after 120s",
+                           cases=[{"stage": "exec", "ok": False, "error": "timeout after 120s"}])
+        return rows
+
+    adapter.rollout = with_code_timeout
+    summary = engine.ReflACTTrainer(cfg, adapter).train()
+    store = _store(cfg)
+    assert summary["total_steps"] == 2 and len(prompts) == 2
+    assert len(store.records("observation")) == 2
+    assert all(r["failure_kind"] == "generated_code_timeout" for r in store.records("observation"))
+    assert len(store.records("attempt")) == 2 and not store.records("infra_failure")
+
+
 @pytest.mark.parametrize("selection,action", [("improve", "accept"), ("tie", "inconclusive")])
 def test_candidate_gate_and_completed_resume(make_run, selection, action):
     cfg, adapter, prompts = make_run(selection=selection, steps=1)
