@@ -79,6 +79,11 @@ class ReMemRuntime(RuntimeAudit):
         self.store.append(call_id + ":done", "optimizer_completed", {"step": self.step, "elapsed_s": time.monotonic()-started,
                           "usage": usage if isinstance(usage, dict) and usage else None,
                           "http_attempts": None, "response_hash": digest(str(text))})
+        # Keep assistant text as a local diagnostic artifact, like AtomSearch.
+        # The history builders read observations and attempts, never this event.
+        if isinstance(text, str):
+            self.store.append(call_id + ":response", "optimizer_response", {"step": self.step,
+                "artifact_hash": self.store.artifact({"assistant_text": text})})
         if not isinstance(text, str) or not text.strip():
             self.store.append(call_id + ":empty", "optimizer_error", {"step": self.step, "error_type": "empty_content"})
             raise InfrastructureFailure("Optimizer returned empty content")

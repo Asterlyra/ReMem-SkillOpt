@@ -34,5 +34,7 @@ class JsonProposalStrategy:
             else:
                 raise ValueError("Unknown response status")
             return ProposalResult(**result)
+        except json.JSONDecodeError:
+            return ProposalResult("proposal_invalid", reason="invalid_json")
         except (ValueError, TypeError, RecursionError):
-            return ProposalResult("proposal_invalid", reason="invalid_json_or_response_contract")
+            return ProposalResult("proposal_invalid", reason="invalid_response_contract")

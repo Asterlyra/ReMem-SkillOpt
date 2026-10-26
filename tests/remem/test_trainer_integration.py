@@ -216,11 +216,26 @@ def test_generation_failure_keeps_training_observations(make_run, replies):
     cfg, adapter, prompts = make_run(replies=replies, steps=1)
     if replies == "invalid":
         engine.ReflACTTrainer(cfg, adapter).train()
-        assert _store(cfg).records("attempt")[0]["gate_action"] == "proposal_invalid"
+        store = _store(cfg)
+        assert store.records("attempt")[0]["gate_action"] == "proposal_invalid"
+        assert store.records("proposal_result")[0]["reason"] == "invalid_json"
+        responses = store.records("optimizer_response")
+        assert len(responses) == 1
+        assert store.read_artifact(responses[0]["artifact_hash"]) == {"assistant_text": "not JSON"}
+        assert "assistant_text" not in canonical(prompts)
     else:
         with pytest.raises(InfrastructureFailure):
             engine.ReflACTTrainer(cfg, adapter).train()
     assert len(_store(cfg).records("observation")) == 1
+
+
+def test_invalid_assistant_diagnostic_artifacts_do_not_enter_next_step_memory(make_run):
+    cfg, adapter, prompts = make_run(replies="invalid", steps=2)
+    engine.ReflACTTrainer(cfg, adapter).train()
+    assert len(_store(cfg).records("optimizer_response")) == 2
+    assert len(prompts) == 2 and prompts[1]["history"]
+    assert "assistant_text" not in canonical(prompts)
+    assert "not JSON" not in canonical(prompts)
 
 
 def test_interrupted_rollout_cannot_silently_repeat(make_run):
