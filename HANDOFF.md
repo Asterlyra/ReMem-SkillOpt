@@ -60,3 +60,7 @@
 ## 中等诊断巡检续接
 
 2026-10-26 21:22 巡检已确认 v1 两个已启动格均终止，其余五格未派发；原记录保留。公共执行超时分类修复已合入，AtomSearch 的 JSON 提示已澄清字段位置，严格解析不变。新诊断使用 intranet-medium-20261026-v2，见 [巡检与修复记录](research/remem/MEDIUM_DIAGNOSTIC_PROGRESS.md)。每 30 分钟的本对话巡检 remem-30 已获用户授权，可修复、测试、保存 Git 并在新冻结版本继续；禁止覆盖旧工件或自动启动正式实验。当前运行位置以 .remem-local/current_diagnostic.json 和实际进程核验为准。
+
+## 2026-10-27 v2 结束与失败格恢复
+
+v2 七个方法全部已终止：core_00 完成三步，其余六格在优化器服务/响应阶段失败。详见 [v2 结束报告](research/remem/MEDIUM_DIAGNOSTIC_V2_REPORT.md) 与 [机器用量记录](research/remem/MEDIUM_DIAGNOSTIC_V2_USAGE.json)。终止后已把独立诊断分支快进合入主分支，151 项测试通过。下一阶段 intranet-recovery-20261027-v1 使用共同 240 秒 HTTP 超时，其余执行与调用上限保持不变；只运行六个失败格，不复跑 core_00，记录为独立恢复版本，不能拼接成 v2 的完整性能表。若恢复遇到明确的上下文、额度、认证等不可自动重试问题，调度器将停止派发。模型与原始响应只留本地忽略目录；继续每30分钟巡检。实际状态以 .remem-local/current_diagnostic.json 和真实进程核验为准。

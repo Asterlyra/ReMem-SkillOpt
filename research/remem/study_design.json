@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "draft_not_executable_not_frozen",
-  "date": "2026-10-26",
+  "date": "2026-10-27",
   "project": "ReMem-SkillOpt",
   "modules": {
     "R": {
@@ -207,7 +207,7 @@
     "formal_required": true
   },
   "medium_diagnostic": {
-    "status": "preparing",
+    "status": "v2_terminal_one_complete_six_infrastructure_failures",
     "user_selected_date": "2026-10-26",
     "arms": 7,
     "seeds": [
@@ -220,6 +220,16 @@
     "batch_size": 20,
     "task_execution_limit": 160,
     "optimizer_call_limit": 40,
-    "atomsearch_attempt_limit": 6
+    "atomsearch_attempt_limit": 6,
+    "report": "research/remem/MEDIUM_DIAGNOSTIC_V2_REPORT.md",
+    "formal_ready": false,
+    "recovery": {
+      "status": "preparing",
+      "study_id": "intranet-recovery-20261027-v1",
+      "request_timeout_s": 240,
+      "scope": "failed_arms_only_separate_version",
+      "max_recovery_runs_per_failed_arm": 1,
+      "test_env_num": 0
+    }
   }
 }

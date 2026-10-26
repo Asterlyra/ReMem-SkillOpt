@@ -1,0 +1,905 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-27",
+  "scope": "intranet_medium_diagnostic_v2_terminal_not_formal",
+  "study_id": "intranet-medium-20261026-v2",
+  "source_git_head": "85d9c14",
+  "all_jobs_terminal_confirmed_by_process_and_ledger": true,
+  "source_verification_before_recovery": {
+    "status": "passed",
+    "scope": "medium_diagnostic_only",
+    "formal_ready": false,
+    "core_runs": 4,
+    "external_runs": 3,
+    "formal_blockers": [
+      "model_identity_cost_throughput_calibration",
+      "fresh_test_source_template_and_quality_audit",
+      "failed_request_usage_reconciliation",
+      "external_control_live_validation",
+      "final_test_release_protocol"
+    ]
+  },
+  "runs": [
+    {
+      "run": "core_00_42",
+      "status": "development_completed",
+      "task_executions": 100,
+      "http_attempts": 105,
+      "retry_attempts": 2,
+      "cache_hits": 0,
+      "tokens": null,
+      "http_elapsed_s_sum": 5126.892999999749,
+      "logical_timing_complete": true,
+      "logical_call_elapsed_s_sum": 5374.640000000305,
+      "usage_complete": false,
+      "task_failures": 40,
+      "infra_failures": 0,
+      "no_change": 0,
+      "proposal_invalid": 2,
+      "execution_timing_complete": true,
+      "execution_wall_time_s": 3118.875,
+      "optimizer_logical_calls": 3,
+      "selection_score": 0.4,
+      "steps": 3,
+      "elapsed_s": 2631.7,
+      "stop_reason": null,
+      "final_selection_score": null,
+      "terminal_status": "finished",
+      "exit_code": 0,
+      "transport": {
+        "http_attempts": 105,
+        "http_responses": 103,
+        "logical_calls": 103,
+        "retry_attempts": 2,
+        "request_stages": {
+          "remem_proposal": 3,
+          "rollout": 102
+        },
+        "http_elapsed_s_sum": 5126.892999999749,
+        "http_response_headers_elapsed_s_sum": 5126.892999999749,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 5374.640000000305,
+        "successful_http_responses": 103,
+        "reported_usage_responses": 103,
+        "usage_complete": false,
+        "known_prompt_tokens": 295299,
+        "known_completion_tokens": 691951,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 3,
+          "target": 102
+        }
+      },
+      "training_observations": 60,
+      "call_errors": [],
+      "history_groups": [
+        0,
+        0,
+        0
+      ],
+      "test_executions": 0,
+      "transport_sha256": "d7f3a76a9f384e0d8bb7d2fc0b097fe5828dbfc01f661813abbc24f6d9553cc4",
+      "sanitized_provider_failure_types": []
+    },
+    {
+      "run": "atomsearch_budgeted_42",
+      "status": "incomplete",
+      "task_executions": 100,
+      "http_attempts": 104,
+      "retry_attempts": 2,
+      "cache_hits": 0,
+      "tokens": null,
+      "http_elapsed_s_sum": 4621.030999999784,
+      "logical_timing_complete": true,
+      "logical_call_elapsed_s_sum": 4990.404999999795,
+      "usage_complete": false,
+      "task_failures": 26,
+      "infra_failures": 0,
+      "no_change": 0,
+      "proposal_invalid": 0,
+      "execution_timing_complete": true,
+      "execution_wall_time_s": 3031.5470000000205,
+      "optimizer_logical_calls": 2,
+      "terminal_status": "failed",
+      "exit_code": 1,
+      "transport": {
+        "http_attempts": 104,
+        "http_responses": 101,
+        "logical_calls": 102,
+        "retry_attempts": 2,
+        "request_stages": {
+          "atomsearch_proposal": 4,
+          "rollout": 100
+        },
+        "http_elapsed_s_sum": 4621.030999999784,
+        "http_response_headers_elapsed_s_sum": 4621.030999999784,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 4990.404999999795,
+        "successful_http_responses": 101,
+        "reported_usage_responses": 101,
+        "usage_complete": false,
+        "known_prompt_tokens": 186720,
+        "known_completion_tokens": 645323,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 4,
+          "target": 100
+        }
+      },
+      "training_observations": 40,
+      "call_errors": [
+        {
+          "elapsed_s": 367.26600000000326,
+          "error_type": "RuntimeError",
+          "stage": "atomsearch_proposal"
+        }
+      ],
+      "history_groups": [],
+      "test_executions": 0,
+      "transport_sha256": "9986366dc2fc81fceecb8a40a1d3d2bdc0b3817ddf8865d28051b4f66c3fee22",
+      "sanitized_provider_failure_types": [
+        "APITimeoutError"
+      ]
+    },
+    {
+      "run": "skillopt_controlled_42",
+      "status": "incomplete",
+      "task_executions": 80,
+      "http_attempts": 90,
+      "retry_attempts": 2,
+      "cache_hits": 0,
+      "tokens": null,
+      "http_elapsed_s_sum": 4295.61599999998,
+      "logical_timing_complete": true,
+      "logical_call_elapsed_s_sum": 4305.3339999999735,
+      "usage_complete": false,
+      "task_failures": 27,
+      "infra_failures": 0,
+      "no_change": 0,
+      "proposal_invalid": 0,
+      "execution_timing_complete": true,
+      "execution_wall_time_s": 2489.125,
+      "optimizer_logical_calls": 8,
+      "terminal_status": "failed",
+      "exit_code": 1,
+      "transport": {
+        "http_attempts": 90,
+        "http_responses": 90,
+        "logical_calls": 88,
+        "retry_attempts": 2,
+        "request_stages": {
+          "analyst": 7,
+          "merge": 2,
+          "ranking": 1,
+          "rollout": 80
+        },
+        "http_elapsed_s_sum": 4295.61599999998,
+        "http_response_headers_elapsed_s_sum": 4295.61599999998,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 4305.3339999999735,
+        "successful_http_responses": 90,
+        "reported_usage_responses": 90,
+        "usage_complete": false,
+        "known_prompt_tokens": 234814,
+        "known_completion_tokens": 577739,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 10,
+          "target": 80
+        }
+      },
+      "training_observations": 40,
+      "call_errors": [
+        {
+          "elapsed_s": 22.67199999996228,
+          "error_type": "RuntimeError",
+          "stage": "analyst"
+        }
+      ],
+      "history_groups": [],
+      "test_executions": 0,
+      "transport_sha256": "5715793985e22c6be2838bb80341aa1f50f804d7f9570c23aae0d01b3fef984c",
+      "sanitized_provider_failure_types": [
+        "TypeError"
+      ]
+    },
+    {
+      "run": "repair_only_42",
+      "status": "incomplete",
+      "task_executions": 40,
+      "http_attempts": 41,
+      "retry_attempts": 0,
+      "cache_hits": 0,
+      "tokens": null,
+      "http_elapsed_s_sum": 1871.4330000000773,
+      "logical_timing_complete": true,
+      "logical_call_elapsed_s_sum": 1993.6089999999967,
+      "usage_complete": false,
+      "task_failures": 18,
+      "infra_failures": 1,
+      "no_change": 0,
+      "proposal_invalid": 0,
+      "execution_timing_complete": true,
+      "execution_wall_time_s": 1151.7970000000205,
+      "optimizer_logical_calls": 1,
+      "terminal_status": "failed",
+      "exit_code": 1,
+      "transport": {
+        "http_attempts": 41,
+        "http_responses": 40,
+        "logical_calls": 41,
+        "retry_attempts": 0,
+        "request_stages": {
+          "remem_proposal": 1,
+          "rollout": 40
+        },
+        "http_elapsed_s_sum": 1871.4330000000773,
+        "http_response_headers_elapsed_s_sum": 1871.4330000000773,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 1993.6089999999967,
+        "successful_http_responses": 40,
+        "reported_usage_responses": 40,
+        "usage_complete": false,
+        "known_prompt_tokens": 51758,
+        "known_completion_tokens": 271039,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 1,
+          "target": 40
+        }
+      },
+      "training_observations": 20,
+      "call_errors": [
+        {
+          "elapsed_s": 121.10899999999674,
+          "error_type": "RuntimeError",
+          "stage": "remem_proposal"
+        }
+      ],
+      "history_groups": [
+        0
+      ],
+      "test_executions": 0,
+      "transport_sha256": "741df29c8cf2f9d0a41f7f79af5a49ada748cdaabc7679649f92664802a51dfd",
+      "sanitized_provider_failure_types": [
+        "APITimeoutError"
+      ]
+    },
+    {
+      "run": "remem_full_42",
+      "status": "incomplete",
+      "task_executions": 40,
+      "http_attempts": 41,
+      "retry_attempts": 0,
+      "cache_hits": 0,
+      "tokens": null,
+      "http_elapsed_s_sum": 2137.0939999998664,
+      "logical_timing_complete": true,
+      "logical_call_elapsed_s_sum": 2258.983000000182,
+      "usage_complete": false,
+      "task_failures": 16,
+      "infra_failures": 1,
+      "no_change": 0,
+      "proposal_invalid": 0,
+      "execution_timing_complete": true,
+      "execution_wall_time_s": 1308.8280000000377,
+      "optimizer_logical_calls": 1,
+      "terminal_status": "failed",
+      "exit_code": 1,
+      "transport": {
+        "http_attempts": 41,
+        "http_responses": 40,
+        "logical_calls": 41,
+        "retry_attempts": 0,
+        "request_stages": {
+          "remem_proposal": 1,
+          "rollout": 40
+        },
+        "http_elapsed_s_sum": 2137.0939999998664,
+        "http_response_headers_elapsed_s_sum": 2137.0939999998664,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 2258.983000000182,
+        "successful_http_responses": 40,
+        "reported_usage_responses": 40,
+        "usage_complete": false,
+        "known_prompt_tokens": 51758,
+        "known_completion_tokens": 294821,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 1,
+          "target": 40
+        }
+      },
+      "training_observations": 20,
+      "call_errors": [
+        {
+          "elapsed_s": 121.125,
+          "error_type": "RuntimeError",
+          "stage": "remem_proposal"
+        }
+      ],
+      "history_groups": [
+        0
+      ],
+      "test_executions": 0,
+      "transport_sha256": "7ae58da6590489e19374cfc36fe645f520fee0bd0421dd3549b235618f477c5e",
+      "sanitized_provider_failure_types": [
+        "APITimeoutError"
+      ]
+    },
+    {
+      "run": "cam_reference_42",
+      "status": "incomplete",
+      "task_executions": 80,
+      "http_attempts": 92,
+      "retry_attempts": 3,
+      "cache_hits": 0,
+      "tokens": null,
+      "http_elapsed_s_sum": 4238.5470000000205,
+      "logical_timing_complete": true,
+      "logical_call_elapsed_s_sum": 4368.929999999644,
+      "usage_complete": false,
+      "task_failures": 26,
+      "infra_failures": 0,
+      "no_change": 0,
+      "proposal_invalid": 0,
+      "execution_timing_complete": true,
+      "execution_wall_time_s": 2465.7820000000065,
+      "optimizer_logical_calls": 9,
+      "terminal_status": "failed",
+      "exit_code": 1,
+      "transport": {
+        "http_attempts": 92,
+        "http_responses": 91,
+        "logical_calls": 89,
+        "retry_attempts": 3,
+        "request_stages": {
+          "analyst": 8,
+          "merge": 2,
+          "ranking": 1,
+          "rollout": 81
+        },
+        "http_elapsed_s_sum": 4238.5470000000205,
+        "http_response_headers_elapsed_s_sum": 4238.5470000000205,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 4368.929999999644,
+        "successful_http_responses": 91,
+        "reported_usage_responses": 91,
+        "usage_complete": false,
+        "known_prompt_tokens": 245056,
+        "known_completion_tokens": 551819,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 11,
+          "target": 81
+        }
+      },
+      "training_observations": 40,
+      "call_errors": [
+        {
+          "elapsed_s": 20.95299999997951,
+          "error_type": "RuntimeError",
+          "stage": "analyst"
+        }
+      ],
+      "history_groups": [],
+      "test_executions": 0,
+      "transport_sha256": "cd6fce6cb6224383f43abf85fa4cfe010becb0ae11c0dabfdd81ecb354b5a939",
+      "sanitized_provider_failure_types": [
+        "TypeError"
+      ]
+    },
+    {
+      "run": "memory_only_42",
+      "status": "incomplete",
+      "task_executions": 40,
+      "http_attempts": 41,
+      "retry_attempts": 0,
+      "cache_hits": 0,
+      "tokens": null,
+      "http_elapsed_s_sum": 1866.717999999877,
+      "logical_timing_complete": true,
+      "logical_call_elapsed_s_sum": 1892.1889999998384,
+      "usage_complete": false,
+      "task_failures": 16,
+      "infra_failures": 1,
+      "no_change": 0,
+      "proposal_invalid": 0,
+      "execution_timing_complete": true,
+      "execution_wall_time_s": 1075.125,
+      "optimizer_logical_calls": 1,
+      "terminal_status": "failed",
+      "exit_code": 1,
+      "transport": {
+        "http_attempts": 41,
+        "http_responses": 40,
+        "logical_calls": 41,
+        "retry_attempts": 0,
+        "request_stages": {
+          "remem_proposal": 1,
+          "rollout": 40
+        },
+        "http_elapsed_s_sum": 1866.717999999877,
+        "http_response_headers_elapsed_s_sum": 1866.717999999877,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 1892.1889999998384,
+        "successful_http_responses": 40,
+        "reported_usage_responses": 40,
+        "usage_complete": false,
+        "known_prompt_tokens": 51758,
+        "known_completion_tokens": 288249,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 1,
+          "target": 40
+        }
+      },
+      "training_observations": 20,
+      "call_errors": [
+        {
+          "elapsed_s": 24.60899999999674,
+          "error_type": "RuntimeError",
+          "stage": "remem_proposal"
+        }
+      ],
+      "history_groups": [
+        0
+      ],
+      "test_executions": 0,
+      "transport_sha256": "f510afcf429d941d6040199e9c0444b2e1f8b58a0250f5b743b08b6543687002",
+      "sanitized_provider_failure_types": [
+        "APIConnectionError"
+      ]
+    }
+  ],
+  "totals": {
+    "task_executions": 480,
+    "http_attempts": 514,
+    "retries": 9,
+    "optimizer_logical_calls": 25,
+    "training_observations": 240,
+    "known_prompt_tokens": 1117163,
+    "known_completion_tokens": 3320941,
+    "usage_complete": false,
+    "test_executions": 0,
+    "execution_wall_s_sum": 14641.079000000085
+  },
+  "recovery_is_separate_version": true,
+  "related_intranet_attempts": {
+    "scope": "model chat requests for medium v1/v2, intranet calibration, both connectivity attempts and the one post-failure health request; excludes unauthenticated network tests and earlier DeepSeek work",
+    "sources": [
+      {
+        "path": "outputs/remem/intranet-medium-20261026-v1/runs/atomsearch_budgeted_42/remem/transport.jsonl",
+        "audit": {
+          "http_attempts": 44,
+          "http_responses": 41,
+          "logical_calls": 41,
+          "retry_attempts": 3,
+          "request_stages": {
+            "atomsearch_proposal": 3,
+            "rollout": 41
+          },
+          "http_elapsed_s_sum": 1940.7060000002384,
+          "http_response_headers_elapsed_s_sum": 1940.7060000002384,
+          "logical_timing_complete": true,
+          "logical_call_elapsed_s_sum": 2306.4859999999753,
+          "successful_http_responses": 41,
+          "reported_usage_responses": 41,
+          "usage_complete": false,
+          "known_prompt_tokens": 111811,
+          "known_completion_tokens": 271292,
+          "prompt_tokens": null,
+          "completion_tokens": null,
+          "cached_prompt_tokens": null,
+          "error_statuses": [],
+          "roles": {
+            "optimizer": 3,
+            "target": 41
+          }
+        },
+        "usage_missing_http_attempts": 3
+      },
+      {
+        "path": "outputs/remem/intranet-medium-20261026-v1/runs/core_00_42/remem/transport.jsonl",
+        "audit": {
+          "http_attempts": 20,
+          "http_responses": 20,
+          "logical_calls": 20,
+          "retry_attempts": 0,
+          "request_stages": {
+            "rollout": 20
+          },
+          "http_elapsed_s_sum": 844.0629999999655,
+          "http_response_headers_elapsed_s_sum": 844.0629999999655,
+          "logical_timing_complete": true,
+          "logical_call_elapsed_s_sum": 844.6719999999041,
+          "successful_http_responses": 20,
+          "reported_usage_responses": 20,
+          "usage_complete": true,
+          "known_prompt_tokens": 21825,
+          "known_completion_tokens": 120741,
+          "prompt_tokens": 21825,
+          "completion_tokens": 120741,
+          "cached_prompt_tokens": 0,
+          "error_statuses": [],
+          "roles": {
+            "target": 20
+          }
+        },
+        "usage_missing_http_attempts": 0
+      },
+      {
+        "path": "outputs/remem/intranet-medium-20261026-v2/runs/atomsearch_budgeted_42/remem/transport.jsonl",
+        "audit": {
+          "http_attempts": 104,
+          "http_responses": 101,
+          "logical_calls": 102,
+          "retry_attempts": 2,
+          "request_stages": {
+            "atomsearch_proposal": 4,
+            "rollout": 100
+          },
+          "http_elapsed_s_sum": 4621.030999999784,
+          "http_response_headers_elapsed_s_sum": 4621.030999999784,
+          "logical_timing_complete": true,
+          "logical_call_elapsed_s_sum": 4990.404999999795,
+          "successful_http_responses": 101,
+          "reported_usage_responses": 101,
+          "usage_complete": false,
+          "known_prompt_tokens": 186720,
+          "known_completion_tokens": 645323,
+          "prompt_tokens": null,
+          "completion_tokens": null,
+          "cached_prompt_tokens": null,
+          "error_statuses": [],
+          "roles": {
+            "optimizer": 4,
+            "target": 100
+          }
+        },
+        "usage_missing_http_attempts": 3
+      },
+      {
+        "path": "outputs/remem/intranet-medium-20261026-v2/runs/cam_reference_42/remem/transport.jsonl",
+        "audit": {
+          "http_attempts": 92,
+          "http_responses": 91,
+          "logical_calls": 89,
+          "retry_attempts": 3,
+          "request_stages": {
+            "analyst": 8,
+            "merge": 2,
+            "ranking": 1,
+            "rollout": 81
+          },
+          "http_elapsed_s_sum": 4238.5470000000205,
+          "http_response_headers_elapsed_s_sum": 4238.5470000000205,
+          "logical_timing_complete": true,
+          "logical_call_elapsed_s_sum": 4368.929999999644,
+          "successful_http_responses": 91,
+          "reported_usage_responses": 91,
+          "usage_complete": false,
+          "known_prompt_tokens": 245056,
+          "known_completion_tokens": 551819,
+          "prompt_tokens": null,
+          "completion_tokens": null,
+          "cached_prompt_tokens": null,
+          "error_statuses": [],
+          "roles": {
+            "optimizer": 11,
+            "target": 81
+          }
+        },
+        "usage_missing_http_attempts": 4
+      },
+      {
+        "path": "outputs/remem/intranet-medium-20261026-v2/runs/core_00_42/remem/transport.jsonl",
+        "audit": {
+          "http_attempts": 105,
+          "http_responses": 103,
+          "logical_calls": 103,
+          "retry_attempts": 2,
+          "request_stages": {
+            "remem_proposal": 3,
+            "rollout": 102
+          },
+          "http_elapsed_s_sum": 5126.892999999749,
+          "http_response_headers_elapsed_s_sum": 5126.892999999749,
+          "logical_timing_complete": true,
+          "logical_call_elapsed_s_sum": 5374.640000000305,
+          "successful_http_responses": 103,
+          "reported_usage_responses": 103,
+          "usage_complete": false,
+          "known_prompt_tokens": 295299,
+          "known_completion_tokens": 691951,
+          "prompt_tokens": null,
+          "completion_tokens": null,
+          "cached_prompt_tokens": null,
+          "error_statuses": [],
+          "roles": {
+            "optimizer": 3,
+            "target": 102
+          }
+        },
+        "usage_missing_http_attempts": 2
+      },
+      {
+        "path": "outputs/remem/intranet-medium-20261026-v2/runs/memory_only_42/remem/transport.jsonl",
+        "audit": {
+          "http_attempts": 41,
+          "http_responses": 40,
+          "logical_calls": 41,
+          "retry_attempts": 0,
+          "request_stages": {
+            "remem_proposal": 1,
+            "rollout": 40
+          },
+          "http_elapsed_s_sum": 1866.717999999877,
+          "http_response_headers_elapsed_s_sum": 1866.717999999877,
+          "logical_timing_complete": true,
+          "logical_call_elapsed_s_sum": 1892.1889999998384,
+          "successful_http_responses": 40,
+          "reported_usage_responses": 40,
+          "usage_complete": false,
+          "known_prompt_tokens": 51758,
+          "known_completion_tokens": 288249,
+          "prompt_tokens": null,
+          "completion_tokens": null,
+          "cached_prompt_tokens": null,
+          "error_statuses": [],
+          "roles": {
+            "optimizer": 1,
+            "target": 40
+          }
+        },
+        "usage_missing_http_attempts": 1
+      },
+      {
+        "path": "outputs/remem/intranet-medium-20261026-v2/runs/remem_full_42/remem/transport.jsonl",
+        "audit": {
+          "http_attempts": 41,
+          "http_responses": 40,
+          "logical_calls": 41,
+          "retry_attempts": 0,
+          "request_stages": {
+            "remem_proposal": 1,
+            "rollout": 40
+          },
+          "http_elapsed_s_sum": 2137.0939999998664,
+          "http_response_headers_elapsed_s_sum": 2137.0939999998664,
+          "logical_timing_complete": true,
+          "logical_call_elapsed_s_sum": 2258.983000000182,
+          "successful_http_responses": 40,
+          "reported_usage_responses": 40,
+          "usage_complete": false,
+          "known_prompt_tokens": 51758,
+          "known_completion_tokens": 294821,
+          "prompt_tokens": null,
+          "completion_tokens": null,
+          "cached_prompt_tokens": null,
+          "error_statuses": [],
+          "roles": {
+            "optimizer": 1,
+            "target": 40
+          }
+        },
+        "usage_missing_http_attempts": 1
+      },
+      {
+        "path": "outputs/remem/intranet-medium-20261026-v2/runs/repair_only_42/remem/transport.jsonl",
+        "audit": {
+          "http_attempts": 41,
+          "http_responses": 40,
+          "logical_calls": 41,
+          "retry_attempts": 0,
+          "request_stages": {
+            "remem_proposal": 1,
+            "rollout": 40
+          },
+          "http_elapsed_s_sum": 1871.4330000000773,
+          "http_response_headers_elapsed_s_sum": 1871.4330000000773,
+          "logical_timing_complete": true,
+          "logical_call_elapsed_s_sum": 1993.6089999999967,
+          "successful_http_responses": 40,
+          "reported_usage_responses": 40,
+          "usage_complete": false,
+          "known_prompt_tokens": 51758,
+          "known_completion_tokens": 271039,
+          "prompt_tokens": null,
+          "completion_tokens": null,
+          "cached_prompt_tokens": null,
+          "error_statuses": [],
+          "roles": {
+            "optimizer": 1,
+            "target": 40
+          }
+        },
+        "usage_missing_http_attempts": 1
+      },
+      {
+        "path": "outputs/remem/intranet-medium-20261026-v2/runs/skillopt_controlled_42/remem/transport.jsonl",
+        "audit": {
+          "http_attempts": 90,
+          "http_responses": 90,
+          "logical_calls": 88,
+          "retry_attempts": 2,
+          "request_stages": {
+            "analyst": 7,
+            "merge": 2,
+            "ranking": 1,
+            "rollout": 80
+          },
+          "http_elapsed_s_sum": 4295.61599999998,
+          "http_response_headers_elapsed_s_sum": 4295.61599999998,
+          "logical_timing_complete": true,
+          "logical_call_elapsed_s_sum": 4305.3339999999735,
+          "successful_http_responses": 90,
+          "reported_usage_responses": 90,
+          "usage_complete": false,
+          "known_prompt_tokens": 234814,
+          "known_completion_tokens": 577739,
+          "prompt_tokens": null,
+          "completion_tokens": null,
+          "cached_prompt_tokens": null,
+          "error_statuses": [],
+          "roles": {
+            "optimizer": 10,
+            "target": 80
+          }
+        },
+        "usage_missing_http_attempts": 3
+      },
+      {
+        "path": "outputs/remem/intranet-cal-20261026-v1/runs/remem_full_42/remem/transport.jsonl",
+        "audit": {
+          "http_attempts": 22,
+          "http_responses": 22,
+          "logical_calls": 22,
+          "retry_attempts": 0,
+          "request_stages": {
+            "remem_proposal": 2,
+            "rollout": 20
+          },
+          "http_elapsed_s_sum": 1075.066000000108,
+          "http_response_headers_elapsed_s_sum": 1075.066000000108,
+          "logical_timing_complete": true,
+          "logical_call_elapsed_s_sum": 1076.1849999998813,
+          "successful_http_responses": 22,
+          "reported_usage_responses": 22,
+          "usage_complete": true,
+          "known_prompt_tokens": 67685,
+          "known_completion_tokens": 138535,
+          "prompt_tokens": 67685,
+          "completion_tokens": 138535,
+          "cached_prompt_tokens": 2496,
+          "error_statuses": [],
+          "roles": {
+            "optimizer": 2,
+            "target": 20
+          }
+        },
+        "usage_missing_http_attempts": 0
+      },
+      {
+        "path": "outputs/remem/intranet-connectivity-20261026-v1/transport.jsonl",
+        "audit": {
+          "http_attempts": 2,
+          "http_responses": 0,
+          "logical_calls": 2,
+          "retry_attempts": 0,
+          "request_stages": {
+            "optimizer_connectivity": 1,
+            "target_connectivity": 1
+          },
+          "http_elapsed_s_sum": 0,
+          "http_response_headers_elapsed_s_sum": 0,
+          "logical_timing_complete": true,
+          "logical_call_elapsed_s_sum": 21.21899999998277,
+          "successful_http_responses": 0,
+          "reported_usage_responses": 0,
+          "usage_complete": false,
+          "known_prompt_tokens": 0,
+          "known_completion_tokens": 0,
+          "prompt_tokens": null,
+          "completion_tokens": null,
+          "cached_prompt_tokens": null,
+          "error_statuses": [],
+          "roles": {
+            "optimizer": 1,
+            "target": 1
+          }
+        },
+        "usage_missing_http_attempts": 2
+      },
+      {
+        "path": "outputs/remem/intranet-connectivity-20261026-v2/transport.jsonl",
+        "audit": {
+          "http_attempts": 2,
+          "http_responses": 2,
+          "logical_calls": 2,
+          "retry_attempts": 0,
+          "request_stages": {
+            "optimizer_connectivity": 1,
+            "target_connectivity": 1
+          },
+          "http_elapsed_s_sum": 4.407000000006519,
+          "http_response_headers_elapsed_s_sum": 4.407000000006519,
+          "logical_timing_complete": true,
+          "logical_call_elapsed_s_sum": 4.532000000006519,
+          "successful_http_responses": 2,
+          "reported_usage_responses": 2,
+          "usage_complete": true,
+          "known_prompt_tokens": 32,
+          "known_completion_tokens": 170,
+          "prompt_tokens": 32,
+          "completion_tokens": 170,
+          "cached_prompt_tokens": 0,
+          "error_statuses": [],
+          "roles": {
+            "optimizer": 1,
+            "target": 1
+          }
+        },
+        "usage_missing_http_attempts": 0
+      },
+      {
+        "path": "outputs/remem/intranet-optimizer-health-after-failures-20261027-v1/transport.jsonl",
+        "audit": {
+          "http_attempts": 1,
+          "http_responses": 1,
+          "logical_calls": 1,
+          "retry_attempts": 0,
+          "request_stages": {
+            "optimizer_health_after_failures": 1
+          },
+          "http_elapsed_s_sum": 1.625,
+          "http_response_headers_elapsed_s_sum": 1.625,
+          "logical_timing_complete": true,
+          "logical_call_elapsed_s_sum": 2.047000000020489,
+          "successful_http_responses": 1,
+          "reported_usage_responses": 1,
+          "usage_complete": true,
+          "known_prompt_tokens": 17,
+          "known_completion_tokens": 34,
+          "prompt_tokens": 17,
+          "completion_tokens": 34,
+          "cached_prompt_tokens": 0,
+          "error_statuses": [],
+          "roles": {
+            "optimizer": 1
+          }
+        },
+        "usage_missing_http_attempts": 0
+      }
+    ],
+    "totals": {
+      "http_attempts": 605,
+      "retries": 12,
+      "known_prompt_tokens": 1318533,
+      "known_completion_tokens": 3851713,
+      "usage_missing_http_attempts": 20,
+      "usage_complete": false
+    }
+  }
+}

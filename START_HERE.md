@@ -1,6 +1,6 @@
 # ReMem-SkillOpt：新项目入口
 
-本项目从 Microsoft SkillOpt 重新克隆，**不是 CAM 工作目录的复制品**。截至 2026-10-26，已配置独立环境和 Verified 400 数据，实现 R/M 策略、公共失败账本、配对门控与 trainer 离线集成；开发版实验框架已建立，已做小样本模型探活，尚未开始正式实验。
+本项目从 Microsoft SkillOpt 重新克隆，**不是 CAM 工作目录的复制品**。截至 2026-10-27，已配置独立环境和 Verified 400 数据，实现 R/M 策略、公共失败账本、配对门控与 trainer 离线集成；开发版实验框架已建立，已做小样本模型探活，尚未开始正式实验。
 
 工作标题：**ReMem-Skill: Evidence-Guided Repair with Persistent Failure Memory for Agent Skill Optimization**。
 
@@ -50,3 +50,5 @@
 最新：[多步联调、用量与预算报告](research/remem/LOOP_CONTROL_REPORT.md)。用户已选择七方法、单 seed、三步的内网中等诊断，最终测试保持关闭。
 
 中等诊断当前修订与已发现问题见 [巡检记录](research/remem/MEDIUM_DIAGNOSTIC_PROGRESS.md)；真实运行位置以忽略目录 `.remem-local/current_diagnostic.json` 和进程核验为准。
+
+最新阶段：[v2 七方法中等诊断结束报告](research/remem/MEDIUM_DIAGNOSTIC_V2_REPORT.md)。七格均已尝试，六格服务/响应异常，不能比较效果；已合入审计和恢复能力，后续仅在新冻结版本单独验证失败格。
