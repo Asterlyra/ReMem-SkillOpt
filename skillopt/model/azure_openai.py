@@ -13,7 +13,14 @@ import time
 import uuid
 from types import SimpleNamespace
 from typing import Any
+
 from openai import AzureOpenAI, OpenAI
+
+from skillopt.remem.provider_contract import (
+    NonRetryableProviderError,
+    ProviderResponseError,
+    validate_research_provider_response,
+)
 
 # Sentinel value used as the api_version when the "openai_compatible"
 # auth_mode is selected. Real Azure deployments never use this string,
@@ -394,6 +401,7 @@ def _chat_impl(
                 with audited_call(stage, audit_identity):
                     resp = client.responses.create(**kwargs)
                     record_usage(role, stage, resp)
+                    validate_research_provider_response(resp)
                 text = getattr(resp, "output_text", None) or ""
                 if not text:
                     for item in getattr(resp, "output", None) or []:
@@ -427,6 +435,7 @@ def _chat_impl(
                 with audited_call(stage, audit_identity):
                     resp = client.chat.completions.create(**kwargs)
                     record_usage(role, stage, resp)
+                    validate_research_provider_response(resp)
                 text = resp.choices[0].message.content or ""
                 if resp.usage:
                     usage_info = {
@@ -444,7 +453,7 @@ def _chat_impl(
 
         except Exception as e:  # noqa: BLE001
             from skillopt.remem.call_policy import CallPolicyError, active_policy
-            if isinstance(e, CallPolicyError):
+            if isinstance(e, (CallPolicyError, NonRetryableProviderError)):
                 raise
             if active_policy() is not None and getattr(e, "status_code", None) in {400, 401, 403, 404, 422}:
                 raise RuntimeError(f"LLM call failed: HTTP {e.status_code}") from None
@@ -453,6 +462,8 @@ def _chat_impl(
             time.sleep(sleep)
 
     from skillopt.remem.call_policy import active_policy
+    if isinstance(last_err, ProviderResponseError):
+        raise last_err
     if active_policy() is not None:
         raise RuntimeError(f"LLM call failed: {type(last_err).__name__}") from None
     raise RuntimeError(f"LLM call failed after {retries} retries: {last_err}")
@@ -503,6 +514,7 @@ def _chat_messages_impl(
                 with audited_call(stage, audit_identity):
                     resp = client.responses.create(**kwargs)
                     record_usage(role, stage, resp)
+                    validate_research_provider_response(resp)
                 message, text = _responses_to_chat_message(resp)
                 if hasattr(resp, "usage") and resp.usage:
                     usage_info = {
@@ -533,6 +545,7 @@ def _chat_messages_impl(
                 with audited_call(stage, audit_identity):
                     resp = client.chat.completions.create(**kwargs)
                     record_usage(role, stage, resp)
+                    validate_research_provider_response(resp)
                 message = resp.choices[0].message
                 text = message.content or ""
                 if resp.usage:
@@ -549,7 +562,7 @@ def _chat_messages_impl(
             return (message if return_message else text), usage_info
         except Exception as e:  # noqa: BLE001
             from skillopt.remem.call_policy import CallPolicyError, active_policy
-            if isinstance(e, CallPolicyError):
+            if isinstance(e, (CallPolicyError, NonRetryableProviderError)):
                 raise
             if active_policy() is not None and getattr(e, "status_code", None) in {400, 401, 403, 404, 422}:
                 raise RuntimeError(f"LLM call failed: HTTP {e.status_code}") from None
@@ -558,6 +571,8 @@ def _chat_messages_impl(
             time.sleep(sleep)
 
     from skillopt.remem.call_policy import active_policy
+    if isinstance(last_err, ProviderResponseError):
+        raise last_err
     if active_policy() is not None:
         raise RuntimeError(f"LLM message call failed: {type(last_err).__name__}") from None
     raise RuntimeError(f"LLM message call failed after {retries} retries: {last_err}")

@@ -396,6 +396,7 @@ def _chat_call(
 ) -> str:
     """Single LLM call, no tools. Returns raw text."""
     from skillopt.remem.call_policy import active_policy
+    from skillopt.remem.provider_contract import validate_research_provider_response
     if active_policy() is not None:
         max_output_tokens = min(max_output_tokens, active_policy().limits["output_tokens"])
     reasoning_effort = get_reasoning_effort()
@@ -419,6 +420,7 @@ def _chat_call(
                     timeout=timeout,
                 ), timeout=llm_timeout)
             record_usage("target", "rollout", resp)
+            validate_research_provider_response(resp)
         if hasattr(resp, "usage") and resp.usage:
             tracker.record(
                 "rollout",
@@ -449,6 +451,7 @@ def _chat_call(
                 timeout=timeout,
             ), timeout=llm_timeout)
             record_usage("target", "rollout", resp)
+            validate_research_provider_response(resp)
         if resp.usage:
             tracker.record(
                 "rollout",

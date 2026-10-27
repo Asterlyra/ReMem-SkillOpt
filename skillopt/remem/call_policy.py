@@ -9,6 +9,7 @@ from contextlib import contextmanager
 from functools import wraps
 from pathlib import Path
 
+from .provider_contract import ProviderResponseError
 from .store import EventStore
 from .transport_audit import audited_call
 
@@ -124,7 +125,8 @@ def budget_optimizer(function):
                 raise CallPolicyError("Optimizer returned empty content")
         except Exception as exc:
             policy.store.append(identity + ":error", "error", {"call_id": identity, "stage": stage,
-                                "error_type": type(exc).__name__, "elapsed_s": time.monotonic() - started})
+                                "error_type": type(exc).__name__, "elapsed_s": time.monotonic() - started,
+                                **({"provider_error_category": exc.category} if isinstance(exc, ProviderResponseError) else {})})
             raise
         policy.store.append(identity + ":done", "done", {"call_id": identity, "stage": stage,
                             "elapsed_s": time.monotonic() - started})

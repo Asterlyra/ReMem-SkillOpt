@@ -130,7 +130,8 @@ def test_recovery_subset_does_not_start_other_frozen_methods(tmp_path, monkeypat
 
 
 @pytest.mark.parametrize(
-    "contract", [{"provider_error_category": "context_length_exceeded"}, {"has_model": False, "has_choices": False}]
+    "contract", [{"provider_error_category": "context_length_exceeded"},
+                 {"provider_error_category": "data_inspection_failed"}, {"has_model": False, "has_choices": False}]
 )
 def test_nontransient_provider_error_stops_before_next_recovery_arm(tmp_path, monkeypatch, contract):
     (tmp_path / "freeze.json").write_text(json.dumps({"study_id": "fixture", "run_order": ["first", "second"]}))

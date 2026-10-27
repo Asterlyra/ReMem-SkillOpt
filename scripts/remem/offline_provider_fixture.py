@@ -50,7 +50,9 @@ def audit(output: Path):
                                     text, _ = backend._chat_impl(client, "synthetic-model", "Synthetic system", "Synthetic user", 16, 3, "offline_fixture", timeout=240)
                             observed.update(status="returned", content_is_fixture=text == "{}")
                         except Exception as error:
-                            observed.update(status="raised", error_type=type(error).__name__, typed_message=str(error) if str(error) == "LLM call failed: TypeError" else None)
+                            observed.update(status="raised", error_type=type(error).__name__,
+                                            provider_error_category=getattr(error, "category", None),
+                                            typed_message=str(error) if str(error) == "LLM call failed: TypeError" else None)
                 records = [json.loads(line) for line in path.read_text().splitlines() if line]
                 observed["transport"] = summarize(path)
                 observed["provider_contracts"] = [r["response_contract"] for r in records if r["kind"] == "usage"]
@@ -59,6 +61,10 @@ def audit(output: Path):
     assert result["cases"]["valid_reply"]["transport"]["http_attempts"] == 1
     # This is a diagnostic of the CURRENT baseline, not the desired behavior.
     result["baseline_repeated_blocked_response"] = result["cases"]["data_inspection_error"]["transport"]["http_attempts"] == 3
+    result["known_block_stopped_on_first_response"] = (
+        result["cases"]["data_inspection_error"]["transport"]["http_attempts"] == 1
+        and result["cases"]["data_inspection_error"]["error_type"] == "NonRetryableProviderError"
+    )
     (output / "metadata.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(result))
 

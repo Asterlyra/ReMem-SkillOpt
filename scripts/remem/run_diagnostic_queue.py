@@ -9,6 +9,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+from skillopt.remem.provider_contract import NON_RETRYABLE_CATEGORIES
 from skillopt.remem.study import report, verify
 
 
@@ -156,16 +157,7 @@ def main(directory, key_file, resume_unstarted=False, reporter=Path(__file__).wi
             if any(x["kind"] == "response" and x["status"] in (401, 403) for x in raw):
                 progress.update(status="stopped_authentication_failure", stop_run=name)
                 break
-            permanent = {
-                "context_length_exceeded",
-                "invalid_request_error",
-                "invalid_argument",
-                "insufficient_quota",
-                "insufficient_balance",
-                "invalid_api_key",
-                "model_not_found",
-                "content_filter",
-            }
+            permanent = NON_RETRYABLE_CATEGORIES
             codes = {x.get("response_contract", {}).get("provider_error_category") for x in raw if x["kind"] == "usage"}
             if codes & permanent:
                 progress.update(

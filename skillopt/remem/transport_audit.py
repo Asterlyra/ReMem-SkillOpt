@@ -13,6 +13,8 @@ from typing import Any
 
 import httpx
 
+from .provider_contract import provider_error, provider_error_category
+
 _WRITE_LOCK = threading.Lock()
 _CALL: ContextVar[tuple[str, str] | None] = ContextVar("remem_audit_call", default=None)
 _RESPONSE_ID: ContextVar[str | None] = ContextVar("remem_audit_response_id", default=None)
@@ -109,13 +111,8 @@ def record_usage(role: str, stage: str, response: Any) -> None:
     cached = getattr(prompt_details, "cached_tokens", None)
     completion_details = getattr(usage, "completion_tokens_details", None)
     choices = getattr(response, "choices", None) or []
-    extras = getattr(response, "model_extra", None)
-    error = extras.get("error") if isinstance(extras, dict) else None
-    code = error.get("code") or error.get("type") if isinstance(error, dict) else None
-    known_codes = {"context_length_exceeded", "invalid_request_error", "invalid_argument", "rate_limit_exceeded",
-                   "insufficient_quota", "insufficient_balance", "invalid_api_key", "model_not_found",
-                   "service_unavailable", "internal_server_error", "overloaded_error", "timeout_error", "content_filter"}
-    error_category = code if isinstance(code, str) and code in known_codes else "unclassified" if error else None
+    error = provider_error(response)
+    error_category = provider_error_category(response)
     current = _CALL.get()
     _write(path, {"kind": "usage", "role": role, "stage": stage,
                   "id": _RESPONSE_ID.get(), "call_id": current[1] if current else None,
@@ -147,6 +144,13 @@ def summarize(path: Path) -> dict[str, Any]:
                 and {record.get("id") for record in usage} == successful_ids
                 and all(record["prompt_tokens"] is not None and record["completion_tokens"] is not None
                         for record in usage))
+    numeric_usage_ids = {record.get("id") for record in usage
+                         if type(record.get("prompt_tokens")) is int and record["prompt_tokens"] >= 0
+                         and type(record.get("completion_tokens")) is int and record["completion_tokens"] >= 0}
+    numeric_usage_ids.discard(None)
+    provider_error_ids = {record.get("id") for record in usage
+                          if record.get("response_contract", {}).get("provider_error_present") is True}
+    provider_error_ids.discard(None)
     return {"http_attempts": len(requests), "http_responses": len(responses),
             "logical_calls": len({record["call_id"] for record in requests if record.get("call_id")})
             if all(record.get("call_id") for record in requests) else None,
@@ -160,6 +164,9 @@ def summarize(path: Path) -> dict[str, Any]:
             "logical_call_elapsed_s_sum": sum(record["elapsed_s"] for record in completions) if timing_complete else None,
             "successful_http_responses": ok_responses,
             "reported_usage_responses": len(usage), "usage_complete": complete,
+            "responses_with_numeric_usage": sum(record.get("id") in numeric_usage_ids for record in responses),
+            "responses_without_numeric_usage": sum(record.get("id") not in numeric_usage_ids for record in responses),
+            "provider_error_http_responses": sum(record.get("id") in provider_error_ids for record in responses),
             "known_prompt_tokens": sum(record["prompt_tokens"] for record in usage if record["prompt_tokens"] is not None),
             "known_completion_tokens": sum(record["completion_tokens"] for record in usage if record["completion_tokens"] is not None),
             "prompt_tokens": sum(record["prompt_tokens"] for record in usage) if complete else None,
