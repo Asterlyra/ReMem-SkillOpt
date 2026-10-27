@@ -731,6 +731,12 @@ def process_one_codegen(
         first_pred = os.path.join(task_out_dir, f"{cases[0][0]}_pred.xlsx")
 
         try:
+            # The research timeout is a frozen role setting, not only an upper
+            # bound on the agent's historical 120-second default. Agents still
+            # clamp this value to the remaining whole-task deadline.
+            from skillopt.remem.call_policy import active_policy
+            policy = active_policy()
+            llm_timeout = policy.limits["timeout_s"] if policy is not None else 120
             if mode == "multi":
                 agent_result = run_multi(
                     instruction=instruction,
@@ -741,6 +747,7 @@ def process_one_codegen(
                     skill_content=skill_content,
                     max_turns=max_turns,
                     max_output_tokens=max_completion_tokens,
+                    llm_timeout=llm_timeout,
                     task_timeout=task_timeout,
                     gold_path=first_gold if use_eval_feedback else "",
                     diagnostic_mode=diagnostic_mode,
@@ -756,6 +763,7 @@ def process_one_codegen(
                     answer_position=answer_position_eval,
                     skill_content=skill_content,
                     max_output_tokens=max_completion_tokens,
+                    llm_timeout=llm_timeout,
                     task_timeout=task_timeout,
                     diagnostic_mode=diagnostic_mode,
                     diagnostic_instruction=diagnostic_instruction,

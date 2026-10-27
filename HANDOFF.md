@@ -68,3 +68,5 @@ v2 七个方法全部已终止：core_00 完成三步，其余六格在优化器
 04:06 更新：恢复版 AtomSearch 已按 160 任务预算正常结束；随后网关 TLS 连接失败，SkillOpt/R-only 终止，后续三格未派发，调度器已停止，等待连接恢复。见 [恢复与网络中止记录](research/remem/RECOVERY_20261027_REPORT.md)。此报告在独立诊断分支保存，暂不合入主运行目录，以保持其冻结源文件清单不变。不得重复执行已完成格或清除失败后伪装首次尝试。
 
 11:20 更新：用户通知内网恢复，两角色最小鉴权与身份检查通过、原版本 verify 通过，已接续尚未启动的 R+M、CAM、M-only，当前先运行 R+M。原成功/失败格不重放；使用原冻结源码与参数，测试仍关闭。队列历史 network_hold 字段保留，最新 scheduler_invocations 和运行指针才表示当前阶段。报告分支继续独立保存，不在运行中合入主目录。
+
+11:54 更新：R+M/CAM的target基线调用超时终止，M-only运行中。已在隔离分支修复target HTTP超时配置传递遗漏；原恢复版实际target仍为120秒，不能继续声称两个角色实际均240秒。见 [修复说明](research/remem/TARGET_TIMEOUT_PROPAGATION_FIX.md)。主目录暂不合入，待所有当前进程终止后建立新版本；实际待办以主目录 `.remem-local/current_diagnostic.json` 指向的pending修复清单为准。
