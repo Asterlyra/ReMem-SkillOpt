@@ -1,0 +1,67 @@
+{
+  "checked_at_utc": "2026-10-27T05:26:27.171325+00:00",
+  "queue_status": "stopped_malformed_provider_response",
+  "archived_source_integrity": true,
+  "target_http_requests": 80,
+  "target_http_responses": 80,
+  "target_response_max_elapsed_s": 86.375,
+  "target_response_count_over120s": 0,
+  "malformed_usage": [
+    {
+      "role": "optimizer",
+      "stage": "analyst",
+      "response_model": null,
+      "response_contract": {
+        "has_model": false,
+        "has_choices": false,
+        "provider_error_present": true,
+        "provider_error_category": "unclassified"
+      },
+      "finish_reason": null,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cached_prompt_tokens": null
+    },
+    {
+      "role": "optimizer",
+      "stage": "analyst",
+      "response_model": null,
+      "response_contract": {
+        "has_model": false,
+        "has_choices": false,
+        "provider_error_present": true,
+        "provider_error_category": "unclassified"
+      },
+      "finish_reason": null,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cached_prompt_tokens": null
+    },
+    {
+      "role": "optimizer",
+      "stage": "analyst",
+      "response_model": null,
+      "response_contract": {
+        "has_model": false,
+        "has_choices": false,
+        "provider_error_present": true,
+        "provider_error_category": "unclassified"
+      },
+      "finish_reason": null,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cached_prompt_tokens": null
+    }
+  ],
+  "native_gates": [
+    {
+      "step": 1,
+      "action": "reject",
+      "current_score": 0.6,
+      "best_score": 0.6,
+      "best_step": 0
+    }
+  ],
+  "extra_model_calls": 0,
+  "final_test_released": false
+}

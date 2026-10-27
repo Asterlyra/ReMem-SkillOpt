@@ -72,3 +72,5 @@ v2 七个方法全部已终止：core_00 完成三步，其余六格在优化器
 11:54 更新：R+M/CAM的target基线调用超时终止，M-only运行中。已在隔离分支修复target HTTP超时配置传递遗漏；原恢复版实际target仍为120秒，不能继续声称两个角色实际均240秒。见 [修复说明](research/remem/TARGET_TIMEOUT_PROPAGATION_FIX.md)。主目录暂不合入，待所有当前进程终止后建立新版本；实际待办以主目录 `.remem-local/current_diagnostic.json` 指向的pending修复清单为准。
 
 12:24更新：恢复版六格全部终止，仅AtomSearch正常预算停止；其余五格失败，详见恢复报告及 `RECOVERY_20261027_TERMINAL_USAGE.json`。主目录合入修复前已验证原freeze、归档源码完整、实际进程全部退出；下一轮仅在新 `intranet-target-timeout-fix-20261027-v1` 中做一次配置传递实现修复验证，限定五个失败格，原任务/预算不变，不重跑core_00和AtomSearch。实际运行位置仍以忽略目录指针为准。
+
+13:24更新：新版本SkillOpt在第二轮analyst连续三次收到缺少model/choices/usage的glm错误封套，保护队列已停止，后续四格未启动。已保存40条训练观察和完整元数据，未完成三步；等待glm网关响应问题恢复，不循环探活或重跑。见 [glm服务中止说明](research/remem/GLM_PROVIDER_HOLD_REPORT.md)。本报告分支不在主目录运行冻结中合入。
