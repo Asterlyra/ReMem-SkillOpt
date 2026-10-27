@@ -70,3 +70,5 @@ v2 七个方法全部已终止：core_00 完成三步，其余六格在优化器
 11:20 更新：用户通知内网恢复，两角色最小鉴权与身份检查通过、原版本 verify 通过，已接续尚未启动的 R+M、CAM、M-only，当前先运行 R+M。原成功/失败格不重放；使用原冻结源码与参数，测试仍关闭。队列历史 network_hold 字段保留，最新 scheduler_invocations 和运行指针才表示当前阶段。报告分支继续独立保存，不在运行中合入主目录。
 
 11:54 更新：R+M/CAM的target基线调用超时终止，M-only运行中。已在隔离分支修复target HTTP超时配置传递遗漏；原恢复版实际target仍为120秒，不能继续声称两个角色实际均240秒。见 [修复说明](research/remem/TARGET_TIMEOUT_PROPAGATION_FIX.md)。主目录暂不合入，待所有当前进程终止后建立新版本；实际待办以主目录 `.remem-local/current_diagnostic.json` 指向的pending修复清单为准。
+
+12:24更新：恢复版六格全部终止，仅AtomSearch正常预算停止；其余五格失败，详见恢复报告及 `RECOVERY_20261027_TERMINAL_USAGE.json`。主目录合入修复前已验证原freeze、归档源码完整、实际进程全部退出；下一轮仅在新 `intranet-target-timeout-fix-20261027-v1` 中做一次配置传递实现修复验证，限定五个失败格，原任务/预算不变，不重跑core_00和AtomSearch。实际运行位置仍以忽略目录指针为准。
