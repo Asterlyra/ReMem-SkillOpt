@@ -74,3 +74,5 @@ v2 七个方法全部已终止：core_00 完成三步，其余六格在优化器
 12:24更新：恢复版六格全部终止，仅AtomSearch正常预算停止；其余五格失败，详见恢复报告及 `RECOVERY_20261027_TERMINAL_USAGE.json`。主目录合入修复前已验证原freeze、归档源码完整、实际进程全部退出；下一轮仅在新 `intranet-target-timeout-fix-20261027-v1` 中做一次配置传递实现修复验证，限定五个失败格，原任务/预算不变，不重跑core_00和AtomSearch。实际运行位置仍以忽略目录指针为准。
 
 13:24更新：新版本SkillOpt在第二轮analyst连续三次收到缺少model/choices/usage的glm错误封套，保护队列已停止，后续四格未启动。已保存40条训练观察和完整元数据，未完成三步；等待glm网关响应问题恢复，不循环探活或重跑。见 [glm服务中止说明](research/remem/GLM_PROVIDER_HOLD_REPORT.md)。本报告分支不在主目录运行冻结中合入。
+
+16:52更新：用户要求再次检查，单独重建失败训练minibatch请求（正文大小与旧失败记录一致）发送1次、无重试，复现 `data_inspection_failed` / `upstream_error`。应核对网关内容检查环节，不再仅按内网未恢复解释；无法判断输入/输出及具体命中内容。见 [复查记录](research/remem/GLM_CONTENT_INSPECTION_RECHECK.md)。原实验保持停止，后续四格未启动，不循环重试相同内容，不擅自删数据或改模型。
