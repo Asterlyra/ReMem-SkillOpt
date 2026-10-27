@@ -76,3 +76,5 @@ v2 七个方法全部已终止：core_00 完成三步，其余六格在优化器
 13:24更新：新版本SkillOpt在第二轮analyst连续三次收到缺少model/choices/usage的glm错误封套，保护队列已停止，后续四格未启动。已保存40条训练观察和完整元数据，未完成三步；等待glm网关响应问题恢复，不循环探活或重跑。见 [glm服务中止说明](research/remem/GLM_PROVIDER_HOLD_REPORT.md)。本报告分支不在主目录运行冻结中合入。
 
 16:52更新：用户要求再次检查，单独重建失败训练minibatch请求（正文大小与旧失败记录一致）发送1次、无重试，复现 `data_inspection_failed` / `upstream_error`。应核对网关内容检查环节，不再仅按内网未恢复解释；无法判断输入/输出及具体命中内容。见 [复查记录](research/remem/GLM_CONTENT_INSPECTION_RECHECK.md)。原实验保持停止，后续四格未启动，不循环重试相同内容，不擅自删数据或改模型。
+
+20:55离线排查：失败批次8题与历史15个任务ID均来自训练，未发现验证ID/本地角色密钥字面匹配。存在95,051字节的成功analyst请求，大于失败请求93,388字节，不能只归因于长度。用真实SDK+MockTransport离线复现：HTTP200数据检查错误因未识别而触发TypeError，随后重试两次；真实网络/模型调用0。见 [离线审计报告](research/remem/GLM_OFFLINE_AUDIT_REPORT.md)。运行时代码未改、主目录freeze不变、定时巡检仍删除；下一步可修客户端明确分类与停止无效重试，上游命中原因仍需网关复核。

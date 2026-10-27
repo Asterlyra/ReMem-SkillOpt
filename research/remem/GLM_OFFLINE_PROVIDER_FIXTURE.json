@@ -1,0 +1,98 @@
+{
+  "scope": "synthetic_offline_provider_contract",
+  "real_model_calls": 0,
+  "network_attempts": 0,
+  "backend_sha256": "7e8ef12a4a8af469f625b7f99c946f3a13b34a7258af15f2ec80b470c11801ad",
+  "cases": {
+    "valid_reply": {
+      "http_status": 200,
+      "status": "returned",
+      "content_is_fixture": true,
+      "transport": {
+        "http_attempts": 1,
+        "http_responses": 1,
+        "logical_calls": 1,
+        "retry_attempts": 0,
+        "request_stages": {
+          "offline_fixture": 1
+        },
+        "http_elapsed_s_sum": 0.0,
+        "http_response_headers_elapsed_s_sum": 0.0,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 0.25,
+        "successful_http_responses": 1,
+        "reported_usage_responses": 1,
+        "usage_complete": true,
+        "known_prompt_tokens": 1,
+        "known_completion_tokens": 1,
+        "prompt_tokens": 1,
+        "completion_tokens": 1,
+        "cached_prompt_tokens": null,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 1
+        }
+      },
+      "provider_contracts": [
+        {
+          "has_model": true,
+          "has_choices": true,
+          "provider_error_present": false,
+          "provider_error_category": null
+        }
+      ]
+    },
+    "data_inspection_error": {
+      "http_status": 200,
+      "status": "raised",
+      "error_type": "RuntimeError",
+      "typed_message": "LLM call failed: TypeError",
+      "transport": {
+        "http_attempts": 3,
+        "http_responses": 3,
+        "logical_calls": 1,
+        "retry_attempts": 2,
+        "request_stages": {
+          "offline_fixture": 3
+        },
+        "http_elapsed_s_sum": 0.015000000013969839,
+        "http_response_headers_elapsed_s_sum": 0.015000000013969839,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 0.0470000000204891,
+        "successful_http_responses": 3,
+        "reported_usage_responses": 3,
+        "usage_complete": false,
+        "known_prompt_tokens": 0,
+        "known_completion_tokens": 0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 3
+        }
+      },
+      "provider_contracts": [
+        {
+          "has_model": false,
+          "has_choices": false,
+          "provider_error_present": true,
+          "provider_error_category": "unclassified"
+        },
+        {
+          "has_model": false,
+          "has_choices": false,
+          "provider_error_present": true,
+          "provider_error_category": "unclassified"
+        },
+        {
+          "has_model": false,
+          "has_choices": false,
+          "provider_error_present": true,
+          "provider_error_category": "unclassified"
+        }
+      ]
+    }
+  },
+  "baseline_repeated_blocked_response": true
+}

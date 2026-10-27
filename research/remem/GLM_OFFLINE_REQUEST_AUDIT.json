@@ -1,0 +1,335 @@
+{
+  "scope": "offline_request_origin_and_failure_path_audit",
+  "audited_at_utc": "2026-10-27T12:55:16.745226+00:00",
+  "source_study": "intranet-target-timeout-fix-20261027-v1",
+  "network_attempts": 0,
+  "new_model_calls": 0,
+  "request": {
+    "model_alias": "glm",
+    "message_roles": [
+      "system",
+      "user"
+    ],
+    "system": {
+      "characters": 2331,
+      "utf8_bytes": 2335,
+      "sha256": "2e5aeb30856529ff39e40c84483a55971744f9c97fdb679b98e07bcebd668839"
+    },
+    "user": {
+      "characters": 87561,
+      "utf8_bytes": 88702,
+      "sha256": "1b9f9f977bcb4c87a04e1fdb623c583de0687a8918e4332da94c033a8e604b81"
+    },
+    "current_skill": {
+      "characters": 1594,
+      "utf8_bytes": 1598,
+      "sha256": "5c49d03008aea2c7151b134da20f2258a746c7323b76f0e49ec2c1ea8c131f26"
+    },
+    "history_context": {
+      "characters": 3171,
+      "utf8_bytes": 3182,
+      "sha256": "7b0a83204ed9136e2811abca513335857c6106f4b6dbdd63832e600739a0940e"
+    },
+    "all_trajectories": {
+      "characters": 82666,
+      "utf8_bytes": 83792,
+      "sha256": "876b10ceb8cc381f488d08afcea38467626eda4a712280394eb5204ab3345627"
+    },
+    "wire_body_bytes": 93388,
+    "messages_sha256": "7a3fbe725d7c6d94b6b209e78176f2406a21ca46ff5474a82a7cedca537bb9a5",
+    "matches_user_requested_recheck_messages_hash": true
+  },
+  "exposure_checks": {
+    "batch_count": 8,
+    "batch_training_only": true,
+    "batch_validation_overlap": 0,
+    "history_failure_pattern_task_ids_training_only": true,
+    "history_failure_pattern_task_id_count": 15,
+    "history_validation_score_summary": [
+      {
+        "step": 1,
+        "action": "reject",
+        "score_before": 0.6,
+        "score_after": 0.45
+      }
+    ],
+    "validation_id_literal_match_count": 0,
+    "actual_local_key_matches": 0,
+    "hidden_reference_items": 0,
+    "test_content_loaded": false,
+    "limitation": "Origin and literal-match checks do not prove complete semantic privacy or identify content-filter trigger."
+  },
+  "task_components": [
+    {
+      "batch_position": 1,
+      "task_id": "32337",
+      "belongs_to_training": true,
+      "formatted_trajectory": {
+        "characters": 8462,
+        "utf8_bytes": 8512,
+        "sha256": "a99f6702bfbe862b2600658404fcb2c6f6e9c25f0ab1f5306872b626998dcd78"
+      },
+      "instruction": {
+        "characters": 1214,
+        "utf8_bytes": 1236,
+        "sha256": "b98749a1127ad7f0f311bf061bfcb957dc48695669a09eed5a765f822f654e67"
+      },
+      "conversation_roles": [
+        "assistant",
+        "system"
+      ],
+      "reference_text_present": false,
+      "target_system_prompt": {
+        "characters": 2172,
+        "utf8_bytes": 2176,
+        "sha256": "6f52cc8a13bf204c144efc70fe2e1ecb860a01f9b66f61db4c2cea0b7b27741e"
+      },
+      "target_user_prompt": {
+        "characters": 2543,
+        "utf8_bytes": 2567,
+        "sha256": "9aa99aad4aa28d389bba153db57d8e73293e7e895f9503546eebde97bee4c403"
+      }
+    },
+    {
+      "batch_position": 2,
+      "task_id": "247-24",
+      "belongs_to_training": true,
+      "formatted_trajectory": {
+        "characters": 22244,
+        "utf8_bytes": 22832,
+        "sha256": "37b527fc0b51573ab4f01a9b3be3b2e4064b887b45a6be0a6d3ce561a966960d"
+      },
+      "instruction": {
+        "characters": 986,
+        "utf8_bytes": 986,
+        "sha256": "0ead4c2df14b51fbb2aa540635afff7404aa0ad299c05f52cd952047573c5ca7"
+      },
+      "conversation_roles": [
+        "assistant",
+        "system"
+      ],
+      "reference_text_present": false,
+      "target_system_prompt": {
+        "characters": 2172,
+        "utf8_bytes": 2176,
+        "sha256": "6f52cc8a13bf204c144efc70fe2e1ecb860a01f9b66f61db4c2cea0b7b27741e"
+      },
+      "target_user_prompt": {
+        "characters": 2631,
+        "utf8_bytes": 2633,
+        "sha256": "25c5af3ba8207894125b1211b31d432b34de19bca6b5045452ec2858b3f56c0c"
+      }
+    },
+    {
+      "batch_position": 3,
+      "task_id": "379-36",
+      "belongs_to_training": true,
+      "formatted_trajectory": {
+        "characters": 7344,
+        "utf8_bytes": 7382,
+        "sha256": "dfd5875c35d7a6a455bfe9b815d4179610bb97e5ede0ea3675acf78c51f8b90d"
+      },
+      "instruction": {
+        "characters": 487,
+        "utf8_bytes": 487,
+        "sha256": "091fc1b709436b2b8468f75eaeb2593ffacc7e5b9924806bb1ba40bf06af6e92"
+      },
+      "conversation_roles": [
+        "assistant",
+        "system"
+      ],
+      "reference_text_present": false,
+      "target_system_prompt": {
+        "characters": 2172,
+        "utf8_bytes": 2176,
+        "sha256": "6f52cc8a13bf204c144efc70fe2e1ecb860a01f9b66f61db4c2cea0b7b27741e"
+      },
+      "target_user_prompt": {
+        "characters": 1651,
+        "utf8_bytes": 1653,
+        "sha256": "dc6d722e648c101d5bb7aec768333d6c19e6ef10f7a3eff16f92dad2730f7959"
+      }
+    },
+    {
+      "batch_position": 4,
+      "task_id": "250-20",
+      "belongs_to_training": true,
+      "formatted_trajectory": {
+        "characters": 17146,
+        "utf8_bytes": 17514,
+        "sha256": "5e4c39cfd56d93cb6384b9006554b8114dd608c4a3991857347502d296be6609"
+      },
+      "instruction": {
+        "characters": 483,
+        "utf8_bytes": 483,
+        "sha256": "30cabc36d395641ecb915ae29c469ed2f2aaf32849052ae07b18bb7bdd52f9c6"
+      },
+      "conversation_roles": [
+        "assistant",
+        "system"
+      ],
+      "reference_text_present": false,
+      "target_system_prompt": {
+        "characters": 2172,
+        "utf8_bytes": 2176,
+        "sha256": "6f52cc8a13bf204c144efc70fe2e1ecb860a01f9b66f61db4c2cea0b7b27741e"
+      },
+      "target_user_prompt": {
+        "characters": 2555,
+        "utf8_bytes": 2557,
+        "sha256": "3562cfa1eb484ab74a08c6956129b44ad2c95c74f05266b939a9173f2f30e935"
+      }
+    },
+    {
+      "batch_position": 5,
+      "task_id": "57113",
+      "belongs_to_training": true,
+      "formatted_trajectory": {
+        "characters": 5948,
+        "utf8_bytes": 5960,
+        "sha256": "0cdd556362f8de29e2d5a77da044ed9aae59104530e8cd891edd317058ba4781"
+      },
+      "instruction": {
+        "characters": 644,
+        "utf8_bytes": 644,
+        "sha256": "2eae0a3dbc9618b86a9f420a1e00561eabf46c6c41fc7a4f654edfee9ebfcd51"
+      },
+      "conversation_roles": [
+        "assistant",
+        "system"
+      ],
+      "reference_text_present": false,
+      "target_system_prompt": {
+        "characters": 2172,
+        "utf8_bytes": 2176,
+        "sha256": "6f52cc8a13bf204c144efc70fe2e1ecb860a01f9b66f61db4c2cea0b7b27741e"
+      },
+      "target_user_prompt": {
+        "characters": 1504,
+        "utf8_bytes": 1506,
+        "sha256": "87ffd9046fde62ff4ce31e130aae383ce72ab71ad0c051ea02c48f866081f772"
+      }
+    },
+    {
+      "batch_position": 6,
+      "task_id": "22-47",
+      "belongs_to_training": true,
+      "formatted_trajectory": {
+        "characters": 8891,
+        "utf8_bytes": 8909,
+        "sha256": "9e1daeed2752454c4d366b1de8df5099ad9b71a350a0b8bead4550696681fa29"
+      },
+      "instruction": {
+        "characters": 901,
+        "utf8_bytes": 903,
+        "sha256": "8bd4e6ded144548b5329cad01625ca46e3bba3d7e5bb2798c88af4e392fb2787"
+      },
+      "conversation_roles": [
+        "assistant",
+        "system"
+      ],
+      "reference_text_present": false,
+      "target_system_prompt": {
+        "characters": 2172,
+        "utf8_bytes": 2176,
+        "sha256": "6f52cc8a13bf204c144efc70fe2e1ecb860a01f9b66f61db4c2cea0b7b27741e"
+      },
+      "target_user_prompt": {
+        "characters": 2059,
+        "utf8_bytes": 2067,
+        "sha256": "72b771355fa53edb0d0dbd118937d0ad82e023387b60b166f5168266db62b0dd"
+      }
+    },
+    {
+      "batch_position": 7,
+      "task_id": "10747",
+      "belongs_to_training": true,
+      "formatted_trajectory": {
+        "characters": 6039,
+        "utf8_bytes": 6077,
+        "sha256": "b673a23b3ba7789fc2b1607fe69ee907249bb27569eb2afe07d28e9f5a7c327c"
+      },
+      "instruction": {
+        "characters": 516,
+        "utf8_bytes": 516,
+        "sha256": "96e7585aeca35644a2c1f624ce78b731758e6b7d239c8c8533ac620f0bed5a4c"
+      },
+      "conversation_roles": [
+        "assistant",
+        "system"
+      ],
+      "reference_text_present": false,
+      "target_system_prompt": {
+        "characters": 2172,
+        "utf8_bytes": 2176,
+        "sha256": "6f52cc8a13bf204c144efc70fe2e1ecb860a01f9b66f61db4c2cea0b7b27741e"
+      },
+      "target_user_prompt": {
+        "characters": 1682,
+        "utf8_bytes": 1690,
+        "sha256": "ff0bf43291549add5d0e8a2e26ba30429634f134d514ccc6af7af1dbcc882b00"
+      }
+    },
+    {
+      "batch_position": 8,
+      "task_id": "57445",
+      "belongs_to_training": true,
+      "formatted_trajectory": {
+        "characters": 6543,
+        "utf8_bytes": 6557,
+        "sha256": "e6cd0b3035c6514d294284436a60876d868ec469900e5b1e20d9cc9295e56c56"
+      },
+      "instruction": {
+        "characters": 310,
+        "utf8_bytes": 310,
+        "sha256": "2bb46d157e9b7f600e4cf15a972384e46b63120994c73bf73be2f4dbefc0f1e2"
+      },
+      "conversation_roles": [
+        "assistant",
+        "system"
+      ],
+      "reference_text_present": false,
+      "target_system_prompt": {
+        "characters": 2172,
+        "utf8_bytes": 2176,
+        "sha256": "6f52cc8a13bf204c144efc70fe2e1ecb860a01f9b66f61db4c2cea0b7b27741e"
+      },
+      "target_user_prompt": {
+        "characters": 1800,
+        "utf8_bytes": 1802,
+        "sha256": "37215f60328486054478f4ab5c68b8e842a0f9e621ebf7000f96f64ed907f08a"
+      }
+    }
+  ],
+  "size_comparison": {
+    "valid_analyst_http_responses": 5,
+    "valid_body_bytes": [
+      95051,
+      72661,
+      63453,
+      43942,
+      63885
+    ],
+    "failed_body_bytes": [
+      93388,
+      93388,
+      93388
+    ],
+    "valid_requests_at_least_as_large_as_failed": 1,
+    "limitation": "Byte size is not token count; successful larger requests cannot identify the exact inspection cause."
+  },
+  "accounting": {
+    "http_attempts": 91,
+    "http_responses": 91,
+    "usage_event_count": 91,
+    "responses_with_numeric_token_usage": 88,
+    "responses_missing_numeric_usage": 3,
+    "complete_total_tokens": null
+  },
+  "original_artifact_hashes_unchanged": true,
+  "diagnosis_limits": [
+    "No upstream moderation decision or full error message was retained.",
+    "Cannot distinguish input inspection, output inspection, or false positive offline.",
+    "No prompt/data/model modification and no online component-ablation tests were performed."
+  ]
+}
