@@ -1,0 +1,79 @@
+{
+  "checked_at_utc": "2026-10-28T05:34:47.067482+00:00",
+  "study": "intranet-pending-arms-20261028-v1",
+  "queue_status": "running",
+  "scheduler_pid": 35928,
+  "runs": [
+    {
+      "run": "repair_only_42",
+      "status": "running",
+      "launcher_pid": 45576,
+      "events": {
+        "identity": 1,
+        "rollout_started": 1
+      },
+      "rollouts_started": [
+        {
+          "phase": "selection",
+          "step": 0,
+          "tasks": 20
+        }
+      ],
+      "calls": {
+        "execution_started": 1,
+        "http": 4,
+        "identity": 1
+      },
+      "transport": {
+        "http_attempts": 4,
+        "http_responses": 2,
+        "logical_calls": 4,
+        "retry_attempts": 0,
+        "request_stages": {
+          "rollout": 4
+        },
+        "http_elapsed_s_sum": 65.92199999996228,
+        "http_response_headers_elapsed_s_sum": 65.92199999996228,
+        "logical_timing_complete": false,
+        "logical_call_elapsed_s_sum": null,
+        "successful_http_responses": 2,
+        "reported_usage_responses": 2,
+        "usage_complete": false,
+        "responses_with_numeric_usage": 2,
+        "responses_without_numeric_usage": 0,
+        "provider_error_http_responses": 0,
+        "known_prompt_tokens": 1660,
+        "known_completion_tokens": 10777,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [],
+        "roles": {
+          "target": 4
+        }
+      },
+      "models_by_role": {
+        "target": [
+          "Qwen3.6-35B-A3B"
+        ],
+        "optimizer": []
+      },
+      "safe_provider_errors": {}
+    }
+  ],
+  "verification": {
+    "status": "passed",
+    "scope": "medium_diagnostic_only",
+    "formal_ready": false,
+    "core_runs": 4,
+    "external_runs": 3,
+    "formal_blockers": [
+      "model_identity_cost_throughput_calibration",
+      "fresh_test_source_template_and_quality_audit",
+      "failed_request_usage_reconciliation",
+      "external_control_live_validation",
+      "final_test_release_protocol"
+    ]
+  },
+  "test_released": false
+}
