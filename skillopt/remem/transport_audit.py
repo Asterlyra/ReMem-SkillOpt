@@ -13,7 +13,7 @@ from typing import Any
 
 import httpx
 
-from .provider_contract import provider_error, provider_error_category
+from .provider_contract import KNOWN_CATEGORIES, provider_error, provider_error_category
 
 _WRITE_LOCK = threading.Lock()
 _CALL: ContextVar[tuple[str, str] | None] = ContextVar("remem_audit_call", default=None)
@@ -127,6 +127,17 @@ def record_usage(role: str, stage: str, response: Any) -> None:
                   "reasoning_tokens": getattr(completion_details, "reasoning_tokens", None)})
 
 
+def record_provider_error(role: str, stage: str, category: str, status: int) -> None:
+    """HTTP errors have no usage event; retain only safe correlated metadata."""
+    path = audit_path()
+    if path is None:
+        return
+    current = _CALL.get()
+    _write(path, {"kind": "provider_error", "role": role, "stage": stage,
+                  "id": _RESPONSE_ID.get(), "call_id": current[1] if current else None,
+                  "status": status, "provider_error_category": category if category in KNOWN_CATEGORIES else "unclassified"})
+
+
 def summarize(path: Path) -> dict[str, Any]:
     records = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
     requests = [record for record in records if record["kind"] == "request"]
@@ -150,6 +161,7 @@ def summarize(path: Path) -> dict[str, Any]:
     numeric_usage_ids.discard(None)
     provider_error_ids = {record.get("id") for record in usage
                           if record.get("response_contract", {}).get("provider_error_present") is True}
+    provider_error_ids.update(record.get("id") for record in records if record["kind"] == "provider_error")
     provider_error_ids.discard(None)
     return {"http_attempts": len(requests), "http_responses": len(responses),
             "logical_calls": len({record["call_id"] for record in requests if record.get("call_id")})

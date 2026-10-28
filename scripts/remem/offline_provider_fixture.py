@@ -1,10 +1,12 @@
 """Reproduce provider-envelope handling with synthetic responses and no network."""
+# ruff: noqa: E402 -- repository bootstrap precedes project imports with a shared venv
 
 import argparse
 import hashlib
 import json
 import os
 import socket
+import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
@@ -12,12 +14,17 @@ from unittest.mock import patch
 import httpx
 from openai import OpenAI
 
+SOURCE_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(SOURCE_ROOT))
+
 from skillopt.model import azure_openai as backend
 from skillopt.remem.call_policy import ResearchCallPolicy, use_call_policy
 from skillopt.remem.transport_audit import audited_call, client_options, summarize
 
 
 def audit(output: Path):
+    if not Path(backend.__file__).resolve().is_relative_to(SOURCE_ROOT):
+        raise RuntimeError("Offline fixture imported a backend outside its source checkout")
     output.mkdir(parents=True, exist_ok=False)
     result = {"scope": "synthetic_offline_provider_contract", "real_model_calls": 0, "network_attempts": 0,
               "backend_sha256": hashlib.sha256(Path(backend.__file__).read_bytes()).hexdigest(), "cases": {}}

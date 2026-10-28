@@ -19,6 +19,7 @@ from openai import AzureOpenAI, OpenAI
 from skillopt.remem.provider_contract import (
     NonRetryableProviderError,
     ProviderResponseError,
+    research_provider_errors,
     validate_research_provider_response,
 )
 
@@ -398,7 +399,7 @@ def _chat_impl(
                 if timeout is not None:
                     kwargs["timeout"] = timeout
                 from skillopt.remem.transport_audit import audited_call, record_usage
-                with audited_call(stage, audit_identity):
+                with audited_call(stage, audit_identity), research_provider_errors(role, stage):
                     resp = client.responses.create(**kwargs)
                     record_usage(role, stage, resp)
                     validate_research_provider_response(resp)
@@ -432,7 +433,7 @@ def _chat_impl(
                 if timeout is not None:
                     kwargs["timeout"] = timeout
                 from skillopt.remem.transport_audit import audited_call, record_usage
-                with audited_call(stage, audit_identity):
+                with audited_call(stage, audit_identity), research_provider_errors(role, stage):
                     resp = client.chat.completions.create(**kwargs)
                     record_usage(role, stage, resp)
                     validate_research_provider_response(resp)
@@ -511,7 +512,7 @@ def _chat_messages_impl(
                 if timeout is not None:
                     kwargs["timeout"] = timeout
                 from skillopt.remem.transport_audit import audited_call, record_usage
-                with audited_call(stage, audit_identity):
+                with audited_call(stage, audit_identity), research_provider_errors(role, stage):
                     resp = client.responses.create(**kwargs)
                     record_usage(role, stage, resp)
                     validate_research_provider_response(resp)
@@ -542,7 +543,7 @@ def _chat_messages_impl(
                 if timeout is not None:
                     kwargs["timeout"] = timeout
                 from skillopt.remem.transport_audit import audited_call, record_usage
-                with audited_call(stage, audit_identity):
+                with audited_call(stage, audit_identity), research_provider_errors(role, stage):
                     resp = client.chat.completions.create(**kwargs)
                     record_usage(role, stage, resp)
                     validate_research_provider_response(resp)

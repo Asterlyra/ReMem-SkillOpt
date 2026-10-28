@@ -12,6 +12,10 @@ from pathlib import Path
 from skillopt.remem.provider_contract import NON_RETRYABLE_CATEGORIES
 from skillopt.remem.study import report, verify
 
+NEW_VERSION_REQUIRED_STOPS = frozenset({
+    "stopped_provider_contract_failure", "stopped_malformed_provider_response",
+})
+
 
 def now():
     return datetime.now(timezone.utc).isoformat()
@@ -54,6 +58,8 @@ def main(directory, key_file, resume_unstarted=False, reporter=Path(__file__).wi
         if not resume_unstarted:
             raise FileExistsError("Queue exists; inspect terminal and live processes before any explicit resume")
         previous = json.loads(progress_path.read_text())
+        if previous.get("status") in NEW_VERSION_REQUIRED_STOPS:
+            raise RuntimeError("Provider contract hold requires a new frozen study/version; cannot resume this queue")
         if any(r["status"] not in ("finished", "failed") for r in previous["runs"]):
             raise RuntimeError("Prior arm lacks an explicit terminal status; reconcile its ledger first")
         backup = directory / (
@@ -154,17 +160,18 @@ def main(directory, key_file, resume_unstarted=False, reporter=Path(__file__).wi
         transport = directory / "runs" / name / "remem/transport.jsonl"
         if code and transport.exists():
             raw = [json.loads(x) for x in transport.read_text().splitlines() if x]
-            if any(x["kind"] == "response" and x["status"] in (401, 403) for x in raw):
-                progress.update(status="stopped_authentication_failure", stop_run=name)
-                break
             permanent = NON_RETRYABLE_CATEGORIES
             codes = {x.get("response_contract", {}).get("provider_error_category") for x in raw if x["kind"] == "usage"}
+            codes.update(x.get("provider_error_category") for x in raw if x["kind"] == "provider_error")
             if codes & permanent:
                 progress.update(
                     status="stopped_provider_contract_failure",
                     stop_run=name,
                     provider_error_categories=sorted(codes & permanent),
                 )
+                break
+            if any(x["kind"] == "response" and x["status"] in (401, 403) for x in raw):
+                progress.update(status="stopped_authentication_failure", stop_run=name)
                 break
             malformed = sum(
                 x["kind"] == "usage"

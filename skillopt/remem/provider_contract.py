@@ -1,5 +1,7 @@
 """Safe provider-error categories; never retain upstream messages or payloads."""
 
+from contextlib import contextmanager
+
 NON_RETRYABLE_CATEGORIES = frozenset({
     "context_length_exceeded", "invalid_request_error", "invalid_argument",
     "insufficient_quota", "insufficient_balance", "invalid_api_key",
@@ -19,6 +21,10 @@ def provider_error(response):
 
 def provider_error_category(response):
     error = provider_error(response)
+    return _error_category(error)
+
+
+def _error_category(error):
     if not error:
         return None
     for field in ("code", "type"):
@@ -50,3 +56,30 @@ def validate_research_provider_response(response):
     if category is not None:
         error_type = NonRetryableProviderError if category in NON_RETRYABLE_CATEGORIES else ProviderResponseError
         raise error_type(category)
+
+
+@contextmanager
+def research_provider_errors(role, stage):
+    """Classify SDK HTTP errors while the response's audit identity is active."""
+    from openai import APIStatusError
+
+    from .call_policy import CallPolicyError, active_policy
+    from .transport_audit import record_provider_error
+
+    try:
+        yield
+    except APIStatusError as exc:
+        if active_policy() is None:
+            raise
+        body = exc.body
+        error = (body.get("error") or body) if isinstance(body, dict) else body
+        category = _error_category(error) or "unclassified"
+        try:
+            record_provider_error(role, stage, category, exc.status_code)
+        except OSError:
+            raise CallPolicyError("Cannot persist provider error audit; do not retry") from None
+        if category in NON_RETRYABLE_CATEGORIES:
+            raise NonRetryableProviderError(category) from None
+        if category in KNOWN_CATEGORIES:
+            raise ProviderResponseError(category) from None
+        raise

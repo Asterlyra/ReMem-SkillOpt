@@ -59,15 +59,16 @@ def test_report_retains_missing_model_and_usage_without_sorting_none_with_string
 
 
 @pytest.mark.parametrize("reporting_exit", [0, 1])
+@pytest.mark.parametrize("previous_status", ["running", "completed_with_failures", "stopped_authentication_failure"])
 def test_explicit_resume_starts_only_unstarted_arms_and_records_reporter_failures(
-    tmp_path, monkeypatch, reporting_exit
+    tmp_path, monkeypatch, reporting_exit, previous_status
 ):
     (tmp_path / "freeze.json").write_text(
         json.dumps({"study_id": "fixture", "run_order": ["complete", "failed", "pending"]})
     )
     progress = {
         "study_id": "fixture",
-        "status": "running",
+        "status": previous_status,
         "pid": 999999,
         "runs": [
             {"run": "complete", "status": "finished", "exit_code": 0},
@@ -157,3 +158,42 @@ def test_nontransient_provider_error_stops_before_next_recovery_arm(tmp_path, mo
         if "provider_error_category" in contract
         else "stopped_malformed_provider_response"
     )
+
+
+@pytest.mark.parametrize("status", ["stopped_provider_contract_failure", "stopped_malformed_provider_response"])
+def test_provider_hold_cannot_be_resumed_or_mutated(tmp_path, monkeypatch, status):
+    original = json.dumps({"status": status, "pid": 999999, "runs": [{"run": "failed", "status": "failed"}]})
+    path = tmp_path / "queue.json"
+    path.write_text(original)
+    monkeypatch.setattr(run_diagnostic_queue, "verify", lambda _: None)
+    monkeypatch.setattr(run_diagnostic_queue, "active_study_processes", lambda _: [])
+    monkeypatch.setattr(run_diagnostic_queue.subprocess, "Popen", lambda *a, **k: pytest.fail("must not launch"))
+    with pytest.raises(RuntimeError, match="new frozen study/version"):
+        run_diagnostic_queue.main(tmp_path, tmp_path / "nonexistent-key-file", resume_unstarted=True)
+    assert path.read_text() == original
+    assert not list(tmp_path.glob("queue.before_resume_*"))
+
+
+@pytest.mark.parametrize("http_status", [400, 403, 429, 500])
+def test_non2xx_error_category_stops_before_next_arm(tmp_path, monkeypatch, http_status):
+    (tmp_path / "freeze.json").write_text(json.dumps({"study_id": "fixture", "run_order": ["first", "second"]}))
+    folder = tmp_path / "runs/first/remem"
+    folder.mkdir(parents=True)
+    (folder / "transport.jsonl").write_text('\n'.join(json.dumps(row) for row in [
+        {"kind": "response", "status": http_status},
+        {"kind": "provider_error", "provider_error_category": "data_inspection_failed", "status": http_status},
+    ]))
+    monkeypatch.setattr(run_diagnostic_queue, "verify", lambda _: None)
+    monkeypatch.setattr(run_diagnostic_queue, "active_study_processes", lambda _: [])
+    monkeypatch.setattr(run_diagnostic_queue, "report", lambda _: {"runs": [{"run": "first", "status": "incomplete"}]})
+    monkeypatch.setattr(run_diagnostic_queue.subprocess, "run", lambda *a, **k: SimpleNamespace(returncode=0))
+    started = []
+    def launch(args, **kwargs):
+        started.append(args[args.index("--name") + 1])
+        return SimpleNamespace(pid=42, wait=lambda: 1)
+    monkeypatch.setattr(run_diagnostic_queue.subprocess, "Popen", launch)
+    assert run_diagnostic_queue.main(tmp_path, tmp_path / "nonexistent-key-file") == 1
+    assert started == ["first"]
+    saved = json.loads((tmp_path / "queue.json").read_text())
+    assert saved["status"] == "stopped_provider_contract_failure"
+    assert saved["provider_error_categories"] == ["data_inspection_failed"]

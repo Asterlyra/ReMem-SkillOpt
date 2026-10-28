@@ -1,0 +1,237 @@
+{
+  "scope": "synthetic_recovery_boundary_audit",
+  "real_model_calls": 0,
+  "real_child_processes": 0,
+  "network_attempts": 0,
+  "http_cases": {
+    "200": {
+      "exception_type": "NonRetryableProviderError",
+      "safe_category": "data_inspection_failed",
+      "transport": {
+        "http_attempts": 1,
+        "http_responses": 1,
+        "logical_calls": 1,
+        "retry_attempts": 0,
+        "request_stages": {
+          "synthetic": 1
+        },
+        "http_elapsed_s_sum": 0.0,
+        "http_response_headers_elapsed_s_sum": 0.0,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 0.1720000000204891,
+        "successful_http_responses": 1,
+        "reported_usage_responses": 1,
+        "usage_complete": false,
+        "responses_with_numeric_usage": 0,
+        "responses_without_numeric_usage": 1,
+        "provider_error_http_responses": 1,
+        "known_prompt_tokens": 0,
+        "known_completion_tokens": 0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 1
+        }
+      },
+      "queue_after_failure": {
+        "mocked_arms_started": [
+          "first"
+        ],
+        "exit_code": 1,
+        "status": "stopped_provider_contract_failure",
+        "retained_original_failed_arm": true
+      }
+    },
+    "400": {
+      "exception_type": "NonRetryableProviderError",
+      "safe_category": "data_inspection_failed",
+      "transport": {
+        "http_attempts": 1,
+        "http_responses": 1,
+        "logical_calls": 1,
+        "retry_attempts": 0,
+        "request_stages": {
+          "synthetic": 1
+        },
+        "http_elapsed_s_sum": 0.0,
+        "http_response_headers_elapsed_s_sum": 0.0,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 0.0,
+        "successful_http_responses": 0,
+        "reported_usage_responses": 0,
+        "usage_complete": false,
+        "responses_with_numeric_usage": 0,
+        "responses_without_numeric_usage": 1,
+        "provider_error_http_responses": 1,
+        "known_prompt_tokens": 0,
+        "known_completion_tokens": 0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [
+          400
+        ],
+        "roles": {
+          "optimizer": 1
+        }
+      },
+      "queue_after_failure": {
+        "mocked_arms_started": [
+          "first"
+        ],
+        "exit_code": 1,
+        "status": "stopped_provider_contract_failure",
+        "retained_original_failed_arm": true
+      }
+    },
+    "403": {
+      "exception_type": "NonRetryableProviderError",
+      "safe_category": "data_inspection_failed",
+      "transport": {
+        "http_attempts": 1,
+        "http_responses": 1,
+        "logical_calls": 1,
+        "retry_attempts": 0,
+        "request_stages": {
+          "synthetic": 1
+        },
+        "http_elapsed_s_sum": 0.0,
+        "http_response_headers_elapsed_s_sum": 0.0,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 0.015000000013969839,
+        "successful_http_responses": 0,
+        "reported_usage_responses": 0,
+        "usage_complete": false,
+        "responses_with_numeric_usage": 0,
+        "responses_without_numeric_usage": 1,
+        "provider_error_http_responses": 1,
+        "known_prompt_tokens": 0,
+        "known_completion_tokens": 0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [
+          403
+        ],
+        "roles": {
+          "optimizer": 1
+        }
+      },
+      "queue_after_failure": {
+        "mocked_arms_started": [
+          "first"
+        ],
+        "exit_code": 1,
+        "status": "stopped_provider_contract_failure",
+        "retained_original_failed_arm": true
+      }
+    },
+    "429": {
+      "exception_type": "NonRetryableProviderError",
+      "safe_category": "data_inspection_failed",
+      "transport": {
+        "http_attempts": 1,
+        "http_responses": 1,
+        "logical_calls": 1,
+        "retry_attempts": 0,
+        "request_stages": {
+          "synthetic": 1
+        },
+        "http_elapsed_s_sum": 0.0,
+        "http_response_headers_elapsed_s_sum": 0.0,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 0.0,
+        "successful_http_responses": 0,
+        "reported_usage_responses": 0,
+        "usage_complete": false,
+        "responses_with_numeric_usage": 0,
+        "responses_without_numeric_usage": 1,
+        "provider_error_http_responses": 1,
+        "known_prompt_tokens": 0,
+        "known_completion_tokens": 0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [
+          429
+        ],
+        "roles": {
+          "optimizer": 1
+        }
+      },
+      "queue_after_failure": {
+        "mocked_arms_started": [
+          "first"
+        ],
+        "exit_code": 1,
+        "status": "stopped_provider_contract_failure",
+        "retained_original_failed_arm": true
+      }
+    },
+    "500": {
+      "exception_type": "NonRetryableProviderError",
+      "safe_category": "data_inspection_failed",
+      "transport": {
+        "http_attempts": 1,
+        "http_responses": 1,
+        "logical_calls": 1,
+        "retry_attempts": 0,
+        "request_stages": {
+          "synthetic": 1
+        },
+        "http_elapsed_s_sum": 0.0,
+        "http_response_headers_elapsed_s_sum": 0.0,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 0.01600000000325963,
+        "successful_http_responses": 0,
+        "reported_usage_responses": 0,
+        "usage_complete": false,
+        "responses_with_numeric_usage": 0,
+        "responses_without_numeric_usage": 1,
+        "provider_error_http_responses": 1,
+        "known_prompt_tokens": 0,
+        "known_completion_tokens": 0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [
+          500
+        ],
+        "roles": {
+          "optimizer": 1
+        }
+      },
+      "queue_after_failure": {
+        "mocked_arms_started": [
+          "first"
+        ],
+        "exit_code": 1,
+        "status": "stopped_provider_contract_failure",
+        "retained_original_failed_arm": true
+      }
+    }
+  },
+  "resume_cases": {
+    "stopped_provider_contract_failure": {
+      "mocked_arms_started": [],
+      "resume_rejected": true,
+      "original_queue_unchanged": true,
+      "backup_created": false
+    },
+    "stopped_malformed_provider_response": {
+      "mocked_arms_started": [],
+      "resume_rejected": true,
+      "original_queue_unchanged": true,
+      "backup_created": false
+    }
+  },
+  "source_hashes": {
+    "skillopt/remem/provider_contract.py": "81b322e359b72b566b2cc1db5d4711869c9b84c687ed315d3bf380f9509a7102",
+    "scripts/remem/run_diagnostic_queue.py": "561e4358d98a22bdcf30f0f7a5d098c97c407b88bccd42f573aa5c2a7167e4b2",
+    "skillopt/model/azure_openai.py": "c638035401eee3a2209a348d2fcc20c6316aac55f0b85d1cdedf075b1a3c128a",
+    "skillopt/envs/spreadsheetbench/codegen_agent.py": "aac4c6e92c9a214b60630981ec750ed72795a33329c084bc314cc9fd74f691ca",
+    "skillopt/remem/transport_audit.py": "e1a26ae0e9b618791d42f0d8935a7500600eacb206ca0aa1a6dfda2a357bbd22"
+  }
+}

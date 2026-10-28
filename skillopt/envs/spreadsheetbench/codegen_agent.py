@@ -196,6 +196,11 @@ def _build_user(
 def _llm_call_with_retry(call_fn, *, retries: int = 5, timeout: int | None = 120):
     """Wrap an LLM API call with retry and per-call timeout."""
     from skillopt.remem.call_policy import CallPolicyError, active_policy
+    from skillopt.remem.provider_contract import (
+        NonRetryableProviderError,
+        ProviderResponseError,
+        research_provider_errors,
+    )
     policy = active_policy()
     if policy is not None:
         retries = min(retries, policy.limits["max_attempts"])
@@ -203,8 +208,9 @@ def _llm_call_with_retry(call_fn, *, retries: int = 5, timeout: int | None = 120
     last_err = None
     for attempt in range(retries):
         try:
-            return call_fn(timeout=timeout)
-        except CallPolicyError:
+            with research_provider_errors("target", "rollout"):
+                return call_fn(timeout=timeout)
+        except (CallPolicyError, NonRetryableProviderError):
             raise
         except Exception as e:  # noqa: BLE001
             last_err = e
@@ -212,6 +218,8 @@ def _llm_call_with_retry(call_fn, *, retries: int = 5, timeout: int | None = 120
                 raise RuntimeError(f"LLM call failed: HTTP {e.status_code}") from None
             sleep = min(2 ** attempt + random.random(), 60)
             time.sleep(sleep)
+    if isinstance(last_err, ProviderResponseError):
+        raise last_err
     if policy is not None:
         raise RuntimeError(f"LLM call failed: {type(last_err).__name__}") from None
     raise RuntimeError(f"LLM call failed after {retries} retries: {last_err}")
