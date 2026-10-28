@@ -67,3 +67,5 @@ CAM第一步已完成，第二步训练的20条观察也已先落盘，累计40�
 ## 2026-10-28 16:39巡检：暂停状态无变化
 
 CIM未发现当前study的Python进程；queue仍因CAM data_inspection_failed停止，M-only未启动。只读SQLite及transport审计与16:09快照逐项相同，未产生新增请求或任务，freeze再次通过，主目录Git干净。本地快照为checks/heartbeat_20261028T083956Z.json。没有外部处置的新证据，未发送探针、重启或修改协议；保留既有故障通知，等待期间静默巡检。
+
+17:09复核：当前study实际Python进程0，逐项比较只读账本/transport汇总与16:39相同，freeze通过，测试关闭。CAM保护停止、M-only未启动；没有新增外部恢复证据或模型请求。本地留存checks/heartbeat_20261028T090956Z.json，继续静默等待。
