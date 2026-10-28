@@ -1,0 +1,39 @@
+{
+  "scope": "offline_proposal_format_diagnosis_no_runtime_change",
+  "model_calls": 0,
+  "results": [
+    {
+      "step": 1,
+      "response_characters": 6690,
+      "whole_response_code_fence": true,
+      "offline_parse_after_fence_removal_valid_json": true,
+      "offline_exact_top_level_contract": true
+    },
+    {
+      "step": 2,
+      "response_characters": 7868,
+      "whole_response_code_fence": true,
+      "offline_parse_after_fence_removal_valid_json": true,
+      "offline_exact_top_level_contract": true
+    }
+  ],
+  "proposal_results": [
+    {
+      "status": "proposal_invalid",
+      "reason_category": "invalid_json"
+    },
+    {
+      "status": "proposal_invalid",
+      "reason_category": "invalid_json"
+    }
+  ],
+  "finish_reasons_by_role": {
+    "target": {
+      "stop": 77,
+      "length": 1
+    },
+    "optimizer": {
+      "stop": 2
+    }
+  }
+}

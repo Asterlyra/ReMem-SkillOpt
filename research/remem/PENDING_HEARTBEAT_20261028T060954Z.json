@@ -1,0 +1,111 @@
+{
+  "checked_at_utc": "2026-10-28T06:14:48.135678+00:00",
+  "study": "intranet-pending-arms-20261028-v1",
+  "queue_status": "running",
+  "scheduler_pid": 35928,
+  "runs": [
+    {
+      "run": "repair_only_42",
+      "status": "running",
+      "launcher_pid": 45576,
+      "events": {
+        "attempt": 2,
+        "checkpoint": 3,
+        "context": 3,
+        "identity": 1,
+        "observation": 60,
+        "optimizer_completed": 2,
+        "optimizer_response": 2,
+        "optimizer_started": 3,
+        "proposal_budget": 2,
+        "proposal_result": 2,
+        "rollout_completed": 4,
+        "rollout_started": 4,
+        "selection": 1
+      },
+      "rollouts_started": [
+        {
+          "phase": "selection",
+          "step": 0,
+          "tasks": 20
+        },
+        {
+          "phase": "train",
+          "step": 1,
+          "tasks": 20
+        },
+        {
+          "phase": "train",
+          "step": 2,
+          "tasks": 20
+        },
+        {
+          "phase": "train",
+          "step": 3,
+          "tasks": 20
+        }
+      ],
+      "calls": {
+        "done": 2,
+        "execution_started": 1,
+        "http": 84,
+        "identity": 1,
+        "start": 3
+      },
+      "transport": {
+        "http_attempts": 84,
+        "http_responses": 82,
+        "logical_calls": 83,
+        "retry_attempts": 1,
+        "request_stages": {
+          "remem_proposal": 3,
+          "rollout": 81
+        },
+        "http_elapsed_s_sum": 4010.6260000002803,
+        "http_response_headers_elapsed_s_sum": 4010.6260000002803,
+        "logical_timing_complete": false,
+        "logical_call_elapsed_s_sum": null,
+        "successful_http_responses": 82,
+        "reported_usage_responses": 82,
+        "usage_complete": false,
+        "responses_with_numeric_usage": 82,
+        "responses_without_numeric_usage": 0,
+        "provider_error_http_responses": 0,
+        "known_prompt_tokens": 216042,
+        "known_completion_tokens": 591382,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 3,
+          "target": 81
+        }
+      },
+      "models_by_role": {
+        "target": [
+          "Qwen3.6-35B-A3B"
+        ],
+        "optimizer": [
+          "glm-5.3-private-19428658"
+        ]
+      },
+      "safe_provider_errors": {}
+    }
+  ],
+  "verification": {
+    "status": "passed",
+    "scope": "medium_diagnostic_only",
+    "formal_ready": false,
+    "core_runs": 4,
+    "external_runs": 3,
+    "formal_blockers": [
+      "model_identity_cost_throughput_calibration",
+      "fresh_test_source_template_and_quality_audit",
+      "failed_request_usage_reconciliation",
+      "external_control_live_validation",
+      "final_test_release_protocol"
+    ]
+  },
+  "test_released": false
+}
