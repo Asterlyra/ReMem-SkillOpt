@@ -101,7 +101,7 @@ def bound_proposal(event, skill, **overrides):
     return body
 
 
-def test_misbound_artifact_hash_is_rebound_to_the_trace_that_holds_the_quote(tmp_path):
+def test_wrong_artifact_hash_is_repaired_to_the_cited_events_own_artifact(tmp_path):
     store = EventStore(tmp_path, {})
     skill = "# Rules\nInspect data.\n"
     cited = observe(store, "e1", "only inspected the first five rows")
@@ -137,18 +137,28 @@ def test_fabricated_quote_is_still_rejected(tmp_path):
         validate_proposal(p, skill, {cited.event_id}, store)
 
 
-def test_ambiguous_quote_is_rejected_rather_than_guessed(tmp_path):
+def test_quote_recorded_under_another_task_is_not_silently_moved(tmp_path):
+    """Evidence quotes are not unique across tasks.
+
+    The 2026-10-28 rerun showed short excerpts such as
+    ``value@Total!O5: gt=2 pred=None`` recurring in several tasks' traces.
+    Re-binding to "the one trace that holds it" therefore moved the evidence to a
+    different task and detached it from the failure case it was meant to support.
+    A citation whose quote is absent from the cited event's own trace stays
+    rejected, even when some other visible trace does contain it.
+    """
     store = EventStore(tmp_path, {})
     skill = "# Rules\nInspect data.\n"
-    first = observe(store, "e1", "only inspected the first five rows", task_id="t1")
-    second = observe(store, "e2", "only inspected the first five rows", task_id="t2", kind="wrong_value")
-    p = bound_proposal(first, skill)
-    # Point at a third artifact that does NOT hold the quote while two visible
-    # traces both do, so re-binding cannot choose without guessing.
-    decoy = store.artifact({"trace": "unrelated trace"})
-    p["evidence_refs"][0]["artifact_hash"] = decoy
-    with pytest.raises(ValueError, match="multiple"):
-        validate_proposal(p, skill, {first.event_id, second.event_id}, store)
+    cited = observe(store, "e1", "a trace that does not contain the excerpt", task_id="t1")
+    elsewhere = observe(store, "e2", "only inspected the first five rows", task_id="t2")
+    p = bound_proposal(cited, skill)
+    p["evidence_refs"][0]["quote"] = "only inspected the first five rows"
+
+    with pytest.raises(ValueError, match="quote") as excinfo:
+        validate_proposal(p, skill, {cited.event_id, elsewhere.event_id}, store)
+    # The reason must say the text exists elsewhere, so a reviewer can tell a
+    # mis-citation from a fabricated one.
+    assert "other visible trace" in str(excinfo.value)
 
 
 def test_rebinding_never_pulls_evidence_from_outside_the_permitted_context(tmp_path):

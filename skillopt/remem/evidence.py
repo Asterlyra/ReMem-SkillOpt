@@ -55,13 +55,9 @@ def _resolve(ref: dict, visible_events: set[str], store: EventStore) -> tuple[di
     return event, artifact
 
 
-def _rebind(quote: str, visible_events: set[str], store: EventStore) -> list[tuple[str, str]]:
-    """Visible training events whose recorded trace contains ``quote`` verbatim.
-
-    Only events already inside the permitted training context are considered, so
-    re-binding can never widen what the optimizer was allowed to see.
-    """
-    matches: list[tuple[str, str]] = []
+def _count_traces_holding(quote: str, visible_events: set[str], store: EventStore) -> int:
+    """How many visible training traces contain ``quote`` verbatim."""
+    hits = 0
     for event_id in sorted(visible_events):
         event = store.get(event_id)
         if not event or event.get("source_split") != "train":
@@ -71,20 +67,45 @@ def _rebind(quote: str, visible_events: set[str], store: EventStore) -> list[tup
         except (ValueError, KeyError):
             continue
         if quote in artifact.get("trace", ""):
-            matches.append((event_id, event["artifact_hash"]))
-    return matches
+            hits += 1
+    return hits
+
+
+def _rejection_reason(ref: dict, visible_events: set[str], store: EventStore) -> str:
+    """Explain a failed citation without accepting it.
+
+    Evidence quotes are short cell-level excerpts such as
+    ``value@Total!O5: gt=2 pred=None``, and the same excerpt frequently occurs in
+    several tasks' traces. Re-binding a quote to "the one trace that contains it"
+    is therefore unsound: it silently moved the evidence to a different task in
+    the 2026-10-28 rerun and detached it from the failure case it was meant to
+    support. Rejection is kept; the reason now distinguishes a fabricated quote or
+    unknown artifact from a merely mis-cited one.
+    """
+    event_id = ref.get("event_id")
+    if event_id not in visible_events:
+        return "Evidence outside current permitted training context"
+    quote = ref.get("quote") if isinstance(ref.get("quote"), str) else ""
+    try:
+        store.read_artifact(ref.get("artifact_hash"))
+        artifact_known = True
+    except (ValueError, KeyError):
+        artifact_known = False
+    if not artifact_known:
+        return "Evidence cites an unknown artifact hash"
+    hits = _count_traces_holding(quote, visible_events, store)
+    if hits == 0:
+        return "Evidence quote is not present in any visible training trace"
+    return f"Evidence quote is not present in the cited trace (occurs in {hits} other visible trace(s))"
 
 
 def validate_proposal(proposal: dict, skill: str, visible_events: set[str], store: EventStore) -> list[dict]:
     """Validate an evidence-bound repair proposal.
 
-    Returns the list of evidence re-bindings that were needed, so the caller can
-    record them. A quote that exists verbatim in exactly one *visible* training
-    trace is re-bound to that trace: pairing a real quote with the wrong artifact
-    is a clerical mistake, not fabricated evidence, and previously it discarded
-    the entire proposal — including the ones citing the most evidence. A quote
-    found nowhere visible, or ambiguously in several traces, is still rejected,
-    so the "evidence must be real and inside the permitted context" rule holds.
+    Returns the artifact-pointer repairs applied. A repair only ever replaces a
+    wrong or absent ``artifact_hash`` with the *same cited event's* recorded
+    artifact, and only when that artifact really holds the quote, so it cannot
+    move evidence to another task or widen the permitted context.
     """
     required = {"proposal_id", "skill_before_hash", "failure_case_ids", "evidence_refs", "diagnosis",
                 "target_rule_id", "repair_operator", "patch", "expected_observation", "preserve_cases"}
@@ -114,20 +135,20 @@ def validate_proposal(proposal: dict, skill: str, visible_events: set[str], stor
             raise ValueError("Evidence quote is not present in the recorded trace")
         resolved = _resolve(ref, visible_events, store)
         if resolved is None:
-            candidates = _rebind(quote, visible_events, store)
-            if len(candidates) == 1:
-                event_id, artifact_hash = candidates[0]
-                repairs.append({"index": index,
-                                "from": {"event_id": ref["event_id"], "artifact_hash": ref["artifact_hash"]},
-                                "to": {"event_id": event_id, "artifact_hash": artifact_hash}})
-                ref["event_id"], ref["artifact_hash"] = event_id, artifact_hash
-                resolved = _resolve(ref, visible_events, store)
-            elif not candidates:
-                if ref["event_id"] not in visible_events:
-                    raise ValueError("Evidence outside current permitted training context")
-                raise ValueError("Evidence quote is not present in the recorded trace")
-            else:
-                raise ValueError("Evidence quote matches multiple visible training artifacts")
+            event = store.get(ref["event_id"]) if ref["event_id"] in visible_events else None
+            if event and event.get("source_split") == "train":
+                try:
+                    own = store.read_artifact(event["artifact_hash"])
+                except (ValueError, KeyError):
+                    own = None
+                if own is not None and quote in own.get("trace", ""):
+                    repairs.append({"index": index,
+                                    "from": {"event_id": ref["event_id"], "artifact_hash": ref["artifact_hash"]},
+                                    "to": {"event_id": ref["event_id"], "artifact_hash": event["artifact_hash"]}})
+                    ref["artifact_hash"] = event["artifact_hash"]
+                    resolved = _resolve(ref, visible_events, store)
+            if resolved is None:
+                raise ValueError(_rejection_reason(ref, visible_events, store))
         event, _artifact = resolved
         if event["outcome"] == "failure":
             supported.add(digest(canonical([event["task_id"], event["failure_kind"]])))
