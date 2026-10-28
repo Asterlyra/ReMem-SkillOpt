@@ -16,6 +16,14 @@ from .evaluation import PairedBootstrapGate
 from .evidence import rule_index, validate_edit, validate_proposal
 from .proposals import JsonProposalStrategy
 from .store import EventStore
+
+# HTTP attempts per optimizer proposal call. The frozen protocol documents
+# "at most 3 attempts" (research_limits.max_attempts), the call policy caps
+# anything higher to that limit, and every sibling optimizer path passes 3. This
+# path passed 1, so a single transient timeout aborted a whole arm: on
+# 2026-10-28 a 178 KB proposal request hit the 240 s client timeout and killed
+# repair_only_42 at step 3 even though steps 1-2 had completed.
+OPTIMIZER_ATTEMPTS = 3
 from .types import RepairAttempt, canonical, digest
 
 
@@ -71,7 +79,7 @@ class ReMemRuntime(RuntimeAudit):
         started = time.monotonic()
         try:
             text, usage = self.chat(system=system, user=user, max_completion_tokens=self.options.optimizer_output_tokens,
-                                    retries=1, stage="remem_proposal")
+                                    retries=OPTIMIZER_ATTEMPTS, stage="remem_proposal")
         except Exception as exc:
             self.store.append(call_id + ":error", "optimizer_error", {"step": self.step, "error_type": type(exc).__name__,
                               "elapsed_s": time.monotonic()-started, "usage": None, "http_attempts": None})
