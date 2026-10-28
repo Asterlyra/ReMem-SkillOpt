@@ -1,0 +1,179 @@
+{
+  "scope": "readonly_completed_diagnostic_arm_audit",
+  "run": "repair_only_42",
+  "model_calls": 0,
+  "queue_entry": {
+    "run": "repair_only_42",
+    "status": "finished",
+    "started_at_utc": "2026-10-28T05:33:53.797098+00:00",
+    "pid": 45576,
+    "exit_code": 0,
+    "elapsed_s": 3081.3279999999795,
+    "finished_at_utc": "2026-10-28T06:25:15.113587+00:00"
+  },
+  "state": {
+    "last_completed_step": 3,
+    "current_score": 0.35,
+    "best_score": 0.35,
+    "best_step": 0,
+    "current_origin": "initial_skill",
+    "best_origin": "initial_skill"
+  },
+  "event_counts": {
+    "identity": 1,
+    "rollout_started": 5,
+    "rollout_completed": 5,
+    "selection": 2,
+    "checkpoint": 4,
+    "observation": 60,
+    "context": 3,
+    "optimizer_started": 3,
+    "optimizer_completed": 3,
+    "optimizer_response": 3,
+    "proposal_result": 3,
+    "proposal_budget": 3,
+    "attempt": 3,
+    "proposal_invalid": 1,
+    "gate": 1
+  },
+  "selections": [
+    {
+      "n": 20,
+      "passed": 7,
+      "score": 0.35
+    },
+    {
+      "n": 20,
+      "passed": 9,
+      "score": 0.45
+    }
+  ],
+  "attempts": [
+    {
+      "step": 1,
+      "gate_action": "proposal_invalid",
+      "adopted": false
+    },
+    {
+      "step": 2,
+      "gate_action": "proposal_invalid",
+      "adopted": false
+    },
+    {
+      "step": 3,
+      "gate_action": "inconclusive",
+      "adopted": false
+    }
+  ],
+  "gates": [
+    {
+      "action": "inconclusive",
+      "confidence": 0.95,
+      "lower": -0.1,
+      "mean_delta": 0.1,
+      "n": 20,
+      "samples": 10000,
+      "step": 3,
+      "upper": 0.3
+    }
+  ],
+  "proposal_results": [
+    {
+      "status": "proposal_invalid",
+      "proposal_count": 0,
+      "reason": "invalid_json"
+    },
+    {
+      "status": "proposal_invalid",
+      "proposal_count": 0,
+      "reason": "invalid_json"
+    },
+    {
+      "status": "proposals",
+      "proposal_count": 2,
+      "reason": "other_or_not_applicable"
+    }
+  ],
+  "invalid_reasons": {
+    "Evidence quote is not present in the recorded trace": 1
+  },
+  "training_observations_by_step": {
+    "1": 20,
+    "2": 20,
+    "3": 20
+  },
+  "observations_before_proposals": [
+    {
+      "step": 1,
+      "prior_observations": 20
+    },
+    {
+      "step": 2,
+      "prior_observations": 20
+    },
+    {
+      "step": 3,
+      "prior_observations": 20
+    }
+  ],
+  "context_history_groups": [
+    {
+      "step": 1,
+      "groups": 0
+    },
+    {
+      "step": 2,
+      "groups": 0
+    },
+    {
+      "step": 3,
+      "groups": 0
+    }
+  ],
+  "call_event_counts": {
+    "identity": 1,
+    "execution_started": 1,
+    "http": 105,
+    "start": 3,
+    "done": 3,
+    "execution_finished": 1
+  },
+  "execution_finished": [
+    {
+      "elapsed_s": 3077.9529999999795,
+      "error_type": null,
+      "scope": "trainer_including_setup_baseline_optimization_summary"
+    }
+  ],
+  "transport": {
+    "http_attempts": 105,
+    "http_responses": 103,
+    "logical_calls": 103,
+    "retry_attempts": 2,
+    "request_stages": {
+      "remem_proposal": 3,
+      "rollout": 102
+    },
+    "http_elapsed_s_sum": 4825.002000000095,
+    "http_response_headers_elapsed_s_sum": 4825.002000000095,
+    "logical_timing_complete": true,
+    "logical_call_elapsed_s_sum": 5073.217999999819,
+    "successful_http_responses": 103,
+    "reported_usage_responses": 103,
+    "usage_complete": false,
+    "responses_with_numeric_usage": 103,
+    "responses_without_numeric_usage": 0,
+    "provider_error_http_responses": 0,
+    "known_prompt_tokens": 299040,
+    "known_completion_tokens": 702905,
+    "prompt_tokens": null,
+    "completion_tokens": null,
+    "cached_prompt_tokens": null,
+    "error_statuses": [],
+    "roles": {
+      "optimizer": 3,
+      "target": 102
+    }
+  },
+  "test_executions": 0
+}
