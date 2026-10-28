@@ -1,0 +1,41 @@
+{
+  "scope": "one_target_identity_check_before_new_pending_arm_version",
+  "created_at_utc": "2026-10-28T05:30:27.439106+00:00",
+  "requested_model": "qwen",
+  "http_attempt_cap": 1,
+  "retries": 0,
+  "task_executions": 0,
+  "test_released": false,
+  "response_model": "Qwen3.6-35B-A3B",
+  "nonempty_content": true,
+  "expected_identity": true,
+  "provider_error_present": false,
+  "finish_reason": "stop",
+  "status": "passed",
+  "transport": {
+    "http_attempts": 1,
+    "http_responses": 1,
+    "logical_calls": 1,
+    "retry_attempts": 0,
+    "request_stages": {
+      "pending_target_identity": 1
+    },
+    "http_elapsed_s_sum": 1.3589999999967404,
+    "http_response_headers_elapsed_s_sum": 1.3589999999967404,
+    "logical_timing_complete": true,
+    "logical_call_elapsed_s_sum": 1.577999999979511,
+    "successful_http_responses": 1,
+    "reported_usage_responses": 1,
+    "usage_complete": true,
+    "known_prompt_tokens": 18,
+    "known_completion_tokens": 188,
+    "prompt_tokens": 18,
+    "completion_tokens": 188,
+    "cached_prompt_tokens": 0,
+    "error_statuses": [],
+    "roles": {
+      "target": 1
+    }
+  },
+  "output_directory": "E:\\Programs\\codex\\ReMem-Skillopt\\outputs\\remem\\pending-target-check-20261028T053027Z"
+}
