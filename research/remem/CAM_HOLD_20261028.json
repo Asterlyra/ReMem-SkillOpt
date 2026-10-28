@@ -1,0 +1,179 @@
+{
+  "scope": "readonly_failed_cam_audit",
+  "checked_at_utc": "2026-10-28T08:14:25.899652+00:00",
+  "model_calls": 0,
+  "queue": {
+    "study_id": "intranet-pending-arms-20261028-v1",
+    "status": "stopped_provider_contract_failure",
+    "pid": 35928,
+    "started_at_utc": "2026-10-28T05:33:53.795594+00:00",
+    "runs": [
+      {
+        "run": "repair_only_42",
+        "status": "finished",
+        "started_at_utc": "2026-10-28T05:33:53.797098+00:00",
+        "pid": 45576,
+        "exit_code": 0,
+        "elapsed_s": 3081.3279999999795,
+        "finished_at_utc": "2026-10-28T06:25:15.113587+00:00"
+      },
+      {
+        "run": "remem_full_42",
+        "status": "finished",
+        "started_at_utc": "2026-10-28T06:25:15.574750+00:00",
+        "pid": 47272,
+        "exit_code": 0,
+        "elapsed_s": 3432.1089999999967,
+        "finished_at_utc": "2026-10-28T07:22:27.658322+00:00"
+      },
+      {
+        "run": "cam_reference_42",
+        "status": "failed",
+        "started_at_utc": "2026-10-28T07:22:28.068030+00:00",
+        "pid": 36240,
+        "exit_code": 1,
+        "elapsed_s": 2323.4679999999935,
+        "finished_at_utc": "2026-10-28T08:01:11.433309+00:00"
+      }
+    ],
+    "final_test_released": false,
+    "selected_run_order": [
+      "repair_only_42",
+      "remem_full_42",
+      "cam_reference_42",
+      "memory_only_42"
+    ],
+    "stop_run": "cam_reference_42",
+    "provider_error_categories": [
+      "data_inspection_failed"
+    ],
+    "finished_at_utc": "2026-10-28T08:01:11.850577+00:00"
+  },
+  "state": {
+    "last_completed_step": 1,
+    "current_score": 0.6,
+    "best_score": 0.6,
+    "best_step": 0,
+    "current_origin": "initial_skill"
+  },
+  "selections": [
+    {
+      "n": 20,
+      "passed": 12
+    },
+    {
+      "n": 20,
+      "passed": 8
+    }
+  ],
+  "training_observations_by_step": {
+    "1": 20,
+    "2": 20
+  },
+  "native_stages": [
+    {
+      "kind": "native_stage_started",
+      "step": 1,
+      "stage": "reflect"
+    },
+    {
+      "kind": "native_stage_completed",
+      "step": 1,
+      "stage": "reflect"
+    },
+    {
+      "kind": "native_stage_started",
+      "step": 1,
+      "stage": "merge"
+    },
+    {
+      "kind": "native_stage_completed",
+      "step": 1,
+      "stage": "merge"
+    },
+    {
+      "kind": "native_stage_started",
+      "step": 1,
+      "stage": "rank"
+    },
+    {
+      "kind": "native_stage_completed",
+      "step": 1,
+      "stage": "rank"
+    },
+    {
+      "kind": "native_stage_started",
+      "step": 2,
+      "stage": "reflect"
+    }
+  ],
+  "observations_before_reflect": [
+    {
+      "step": 1,
+      "count": 20
+    },
+    {
+      "step": 2,
+      "count": 20
+    }
+  ],
+  "cam_final_actions": [
+    {
+      "step": 1,
+      "result_action": "reject",
+      "group_guard_status": "blocked"
+    }
+  ],
+  "execution_finished": [
+    {
+      "elapsed_s": 2320.375,
+      "error_type": "CallPolicyError",
+      "scope": "trainer_including_setup_baseline_optimization_summary"
+    }
+  ],
+  "optimizer_calls": {
+    "start": 8,
+    "done": 7,
+    "error": 1
+  },
+  "transport_errors": [
+    {
+      "kind": "logical_completion",
+      "stage": "analyst",
+      "error_type": "NonRetryableProviderError"
+    }
+  ],
+  "transport": {
+    "http_attempts": 88,
+    "http_responses": 88,
+    "logical_calls": 88,
+    "retry_attempts": 0,
+    "request_stages": {
+      "analyst": 5,
+      "merge": 2,
+      "ranking": 1,
+      "rollout": 80
+    },
+    "http_elapsed_s_sum": 4020.8709999996936,
+    "http_response_headers_elapsed_s_sum": 4020.8709999996936,
+    "logical_timing_complete": true,
+    "logical_call_elapsed_s_sum": 4023.188999999664,
+    "successful_http_responses": 88,
+    "reported_usage_responses": 88,
+    "usage_complete": false,
+    "responses_with_numeric_usage": 87,
+    "responses_without_numeric_usage": 1,
+    "provider_error_http_responses": 1,
+    "known_prompt_tokens": 216716,
+    "known_completion_tokens": 563443,
+    "prompt_tokens": null,
+    "completion_tokens": null,
+    "cached_prompt_tokens": null,
+    "error_statuses": [],
+    "roles": {
+      "optimizer": 8,
+      "target": 80
+    }
+  },
+  "test_executions": 0
+}

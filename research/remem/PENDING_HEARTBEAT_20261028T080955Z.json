@@ -1,0 +1,387 @@
+{
+  "checked_at_utc": "2026-10-28T08:13:25.993387+00:00",
+  "scope": "readonly_heartbeat",
+  "model_calls": 0,
+  "arms": {
+    "core_00_42": {
+      "reported_status": "not_started",
+      "tasks": null,
+      "test_executions": 0,
+      "memory_validation_id_matches": [],
+      "cam_final_actions": [],
+      "context_history_groups": [],
+      "events": {
+        "exists": false
+      },
+      "calls": {
+        "exists": false
+      }
+    },
+    "atomsearch_budgeted_42": {
+      "reported_status": "not_started",
+      "tasks": null,
+      "test_executions": 0,
+      "memory_validation_id_matches": [],
+      "cam_final_actions": [],
+      "context_history_groups": [],
+      "events": {
+        "exists": false
+      },
+      "calls": {
+        "exists": false
+      }
+    },
+    "skillopt_controlled_42": {
+      "reported_status": "not_started",
+      "tasks": null,
+      "test_executions": 0,
+      "memory_validation_id_matches": [],
+      "cam_final_actions": [],
+      "context_history_groups": [],
+      "events": {
+        "exists": false
+      },
+      "calls": {
+        "exists": false
+      }
+    },
+    "repair_only_42": {
+      "reported_status": "development_completed",
+      "tasks": 100,
+      "test_executions": 0,
+      "memory_validation_id_matches": [],
+      "cam_final_actions": [],
+      "context_history_groups": [
+        {
+          "step": 1,
+          "groups": 0
+        },
+        {
+          "step": 2,
+          "groups": 0
+        },
+        {
+          "step": 3,
+          "groups": 0
+        }
+      ],
+      "events": {
+        "counts": {
+          "identity": 1,
+          "rollout_started": 5,
+          "rollout_completed": 5,
+          "selection": 2,
+          "checkpoint": 4,
+          "observation": 60,
+          "context": 3,
+          "optimizer_started": 3,
+          "optimizer_completed": 3,
+          "optimizer_response": 3,
+          "proposal_result": 3,
+          "proposal_budget": 3,
+          "attempt": 3,
+          "proposal_invalid": 1,
+          "gate": 1
+        },
+        "terminal": []
+      },
+      "observations_before_proposal": [
+        {
+          "step": 1,
+          "prior_observations": 20
+        },
+        {
+          "step": 2,
+          "prior_observations": 20
+        },
+        {
+          "step": 3,
+          "prior_observations": 20
+        }
+      ],
+      "calls": {
+        "counts": {
+          "identity": 1,
+          "execution_started": 1,
+          "http": 105,
+          "start": 3,
+          "done": 3,
+          "execution_finished": 1
+        },
+        "terminal": [
+          {
+            "error_type": null,
+            "elapsed_s": 3077.9529999999795
+          }
+        ]
+      },
+      "transport_counts": {
+        "request": 105,
+        "response": 103,
+        "usage": 103,
+        "logical_completion": 103
+      },
+      "response_models": [
+        "Qwen3.6-35B-A3B",
+        "glm-5.3-private-19428658"
+      ],
+      "logical_errors": {},
+      "latest_request_utc": "2026-10-28T06:24:40.509821+00:00",
+      "http_error_statuses": {},
+      "transport_summary": {
+        "http_attempts": 105,
+        "http_responses": 103,
+        "logical_calls": 103,
+        "retry_attempts": 2,
+        "request_stages": {
+          "remem_proposal": 3,
+          "rollout": 102
+        },
+        "http_elapsed_s_sum": 4825.002000000095,
+        "http_response_headers_elapsed_s_sum": 4825.002000000095,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 5073.217999999819,
+        "successful_http_responses": 103,
+        "reported_usage_responses": 103,
+        "usage_complete": false,
+        "responses_with_numeric_usage": 103,
+        "responses_without_numeric_usage": 0,
+        "provider_error_http_responses": 0,
+        "known_prompt_tokens": 299040,
+        "known_completion_tokens": 702905,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 3,
+          "target": 102
+        }
+      }
+    },
+    "remem_full_42": {
+      "reported_status": "development_completed",
+      "tasks": 120,
+      "test_executions": 0,
+      "memory_validation_id_matches": [],
+      "cam_final_actions": [],
+      "context_history_groups": [
+        {
+          "step": 1,
+          "groups": 0
+        },
+        {
+          "step": 2,
+          "groups": 0
+        },
+        {
+          "step": 3,
+          "groups": 3
+        }
+      ],
+      "events": {
+        "counts": {
+          "identity": 1,
+          "rollout_started": 6,
+          "rollout_completed": 6,
+          "selection": 3,
+          "checkpoint": 4,
+          "observation": 60,
+          "context": 3,
+          "optimizer_started": 3,
+          "optimizer_completed": 3,
+          "optimizer_response": 3,
+          "proposal_result": 3,
+          "proposal_invalid": 2,
+          "proposal_budget": 3,
+          "gate": 2,
+          "attempt": 3
+        },
+        "terminal": []
+      },
+      "observations_before_proposal": [
+        {
+          "step": 1,
+          "prior_observations": 20
+        },
+        {
+          "step": 2,
+          "prior_observations": 20
+        },
+        {
+          "step": 3,
+          "prior_observations": 20
+        }
+      ],
+      "calls": {
+        "counts": {
+          "identity": 1,
+          "execution_started": 1,
+          "http": 123,
+          "start": 3,
+          "done": 3,
+          "execution_finished": 1
+        },
+        "terminal": [
+          {
+            "error_type": null,
+            "elapsed_s": 3428.9070000000065
+          }
+        ]
+      },
+      "transport_counts": {
+        "request": 123,
+        "response": 123,
+        "usage": 123,
+        "logical_completion": 123
+      },
+      "response_models": [
+        "Qwen3.6-35B-A3B",
+        "glm-5.3-private-19428658"
+      ],
+      "logical_errors": {},
+      "latest_request_utc": "2026-10-28T07:20:41.487842+00:00",
+      "http_error_statuses": {},
+      "transport_summary": {
+        "http_attempts": 123,
+        "http_responses": 123,
+        "logical_calls": 123,
+        "retry_attempts": 0,
+        "request_stages": {
+          "remem_proposal": 3,
+          "rollout": 120
+        },
+        "http_elapsed_s_sum": 5795.413000000117,
+        "http_response_headers_elapsed_s_sum": 5795.413000000117,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 5798.219000000274,
+        "successful_http_responses": 123,
+        "reported_usage_responses": 123,
+        "usage_complete": true,
+        "responses_with_numeric_usage": 123,
+        "responses_without_numeric_usage": 0,
+        "provider_error_http_responses": 0,
+        "known_prompt_tokens": 335154,
+        "known_completion_tokens": 837743,
+        "prompt_tokens": 335154,
+        "completion_tokens": 837743,
+        "cached_prompt_tokens": 46464,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 3,
+          "target": 120
+        }
+      }
+    },
+    "cam_reference_42": {
+      "reported_status": "incomplete",
+      "tasks": 80,
+      "test_executions": 0,
+      "memory_validation_id_matches": [],
+      "cam_final_actions": [
+        {
+          "step": 1,
+          "action": "reject",
+          "group_guard": "blocked"
+        }
+      ],
+      "context_history_groups": [],
+      "events": {
+        "counts": {
+          "identity": 1,
+          "rollout_started": 4,
+          "rollout_completed": 4,
+          "selection": 2,
+          "checkpoint": 2,
+          "observation": 40,
+          "cam_context": 2,
+          "native_stage_started": 4,
+          "native_stage_completed": 3,
+          "cam_budget": 1,
+          "cam_gate": 1,
+          "native_gate": 1
+        },
+        "terminal": []
+      },
+      "observations_before_proposal": [],
+      "calls": {
+        "counts": {
+          "identity": 1,
+          "execution_started": 1,
+          "http": 88,
+          "start": 8,
+          "done": 7,
+          "error": 1,
+          "execution_finished": 1
+        },
+        "terminal": [
+          {
+            "error_type": "CallPolicyError",
+            "elapsed_s": 2320.375
+          }
+        ]
+      },
+      "transport_counts": {
+        "request": 88,
+        "response": 88,
+        "usage": 88,
+        "logical_completion": 88
+      },
+      "response_models": [
+        "Qwen3.6-35B-A3B",
+        "glm-5.3-private-19428658"
+      ],
+      "logical_errors": {
+        "NonRetryableProviderError": 1
+      },
+      "latest_request_utc": "2026-10-28T07:59:44.328475+00:00",
+      "http_error_statuses": {},
+      "transport_summary": {
+        "http_attempts": 88,
+        "http_responses": 88,
+        "logical_calls": 88,
+        "retry_attempts": 0,
+        "request_stages": {
+          "analyst": 5,
+          "merge": 2,
+          "ranking": 1,
+          "rollout": 80
+        },
+        "http_elapsed_s_sum": 4020.8709999996936,
+        "http_response_headers_elapsed_s_sum": 4020.8709999996936,
+        "logical_timing_complete": true,
+        "logical_call_elapsed_s_sum": 4023.188999999664,
+        "successful_http_responses": 88,
+        "reported_usage_responses": 88,
+        "usage_complete": false,
+        "responses_with_numeric_usage": 87,
+        "responses_without_numeric_usage": 1,
+        "provider_error_http_responses": 1,
+        "known_prompt_tokens": 216716,
+        "known_completion_tokens": 563443,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "cached_prompt_tokens": null,
+        "error_statuses": [],
+        "roles": {
+          "optimizer": 8,
+          "target": 80
+        }
+      }
+    },
+    "memory_only_42": {
+      "reported_status": "not_started",
+      "tasks": null,
+      "test_executions": 0,
+      "memory_validation_id_matches": [],
+      "cam_final_actions": [],
+      "context_history_groups": [],
+      "events": {
+        "exists": false
+      },
+      "calls": {
+        "exists": false
+      }
+    }
+  }
+}

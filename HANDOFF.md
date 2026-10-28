@@ -100,3 +100,5 @@ v2 七个方法全部已终止：core_00 完成三步，其余六格在优化器
 15:09巡检：R+M持续正常推进，检查期间完成第二步并进入第三步训练；前两轮候选均.45对本格初始.55，配对CI[-.35,.15]，均inconclusive未采用。40训练观察先保存，前两批无同题历史，history_groups均0；须等第三步反射再核验M。实际PID50320身份及freeze通过，无接口错误/重试，无额外探针或改动。见 [检查点](research/remem/REMEM_FULL_CHECKPOINT_20261028T070956Z.json)；正常中间状态保持安静，后续仍按原队列。
 
 15:39巡检：R+M已于15:22完成三步，120任务/3优化器逻辑调用/123HTTP、0重试、用量完整；未采用修改，最终仍初始skill .55。第三步确实读到3组同任务历史失败及各1条修改尝试，训练来源/时序/字符上限核对通过，不代表记忆收益。CAM实际PID38092、创建15:22:28，已保存首轮20条训练观察，analyst在途，尚无最终result_action；M-only等待。freeze与真实进程核验通过，见 [R+M终止审计](research/remem/REMEM_FULL_TERMINAL_20261028.json) 和 [记忆检查](research/remem/REMEM_MEMORY_CONTEXT_20261028.json)。
+
+16:09巡检：CAM于16:01在第二步analyst遇到data_inspection_failed，首次即停，队列stopped_provider_contract_failure；CIM确认调度器/CAM均已退出，M-only未启动。第一步候选8/20对初始12/20，最终result_action=reject，group_guard=blocked，仍初始skill .60；仅完成一步。40训练观察先保存，80任务/8优化器逻辑调用/88HTTP、0重试、1份错误响应缺用量，墙钟2320.375秒，测试0。见 [CAM停止审计](research/remem/CAM_HOLD_20261028.json)。指针更新upstream_data_inspection_hold；等待网关核查，不重发被拦请求、不resume原队列、不自动新建恢复版或跳到M-only。主目录freeze通过且干净。巡检保持授权，无变化静默，不重复故障通知。
