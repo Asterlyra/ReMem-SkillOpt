@@ -1,0 +1,60 @@
+{
+  "scope": "one_failed_training_batch_recheck_not_experiment_replay",
+  "created_at_utc": "2026-10-28T09:41:04.359917+00:00",
+  "source_study": "intranet-target-timeout-fix-20261027-v1",
+  "task_executions": 0,
+  "original_run_mutated": false,
+  "http_attempt_cap": 1,
+  "timeout_s": 240,
+  "max_completion_tokens": 16384,
+  "body_bytes": 93388,
+  "matches_previous_failed_request_size": true,
+  "messages_sha256": "7a3fbe725d7c6d94b6b209e78176f2406a21ca46ff5474a82a7cedca537bb9a5",
+  "test_released": false,
+  "user_authorization": "explicit_continue_after_vpn_clash_route_check",
+  "socket_path": {
+    "socket_peer": [
+      "10.1.132.25",
+      443
+    ],
+    "http_status": 200
+  },
+  "response_model": null,
+  "has_choices": false,
+  "provider_error_present": true,
+  "nonempty_content": false,
+  "finish_reason": null,
+  "safe_provider_error_code": "data_inspection_failed",
+  "safe_provider_error_type": "upstream_error",
+  "provider_error_keyword_categories": [],
+  "status": "provider_contract_failure",
+  "transport": {
+    "http_attempts": 1,
+    "http_responses": 1,
+    "logical_calls": 1,
+    "retry_attempts": 0,
+    "request_stages": {
+      "failed_analyst_batch_recheck": 1
+    },
+    "http_elapsed_s_sum": 15.328000000037719,
+    "http_response_headers_elapsed_s_sum": 15.328000000037719,
+    "logical_timing_complete": true,
+    "logical_call_elapsed_s_sum": 15.485000000044238,
+    "successful_http_responses": 1,
+    "reported_usage_responses": 1,
+    "usage_complete": false,
+    "responses_with_numeric_usage": 0,
+    "responses_without_numeric_usage": 1,
+    "provider_error_http_responses": 1,
+    "known_prompt_tokens": 0,
+    "known_completion_tokens": 0,
+    "prompt_tokens": null,
+    "completion_tokens": null,
+    "cached_prompt_tokens": null,
+    "error_statuses": [],
+    "roles": {
+      "optimizer": 1
+    }
+  },
+  "output_directory": "E:\\Programs\\codex\\ReMem-Skillopt\\outputs\\remem\\glm-long-request-recheck-20261028T094104Z"
+}

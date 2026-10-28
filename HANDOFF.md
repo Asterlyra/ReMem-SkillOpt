@@ -102,3 +102,5 @@ v2 七个方法全部已终止：core_00 完成三步，其余六格在优化器
 15:39巡检：R+M已于15:22完成三步，120任务/3优化器逻辑调用/123HTTP、0重试、用量完整；未采用修改，最终仍初始skill .55。第三步确实读到3组同任务历史失败及各1条修改尝试，训练来源/时序/字符上限核对通过，不代表记忆收益。CAM实际PID38092、创建15:22:28，已保存首轮20条训练观察，analyst在途，尚无最终result_action；M-only等待。freeze与真实进程核验通过，见 [R+M终止审计](research/remem/REMEM_FULL_TERMINAL_20261028.json) 和 [记忆检查](research/remem/REMEM_MEMORY_CONTEXT_20261028.json)。
 
 16:09巡检：CAM于16:01在第二步analyst遇到data_inspection_failed，首次即停，队列stopped_provider_contract_failure；CIM确认调度器/CAM均已退出，M-only未启动。第一步候选8/20对初始12/20，最终result_action=reject，group_guard=blocked，仍初始skill .60；仅完成一步。40训练观察先保存，80任务/8优化器逻辑调用/88HTTP、0重试、1份错误响应缺用量，墙钟2320.375秒，测试0。见 [CAM停止审计](research/remem/CAM_HOLD_20261028.json)。指针更新upstream_data_inspection_hold；等待网关核查，不重发被拦请求、不resume原队列、不自动新建恢复版或跳到M-only。主目录freeze通过且干净。巡检保持授权，无变化静默，不重复故障通知。
+
+17:41用户要求VPN配置好后继续，先单次验证原失败训练分析请求：实际socket为10.1.132.25:443，确认内网直连，仍在15.485秒后返回data_inspection_failed/upstream_error，0重试、缺模型/正文/用量。见 [直连真实负载复查](research/remem/GLM_DIRECT_RECHECK_20261028.md)。当前错误在绕过Clash后仍存在，不能据普通连接成功启动实验；未新建实验、未resume旧队列、未启动M-only。每半小时仅只读检查，禁止循环重发，等待网关处理的新证据。R-only/R+M结果和CAM失败现场保留，最终测试关闭。
