@@ -1,0 +1,165 @@
+{
+  "scope": "readonly_arm_checkpoint_audit",
+  "run": "remem_full_42",
+  "model_calls": 0,
+  "queue_entry": {
+    "run": "remem_full_42",
+    "status": "running",
+    "started_at_utc": "2026-10-28T06:25:15.574750+00:00",
+    "pid": 47272
+  },
+  "state": {
+    "last_completed_step": 2,
+    "current_score": 0.55,
+    "best_score": 0.55,
+    "best_step": 0,
+    "current_origin": "initial_skill",
+    "best_origin": "initial_skill"
+  },
+  "event_counts": {
+    "identity": 1,
+    "rollout_started": 6,
+    "rollout_completed": 5,
+    "selection": 3,
+    "checkpoint": 3,
+    "observation": 40,
+    "context": 2,
+    "optimizer_started": 2,
+    "optimizer_completed": 2,
+    "optimizer_response": 2,
+    "proposal_result": 2,
+    "proposal_invalid": 1,
+    "proposal_budget": 2,
+    "gate": 2,
+    "attempt": 2
+  },
+  "selections": [
+    {
+      "n": 20,
+      "passed": 11,
+      "score": 0.55
+    },
+    {
+      "n": 20,
+      "passed": 9,
+      "score": 0.45
+    },
+    {
+      "n": 20,
+      "passed": 9,
+      "score": 0.45
+    }
+  ],
+  "attempts": [
+    {
+      "step": 1,
+      "gate_action": "inconclusive",
+      "adopted": false
+    },
+    {
+      "step": 2,
+      "gate_action": "inconclusive",
+      "adopted": false
+    }
+  ],
+  "gates": [
+    {
+      "action": "inconclusive",
+      "confidence": 0.95,
+      "lower": -0.35,
+      "mean_delta": -0.1,
+      "n": 20,
+      "samples": 10000,
+      "step": 1,
+      "upper": 0.15
+    },
+    {
+      "action": "inconclusive",
+      "confidence": 0.95,
+      "lower": -0.35,
+      "mean_delta": -0.1,
+      "n": 20,
+      "samples": 10000,
+      "step": 2,
+      "upper": 0.15
+    }
+  ],
+  "proposal_results": [
+    {
+      "status": "proposals",
+      "proposal_count": 2,
+      "reason": "other_or_not_applicable"
+    },
+    {
+      "status": "proposals",
+      "proposal_count": 2,
+      "reason": "other_or_not_applicable"
+    }
+  ],
+  "invalid_reasons": {
+    "Evidence outside current permitted training context": 1
+  },
+  "training_observations_by_step": {
+    "1": 20,
+    "2": 20
+  },
+  "observations_before_proposals": [
+    {
+      "step": 1,
+      "prior_observations": 20
+    },
+    {
+      "step": 2,
+      "prior_observations": 20
+    }
+  ],
+  "context_history_groups": [
+    {
+      "step": 1,
+      "groups": 0
+    },
+    {
+      "step": 2,
+      "groups": 0
+    }
+  ],
+  "call_event_counts": {
+    "identity": 1,
+    "execution_started": 1,
+    "http": 104,
+    "start": 2,
+    "done": 2
+  },
+  "execution_finished": [],
+  "transport": {
+    "http_attempts": 104,
+    "http_responses": 102,
+    "logical_calls": 104,
+    "retry_attempts": 0,
+    "request_stages": {
+      "remem_proposal": 2,
+      "rollout": 102
+    },
+    "http_elapsed_s_sum": 4696.522000000172,
+    "http_response_headers_elapsed_s_sum": 4696.522000000172,
+    "logical_timing_complete": false,
+    "logical_call_elapsed_s_sum": null,
+    "successful_http_responses": 102,
+    "reported_usage_responses": 102,
+    "usage_complete": false,
+    "responses_with_numeric_usage": 102,
+    "responses_without_numeric_usage": 0,
+    "provider_error_http_responses": 0,
+    "known_prompt_tokens": 238367,
+    "known_completion_tokens": 695721,
+    "prompt_tokens": null,
+    "completion_tokens": null,
+    "cached_prompt_tokens": null,
+    "error_statuses": [],
+    "roles": {
+      "optimizer": 2,
+      "target": 102
+    }
+  },
+  "test_executions": 0
+}
