@@ -31,3 +31,5 @@ model / choices / usage = missing
 源码/配置/数据冻结不变，已失败的SkillOpt保留；R-only、R+M、CAM、M-only未启动。定时巡检已按用户要求删除，当前“继续”按手动工作处理，不重建定时任务。等待网关处置结果后再确认接续条件，不循环重发被拦请求，不将缺失token填成0，不把失败格当方法得分。
 
 既有证据：[复查说明](GLM_CONTENT_INSPECTION_RECHECK.md)、[安全元数据](GLM_CONTENT_INSPECTION_RECHECK.json)、[暂停版用量](TARGET_TIMEOUT_FIX_PAUSED_USAGE.json)。
+
+2026-10-28新增核对时间：北京时间11:14:17–11:14:33，用户授权单次实际验证，仍为HTTP200/data_inspection_failed/upstream_error，model/choices/usage缺失；同一重建消息哈希与93,388字节正文规模，0重试。见 [新验证记录](GLM_RECHECK_20261028.md)。这次也没有可核验request_id；尚不满足继续试跑条件。
