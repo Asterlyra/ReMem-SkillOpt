@@ -1,0 +1,195 @@
+{
+  "scope": "readonly_completed_diagnostic_arm_audit",
+  "run": "remem_full_42",
+  "model_calls": 0,
+  "queue_entry": {
+    "run": "remem_full_42",
+    "status": "finished",
+    "started_at_utc": "2026-10-28T06:25:15.574750+00:00",
+    "pid": 47272,
+    "exit_code": 0,
+    "elapsed_s": 3432.1089999999967,
+    "finished_at_utc": "2026-10-28T07:22:27.658322+00:00"
+  },
+  "state": {
+    "last_completed_step": 3,
+    "current_score": 0.55,
+    "best_score": 0.55,
+    "best_step": 0,
+    "current_origin": "initial_skill",
+    "best_origin": "initial_skill"
+  },
+  "event_counts": {
+    "identity": 1,
+    "rollout_started": 6,
+    "rollout_completed": 6,
+    "selection": 3,
+    "checkpoint": 4,
+    "observation": 60,
+    "context": 3,
+    "optimizer_started": 3,
+    "optimizer_completed": 3,
+    "optimizer_response": 3,
+    "proposal_result": 3,
+    "proposal_invalid": 2,
+    "proposal_budget": 3,
+    "gate": 2,
+    "attempt": 3
+  },
+  "selections": [
+    {
+      "n": 20,
+      "passed": 11,
+      "score": 0.55
+    },
+    {
+      "n": 20,
+      "passed": 9,
+      "score": 0.45
+    },
+    {
+      "n": 20,
+      "passed": 9,
+      "score": 0.45
+    }
+  ],
+  "attempts": [
+    {
+      "step": 1,
+      "gate_action": "inconclusive",
+      "adopted": false
+    },
+    {
+      "step": 2,
+      "gate_action": "inconclusive",
+      "adopted": false
+    },
+    {
+      "step": 3,
+      "gate_action": "proposal_invalid",
+      "adopted": false
+    }
+  ],
+  "gates": [
+    {
+      "action": "inconclusive",
+      "confidence": 0.95,
+      "lower": -0.35,
+      "mean_delta": -0.1,
+      "n": 20,
+      "samples": 10000,
+      "step": 1,
+      "upper": 0.15
+    },
+    {
+      "action": "inconclusive",
+      "confidence": 0.95,
+      "lower": -0.35,
+      "mean_delta": -0.1,
+      "n": 20,
+      "samples": 10000,
+      "step": 2,
+      "upper": 0.15
+    }
+  ],
+  "proposal_results": [
+    {
+      "status": "proposals",
+      "proposal_count": 2,
+      "reason": "other_or_not_applicable"
+    },
+    {
+      "status": "proposals",
+      "proposal_count": 2,
+      "reason": "other_or_not_applicable"
+    },
+    {
+      "status": "proposals",
+      "proposal_count": 1,
+      "reason": "other_or_not_applicable"
+    }
+  ],
+  "invalid_reasons": {
+    "Evidence outside current permitted training context": 1,
+    "Evidence quote is not present in the recorded trace": 1
+  },
+  "training_observations_by_step": {
+    "1": 20,
+    "2": 20,
+    "3": 20
+  },
+  "observations_before_proposals": [
+    {
+      "step": 1,
+      "prior_observations": 20
+    },
+    {
+      "step": 2,
+      "prior_observations": 20
+    },
+    {
+      "step": 3,
+      "prior_observations": 20
+    }
+  ],
+  "context_history_groups": [
+    {
+      "step": 1,
+      "groups": 0
+    },
+    {
+      "step": 2,
+      "groups": 0
+    },
+    {
+      "step": 3,
+      "groups": 3
+    }
+  ],
+  "call_event_counts": {
+    "identity": 1,
+    "execution_started": 1,
+    "http": 123,
+    "start": 3,
+    "done": 3,
+    "execution_finished": 1
+  },
+  "execution_finished": [
+    {
+      "elapsed_s": 3428.9070000000065,
+      "error_type": null,
+      "scope": "trainer_including_setup_baseline_optimization_summary"
+    }
+  ],
+  "transport": {
+    "http_attempts": 123,
+    "http_responses": 123,
+    "logical_calls": 123,
+    "retry_attempts": 0,
+    "request_stages": {
+      "remem_proposal": 3,
+      "rollout": 120
+    },
+    "http_elapsed_s_sum": 5795.413000000117,
+    "http_response_headers_elapsed_s_sum": 5795.413000000117,
+    "logical_timing_complete": true,
+    "logical_call_elapsed_s_sum": 5798.219000000274,
+    "successful_http_responses": 123,
+    "reported_usage_responses": 123,
+    "usage_complete": true,
+    "responses_with_numeric_usage": 123,
+    "responses_without_numeric_usage": 0,
+    "provider_error_http_responses": 0,
+    "known_prompt_tokens": 335154,
+    "known_completion_tokens": 837743,
+    "prompt_tokens": 335154,
+    "completion_tokens": 837743,
+    "cached_prompt_tokens": 46464,
+    "error_statuses": [],
+    "roles": {
+      "optimizer": 3,
+      "target": 120
+    }
+  },
+  "test_executions": 0
+}

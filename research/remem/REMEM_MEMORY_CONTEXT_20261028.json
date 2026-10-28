@@ -1,0 +1,56 @@
+{
+  "scope": "readonly_persisted_memory_context_audit",
+  "model_calls": 0,
+  "contexts": [
+    {
+      "step": 1,
+      "history_groups": 0,
+      "history_characters": 2,
+      "history_within_character_cap": true,
+      "current_training_only": true,
+      "memory_training_only": true,
+      "memory_matches_current_tasks": true,
+      "memory_validation_overlap": 0,
+      "past_observations_only": true,
+      "past_attempts_only": true,
+      "stored_attempts_per_group": [],
+      "trace_context_truncated_per_group": []
+    },
+    {
+      "step": 2,
+      "history_groups": 0,
+      "history_characters": 2,
+      "history_within_character_cap": true,
+      "current_training_only": true,
+      "memory_training_only": true,
+      "memory_matches_current_tasks": true,
+      "memory_validation_overlap": 0,
+      "past_observations_only": true,
+      "past_attempts_only": true,
+      "stored_attempts_per_group": [],
+      "trace_context_truncated_per_group": []
+    },
+    {
+      "step": 3,
+      "history_groups": 3,
+      "history_characters": 10769,
+      "history_within_character_cap": true,
+      "current_training_only": true,
+      "memory_training_only": true,
+      "memory_matches_current_tasks": true,
+      "memory_validation_overlap": 0,
+      "past_observations_only": true,
+      "past_attempts_only": true,
+      "stored_attempts_per_group": [
+        1,
+        1,
+        1
+      ],
+      "trace_context_truncated_per_group": [
+        true,
+        true,
+        true
+      ]
+    }
+  ]
+}
