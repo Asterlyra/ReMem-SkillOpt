@@ -37,7 +37,55 @@ def validate_edit(edit: dict, skill: str) -> None:
         raise ValueError("Protected region marker")
 
 
-def validate_proposal(proposal: dict, skill: str, visible_events: set[str], store: EventStore) -> None:
+def _resolve(ref: dict, visible_events: set[str], store: EventStore) -> tuple[dict, dict] | None:
+    """Return (event, artifact) only when the reference is valid exactly as written."""
+    event_id = ref.get("event_id")
+    if event_id not in visible_events:
+        return None
+    event = store.get(event_id)
+    if not event or event.get("source_split") != "train" or event.get("artifact_hash") != ref.get("artifact_hash"):
+        return None
+    try:
+        artifact = store.read_artifact(ref["artifact_hash"])
+    except (ValueError, KeyError):
+        return None
+    quote = ref.get("quote")
+    if not isinstance(quote, str) or quote not in artifact.get("trace", ""):
+        return None
+    return event, artifact
+
+
+def _rebind(quote: str, visible_events: set[str], store: EventStore) -> list[tuple[str, str]]:
+    """Visible training events whose recorded trace contains ``quote`` verbatim.
+
+    Only events already inside the permitted training context are considered, so
+    re-binding can never widen what the optimizer was allowed to see.
+    """
+    matches: list[tuple[str, str]] = []
+    for event_id in sorted(visible_events):
+        event = store.get(event_id)
+        if not event or event.get("source_split") != "train":
+            continue
+        try:
+            artifact = store.read_artifact(event["artifact_hash"])
+        except (ValueError, KeyError):
+            continue
+        if quote in artifact.get("trace", ""):
+            matches.append((event_id, event["artifact_hash"]))
+    return matches
+
+
+def validate_proposal(proposal: dict, skill: str, visible_events: set[str], store: EventStore) -> list[dict]:
+    """Validate an evidence-bound repair proposal.
+
+    Returns the list of evidence re-bindings that were needed, so the caller can
+    record them. A quote that exists verbatim in exactly one *visible* training
+    trace is re-bound to that trace: pairing a real quote with the wrong artifact
+    is a clerical mistake, not fabricated evidence, and previously it discarded
+    the entire proposal — including the ones citing the most evidence. A quote
+    found nowhere visible, or ambiguously in several traces, is still rejected,
+    so the "evidence must be real and inside the permitted context" rule holds.
+    """
     required = {"proposal_id", "skill_before_hash", "failure_case_ids", "evidence_refs", "diagnosis",
                 "target_rule_id", "repair_operator", "patch", "expected_observation", "preserve_cases"}
     if not isinstance(proposal, dict) or set(proposal) != required:
@@ -57,18 +105,30 @@ def validate_proposal(proposal: dict, skill: str, visible_events: set[str], stor
     if not isinstance(refs, list) or not refs:
         raise ValueError("Evidence is required")
     supported = set()
-    for ref in refs:
+    repairs: list[dict] = []
+    for index, ref in enumerate(refs):
         if not isinstance(ref, dict) or set(ref) != {"event_id", "artifact_hash", "quote"}:
             raise ValueError("Invalid evidence reference")
-        if ref["event_id"] not in visible_events:
-            raise ValueError("Evidence outside current permitted training context")
-        event = store.get(ref["event_id"])
-        if not event or event.get("source_split") != "train" or event.get("artifact_hash") != ref["artifact_hash"]:
-            raise ValueError("Unknown training evidence")
-        artifact = store.read_artifact(ref["artifact_hash"])
         quote = ref["quote"]
-        if not isinstance(quote, str) or len(quote.strip()) < 8 or quote not in artifact["trace"]:
+        if not isinstance(quote, str) or len(quote.strip()) < 8:
             raise ValueError("Evidence quote is not present in the recorded trace")
+        resolved = _resolve(ref, visible_events, store)
+        if resolved is None:
+            candidates = _rebind(quote, visible_events, store)
+            if len(candidates) == 1:
+                event_id, artifact_hash = candidates[0]
+                repairs.append({"index": index,
+                                "from": {"event_id": ref["event_id"], "artifact_hash": ref["artifact_hash"]},
+                                "to": {"event_id": event_id, "artifact_hash": artifact_hash}})
+                ref["event_id"], ref["artifact_hash"] = event_id, artifact_hash
+                resolved = _resolve(ref, visible_events, store)
+            elif not candidates:
+                if ref["event_id"] not in visible_events:
+                    raise ValueError("Evidence outside current permitted training context")
+                raise ValueError("Evidence quote is not present in the recorded trace")
+            else:
+                raise ValueError("Evidence quote matches multiple visible training artifacts")
+        event, _artifact = resolved
         if event["outcome"] == "failure":
             supported.add(digest(canonical([event["task_id"], event["failure_kind"]])))
     if not set(proposal["failure_case_ids"]).issubset(supported):
@@ -86,3 +146,4 @@ def validate_proposal(proposal: dict, skill: str, visible_events: set[str], stor
     rules = rule_index(skill)
     if proposal["target_rule_id"] not in rules or rules[proposal["target_rule_id"]] != edit.get("target", ""):
         raise ValueError("Rule ID and exact version anchor disagree")
+    return repairs

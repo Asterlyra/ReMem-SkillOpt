@@ -109,7 +109,11 @@ class ReMemRuntime(RuntimeAudit):
         for i, proposal in enumerate(saved["proposals"]):
             try:
                 if self.options.repair:
-                    validate_proposal(proposal, skill, allowed, self.store)
+                    repairs = validate_proposal(proposal, skill, allowed, self.store)
+                    if repairs:
+                        self.store.append(f"rebound:{self.step}:{i}", "proposal_rebound",
+                                          {"step": self.step, "index": i, "proposal_id": proposal.get("proposal_id"),
+                                           "repairs": repairs})
                     if proposal["proposal_id"] in proposal_ids:
                         raise ValueError("Duplicate proposal ID")
                     proposal_ids.add(proposal["proposal_id"])

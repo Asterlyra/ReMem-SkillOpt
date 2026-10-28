@@ -61,6 +61,9 @@ class ProposalResult:
     status: str
     proposals: list[dict] = field(default_factory=list)
     reason: str = ""
+    # How the optimizer reply was recovered: bare_json, fenced_json,
+    # repaired_json or no_json. Recorded so a fence strip stays visible.
+    parse: str = "bare_json"
 
 
 class MemoryStrategy(Protocol):
