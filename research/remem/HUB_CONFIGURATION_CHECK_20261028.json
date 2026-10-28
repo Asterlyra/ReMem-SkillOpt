@@ -1,0 +1,59 @@
+{
+  "scope": "user_requested_interface_and_key_configuration_check",
+  "created_at_utc": "2026-10-28T05:24:22.155819+00:00",
+  "requested_model": "glm",
+  "sdk_base_url": "https://hub.zgci.org/v1",
+  "actual_chat_endpoint": "https://hub.zgci.org/v1/chat/completions",
+  "credentials_printed_or_persisted": false,
+  "config_modified": false,
+  "real_chat_call_cap": 1,
+  "retries": 0,
+  "experiment_started": false,
+  "optimizer_key_present": true,
+  "provided_key_matches_optimizer": true,
+  "optimizer_endpoint_correct": true,
+  "target_key_present": true,
+  "provided_key_matches_target": true,
+  "target_endpoint_correct": true,
+  "website": {
+    "error_type": "ConnectError"
+  },
+  "model_listing": {
+    "error_type": "ConnectError"
+  },
+  "chat": {
+    "status": "valid_reply",
+    "response_model": "glm-5.3-private-19428658",
+    "has_choices": true,
+    "nonempty_content": true,
+    "is_ok": true,
+    "provider_error_present": false,
+    "finish_reason": "stop"
+  },
+  "transport": {
+    "http_attempts": 1,
+    "http_responses": 1,
+    "logical_calls": 1,
+    "retry_attempts": 0,
+    "request_stages": {
+      "minimal_glm_configuration_check": 1
+    },
+    "http_elapsed_s_sum": 1.6400000000139698,
+    "http_response_headers_elapsed_s_sum": 1.6400000000139698,
+    "logical_timing_complete": true,
+    "logical_call_elapsed_s_sum": 1.922000000020489,
+    "successful_http_responses": 1,
+    "reported_usage_responses": 1,
+    "usage_complete": true,
+    "known_prompt_tokens": 20,
+    "known_completion_tokens": 40,
+    "prompt_tokens": 20,
+    "completion_tokens": 40,
+    "cached_prompt_tokens": 0,
+    "error_statuses": [],
+    "roles": {
+      "optimizer": 1
+    }
+  },
+  "output_directory": "E:\\Programs\\codex\\ReMem-Skillopt\\outputs\\remem\\hub-interface-check-20261028T052422Z"
+}

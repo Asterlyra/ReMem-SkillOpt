@@ -1,0 +1,50 @@
+{
+  "scope": "single_inventory_read_after_connection_failure",
+  "new_llm_calls": 0,
+  "get_attempt_cap": 1,
+  "retries": 0,
+  "status": "ok",
+  "ids": [
+    "bge-m3",
+    "bge-reranker-v2-m3",
+    "cosy-voice",
+    "face-detect",
+    "face-embed",
+    "gemma4:26b",
+    "glm",
+    "glm-anthropic",
+    "minimax-h3",
+    "qwen",
+    "qwen-asr",
+    "qwen-image",
+    "qwen3-embedding:4b",
+    "smart-router",
+    "smart-router-v2"
+  ],
+  "glm_listed": true,
+  "transport": {
+    "http_attempts": 1,
+    "http_responses": 1,
+    "logical_calls": 1,
+    "retry_attempts": 0,
+    "request_stages": {
+      "model_inventory_read": 1
+    },
+    "http_elapsed_s_sum": 0.10899999999674037,
+    "http_response_headers_elapsed_s_sum": 0.10899999999674037,
+    "logical_timing_complete": true,
+    "logical_call_elapsed_s_sum": 0.26500000001396984,
+    "successful_http_responses": 1,
+    "reported_usage_responses": 0,
+    "usage_complete": false,
+    "known_prompt_tokens": 0,
+    "known_completion_tokens": 0,
+    "prompt_tokens": null,
+    "completion_tokens": null,
+    "cached_prompt_tokens": null,
+    "error_statuses": [],
+    "roles": {
+      "optimizer": 1
+    }
+  }
+}
