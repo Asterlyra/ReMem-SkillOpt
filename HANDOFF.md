@@ -104,3 +104,5 @@ v2 七个方法全部已终止：core_00 完成三步，其余六格在优化器
 16:09巡检：CAM于16:01在第二步analyst遇到data_inspection_failed，首次即停，队列stopped_provider_contract_failure；CIM确认调度器/CAM均已退出，M-only未启动。第一步候选8/20对初始12/20，最终result_action=reject，group_guard=blocked，仍初始skill .60；仅完成一步。40训练观察先保存，80任务/8优化器逻辑调用/88HTTP、0重试、1份错误响应缺用量，墙钟2320.375秒，测试0。见 [CAM停止审计](research/remem/CAM_HOLD_20261028.json)。指针更新upstream_data_inspection_hold；等待网关核查，不重发被拦请求、不resume原队列、不自动新建恢复版或跳到M-only。主目录freeze通过且干净。巡检保持授权，无变化静默，不重复故障通知。
 
 17:41用户要求VPN配置好后继续，先单次验证原失败训练分析请求：实际socket为10.1.132.25:443，确认内网直连，仍在15.485秒后返回data_inspection_failed/upstream_error，0重试、缺模型/正文/用量。见 [直连真实负载复查](research/remem/GLM_DIRECT_RECHECK_20261028.md)。当前错误在绕过Clash后仍存在，不能据普通连接成功启动实验；未新建实验、未resume旧队列、未启动M-only。每半小时仅只读检查，禁止循环重发，等待网关处理的新证据。R-only/R+M结果和CAM失败现场保留，最终测试关闭。
+
+17:53用户要求整理实验进度交给DeepSeek harness。已生成 [独立接手文档](research/remem/DEEPSEEK_HARNESS_HANDOFF_20261028.md)，包含方法/环境/冻结版本、七方法跨版本进度、当前三格结果及用量、VPN直连仍失败证据、只读检查命令、未完成项和执行边界。本文整理时主目录freeze通过、无该study实验进程，未启动新实验。旧remem-30巡检仍ACTIVE，交接文档明确提示接手前协调单一执行者，未擅自关闭用户授权巡检。
