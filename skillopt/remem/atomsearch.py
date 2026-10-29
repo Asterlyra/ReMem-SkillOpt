@@ -404,6 +404,24 @@ class AtomSearchRuntime(RuntimeAudit):
                     tree.attach(index, child, score, kept)
                 completed = attempt
                 self._checkpoint(tree, completed)
+            except ProposalInvalid as exc:
+                # A structural-contract violation is a failure of *this node's*
+                # proposal, not a reason to abandon a budget-limited search. It is
+                # recorded and scored as a zero-reward expansion so the tree moves
+                # on; previously it propagated out of run() and destroyed the whole
+                # arm (observed 2026-10-29: glm emitted a specification whose field
+                # set was wrong, and the arm died at proposal 2 of 30).
+                cause = exc.__cause__
+                self.store.append(
+                    f"atom_proposal_invalid:{attempt}", "atom_proposal_invalid",
+                    {"step": attempt, "node": index, "reason": str(exc),
+                     "cause_type": type(cause).__name__ if cause else None,
+                     "cause": str(cause) if cause else None})
+                tree.backup(index, tree.nodes[0].score)
+                self._remember(node.skill, node.skill, [], "contract_invalid")
+                completed = attempt
+                self._checkpoint(tree, completed)
+                continue
             except BudgetExhausted:
                 status = "budget_exhausted"
                 # Stop is terminal: partial work is audited but never silently replayed.
@@ -419,7 +437,8 @@ class AtomSearchRuntime(RuntimeAudit):
             "final_skill": str(final), "final_skill_hash": digest(recommended.skill),
             "best_validation_skill_hash": digest(tree.best_skill), "test_executions": 0,
             "task_executions": sum(r["tasks"] for r in self.store.records("rollout_started")),
-            "nodes": len(tree.nodes), "refills": self.refills}
+            "nodes": len(tree.nodes), "refills": self.refills,
+            "contract_invalid_proposals": len(self.store.records("atom_proposal_invalid"))}
         self.store.append("atom_finished", "atom_finished", {"artifact_hash": self.store.artifact({
             "summary": summary, "nodes": [asdict(n) for n in tree.nodes], "memory": self.memory})})
         (self.root / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")

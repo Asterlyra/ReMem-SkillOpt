@@ -109,6 +109,38 @@ def make_runtime(tmp_path, chat=None, **options):
     return runtime, adapter, prompts, loader
 
 
+def test_contract_invalid_proposal_fails_the_node_not_the_whole_search(tmp_path):
+    """A malformed proposal must not destroy a budget-limited search.
+
+    On 2026-10-29 glm returned a specification whose field set was wrong and
+    `ProposalInvalid` propagated out of run(), killing the arm at proposal 2 of 30.
+    The violation is now recorded and scored as a zero-reward expansion.
+    """
+    malformed = canonical({"status": "proposals", "reason": "malformed",
+                           "specifications": [{"id": "0"}],
+                           "edits": [{"criterion_id": "0", "operation": "add",
+                                      "rule_id": "document_end", "content": "CHECK"}]})
+    calls = {"n": 0}
+
+    def flaky(**kwargs):
+        calls["n"] += 1
+        assert runtime.store.records("observation")
+        if calls["n"] == 1:
+            return malformed, {}
+        return reply(), {}
+
+    runtime, adapter, _, _ = make_runtime(tmp_path, chat=flaky)
+    result = runtime.run()
+
+    assert result["contract_invalid_proposals"] == 1
+    events = runtime.store.records("atom_proposal_invalid")
+    assert len(events) == 1
+    assert events[0]["cause"] == "specification fields"
+    # The search still produced and evaluated a candidate afterwards.
+    assert result["nodes"] >= 2
+    assert result["status"] != "tree_exhausted" or result["total_steps"] >= 1
+
+
 def test_real_search_composition_memory_isolation_and_resume(tmp_path):
     runtime, adapter, prompts, loader = make_runtime(tmp_path)
     result = runtime.run()
@@ -144,13 +176,22 @@ def test_budget_stops_without_overshoot_and_keeps_evaluated_child(tmp_path):
     assert len(adapter.calls) == before
 
 
-def test_bad_proposal_does_not_silently_become_no_change(tmp_path):
+def test_bad_proposal_is_recorded_per_node_and_never_silently_becomes_no_change(tmp_path):
+    """A contract violation must be auditable, but must not destroy the search.
+
+    Superseded semantics: this used to assert that ProposalInvalid escaped run().
+    The arm-level abort was replaced by a recorded, zero-reward node failure on
+    2026-10-29, because one malformed glm proposal killed a 30-attempt search.
+    What must still hold: it is never treated as a legitimate "no change", it is
+    always recorded, and the run reports it.
+    """
     runtime, _, _, _ = make_runtime(tmp_path, chat=lambda **kwargs: ("bad JSON", {}))
-    with pytest.raises(ProposalInvalid):
-        runtime.run()
-    assert runtime.store.records("proposal_invalid")
+    result = runtime.run()
+    assert runtime.store.records("atom_proposal_invalid")
+    assert not runtime.store.records("atom_no_change")
     assert runtime.store.records("observation")
-    assert not (runtime.root / "summary.json").exists()
+    assert result["contract_invalid_proposals"] >= 1
+    assert (runtime.root / "summary.json").exists()
 
 
 def test_optimizer_service_failure_is_recorded_and_cannot_become_no_change_or_silent_resume(tmp_path):
